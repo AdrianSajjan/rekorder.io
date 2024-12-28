@@ -127,18 +127,27 @@ export const theme = {
     ].join(', '),
   },
 
+  screens: {
+    xxs: 320,
+    xs: 420,
+    sm: 640,
+    md: 768,
+    lg: 1024,
+    xl: 1280,
+    '2xl': 1536,
+  },
+
   shadow(_color?: string) {
-    const color = _color || theme.alpha(this.colors.core.black, 0.1);
-    const lighter = color || theme.alpha(this.colors.core.black, 0.05);
-    const darker = color || theme.alpha(this.colors.core.black, 0.25);
+    const color = _color || theme.alpha(this.colors.core.black, 0.05);
+    const darker = _color || theme.alpha(this.colors.core.black, 0.25);
     return {
-      xs: `0px 1px 2px 0px ${lighter}`,
+      xs: `0px 1px 2px 0px ${color}`,
       sm: `0 1px 3px 0px ${color}, 0 1px 2px -1px ${color}`,
       md: `0 4px 6px -1px ${color}, 0 2px 4px -2px ${color}`,
       lg: `0 10px 15px -3px ${color}, 0 4px 6px -4px ${color}`,
       xl: `0 20px 25px -5px ${color}, 0 8px 10px -6px ${color}`,
       '2xl': `0 25px 50px -12px ${darker}`,
-      inner: `inset 0 2px 4px 0 ${lighter}`,
+      inner: `inset 0 2px 4px 0 ${color}`,
     };
   },
 

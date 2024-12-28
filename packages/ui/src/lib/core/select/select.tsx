@@ -57,9 +57,9 @@ const SelectInputCSS = css.resolve`
 
     cursor: pointer;
     font-weight: 400;
-    background-color: transparent;
     font-family: ${theme.fonts.default};
     color: ${theme.colors.background.text};
+    background-color: ${theme.colors.core.white};
 
     box-shadow: ${theme.shadow().xs};
     border: 1px solid ${theme.colors.borders.input};
@@ -171,7 +171,7 @@ const SelectContentCSS = css.resolve`
     min-width: var(--radix-select-trigger-width);
     background-color: ${theme.colors.core.white};
 
-    padding: ${theme.space(2)};
+    padding: ${theme.space(1.5)};
     font-family: ${theme.fonts.default};
     border: 1px solid ${theme.colors.borders.input};
   }
@@ -199,7 +199,7 @@ const SelectContentCSS = css.resolve`
     justify-content: space-between;
     gap: ${theme.space(3)};
 
-    padding: ${theme.space(2)} ${theme.space(3)};
+    padding: ${theme.space(2.5)} ${theme.space(3.5)};
     border-radius: ${theme.space(1.5)};
     font-size: 14px;
 

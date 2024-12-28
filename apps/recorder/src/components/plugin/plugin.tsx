@@ -1,23 +1,66 @@
+import clsx from 'clsx';
 import Draggable from 'react-draggable';
+import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
-import { useRef } from 'react';
-import css from 'styled-jsx/css';
-import { HandGrabbing, SquaresFour, Video } from '@phosphor-icons/react';
+import { Fragment, useRef } from 'react';
+import { SquaresFour, VideoCamera } from '@phosphor-icons/react';
 
 import { useWindowDimensions } from '@rekorder.io/hooks';
-import { Button, Divider, SegmentedControl } from '@rekorder.io/ui';
+import { AnimateHeight, Button, HorizontalTabs, SegmentedControl, theme } from '@rekorder.io/ui';
 
 import { measureElement } from '../../lib/utils';
 import { recorder } from '../../store/recorder';
 import { SAFE_AREA_PADDING } from '../../constants/layout';
-import clsx from 'clsx';
+import { CameraPlugin } from './camera';
 
 const PluginCardCSS = css.resolve`
   .container {
+    position: absolute;
+    width: 100%;
+    max-width: ${theme.screens.xs}px;
   }
 
   .card {
+    width: 100%;
+    padding-top: ${theme.space(8)};
+    padding-bottom: ${theme.space(6)};
+
+    box-shadow: ${theme.shadow().lg};
+    border: 1px solid ${theme.colors.borders.input};
+    background-color: ${theme.colors.core.white};
+    border-radius: ${theme.space(4)};
+  }
+
+  .segmented-list {
+    margin: 0 auto;
+    width: ${theme.space(70)} !important;
+  }
+
+  .segmented-panel {
+    margin-top: ${theme.space(5)};
+  }
+
+  .horizontal-panel {
+    padding: ${theme.space(6)};
+    background-color: ${theme.colors.background.light};
+  }
+
+  .footer {
+    border-top: 1px solid ${theme.colors.borders.input};
+    padding: ${theme.space(6)} ${theme.space(6)} 0;
+  }
+
+  .record-button {
+    width: 100%;
+    position: relative;
+  }
+
+  .record-button-command {
+    position: absolute;
+    top: 50%;
+    right: ${theme.space(4)};
+    transform: translateY(-50%);
   }
 `;
 
@@ -30,7 +73,7 @@ const PluginCardHOC = observer(() => {
 });
 
 const PluginCard = observer(() => {
-  const plugin$ = useRef<HTMLDivElement>(null!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+  const plugin$ = useRef<HTMLDivElement>(null!);
 
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const { height: pluginHeight, width: pluginWidth } = measureElement(plugin$.current, { height: 526, width: 448 });
@@ -59,41 +102,57 @@ const PluginCard = observer(() => {
   };
 
   return (
-    <Draggable nodeRef={plugin$} handle="#plugin-handle" defaultPosition={defaultPosition} bounds={bounds}>
-      <div ref={plugin$} className={clsx(PluginCardCSS.className, 'container')}>
-        <article className={clsx(PluginCardCSS.className, 'card')}>
-          <SegmentedControl defaultValue="record">
-            <SegmentedControl.List>
-              <SegmentedControl.Trigger value="record">
-                <SegmentedControl.TriggerIcon>
-                  <Video size={20} />
-                </SegmentedControl.TriggerIcon>
-                <span>Record</span>
-              </SegmentedControl.Trigger>
-              <SegmentedControl.Trigger value="video">
-                <SegmentedControl.TriggerIcon>
-                  <SquaresFour size={20} />
-                </SegmentedControl.TriggerIcon>
-                <span>Videos</span>
-              </SegmentedControl.Trigger>
-            </SegmentedControl.List>
-            <SegmentedControl.Panel value="record">
-              <div className="p-0"></div>
-              <Divider />
-              <div className="pt-5">
-                <Button onClick={handleScreenCapture}>
-                  <span>{recorder.status === 'pending' ? 'Cancel Recording' : 'Start Recording'}</span>
-                  <span>⌥⇧D</span>
-                </Button>
-              </div>
-            </SegmentedControl.Panel>
-            <SegmentedControl.Panel value="video">
-              <div>Coming Soon!</div>
-            </SegmentedControl.Panel>
-          </SegmentedControl>
-        </article>
-      </div>
-    </Draggable>
+    <Fragment>
+      {PluginCardCSS.styles}
+      <Draggable nodeRef={plugin$} defaultPosition={defaultPosition} bounds={bounds}>
+        <div ref={plugin$} className={clsx(PluginCardCSS.className, 'container')}>
+          <article className={clsx(PluginCardCSS.className, 'card')}>
+            <SegmentedControl
+              size="small"
+              defaultValue="record"
+              className={clsx(PluginCardCSS.className, 'segmented-controls')}
+            >
+              <SegmentedControl.List className={clsx(PluginCardCSS.className, 'segmented-list')}>
+                <SegmentedControl.Trigger value="record">
+                  <SegmentedControl.TriggerIcon>
+                    <VideoCamera weight="fill" size={20} />
+                  </SegmentedControl.TriggerIcon>
+                  <span>Record</span>
+                </SegmentedControl.Trigger>
+                <SegmentedControl.Trigger value="video" disabled>
+                  <SegmentedControl.TriggerIcon>
+                    <SquaresFour size={20} />
+                  </SegmentedControl.TriggerIcon>
+                  <span>Videos</span>
+                </SegmentedControl.Trigger>
+              </SegmentedControl.List>
+              <SegmentedControl.Panel value="record" className={clsx(PluginCardCSS.className, 'segmented-panel')}>
+                <HorizontalTabs defaultValue="screen">
+                  <HorizontalTabs.List>
+                    <HorizontalTabs.Trigger value="screen">Screen</HorizontalTabs.Trigger>
+                    <HorizontalTabs.Trigger value="camera">Camera</HorizontalTabs.Trigger>
+                    <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
+                  </HorizontalTabs.List>
+                  <AnimateHeight className={clsx(PluginCardCSS.className, 'horizontal-panel')}>
+                    <HorizontalTabs.Panel value="screen">Screen</HorizontalTabs.Panel>
+                    <HorizontalTabs.Panel value="camera">
+                      <CameraPlugin />
+                    </HorizontalTabs.Panel>
+                    <HorizontalTabs.Panel value="audio">Audio</HorizontalTabs.Panel>
+                  </AnimateHeight>
+                </HorizontalTabs>
+                <div className={clsx(PluginCardCSS.className, 'footer')}>
+                  <Button onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'record-button')}>
+                    <span>{recorder.status === 'pending' ? 'Cancel Recording' : 'Start Recording'}</span>
+                    <span className={clsx(PluginCardCSS.className, 'record-button-command')}>⌥⇧D</span>
+                  </Button>
+                </div>
+              </SegmentedControl.Panel>
+            </SegmentedControl>
+          </article>
+        </div>
+      </Draggable>
+    </Fragment>
   );
 });
 

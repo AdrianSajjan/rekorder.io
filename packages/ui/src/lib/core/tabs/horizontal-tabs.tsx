@@ -27,7 +27,6 @@ const HorizontalTabsCSS = css.resolve`
 
   .control {
     font-family: ${theme.fonts.default};
-    border-bottom: 1px solid ${theme.colors.borders.input};
   }
 
   .list {
@@ -42,6 +41,7 @@ const HorizontalTabsCSS = css.resolve`
 
     font-weight: 500;
     font-size: 14px;
+    border-bottom: 1px solid ${theme.colors.borders.input};
   }
 
   .trigger {

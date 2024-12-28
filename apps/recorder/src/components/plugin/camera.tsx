@@ -1,46 +1,94 @@
-import { observer } from "mobx-react";
+import css from 'styled-jsx/css';
+import clsx from 'clsx';
 
-import { VideoIcon, VideoOffIcon } from "lucide-react";
+import { observer } from 'mobx-react';
+import { Fragment } from 'react/jsx-runtime';
+import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 
-import { AccordionContent, AccordionItem, AccordionTrigger } from "@screenify.io/ui/components/ui/accordion";
-import { Badge } from "@screenify.io/ui/components/ui/badge";
-import { Label } from "@screenify.io/ui/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@screenify.io/ui/components/ui/select";
-import { Switch } from "@screenify.io/ui/components/ui/switch";
+import { Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 
-import { camera } from "@screenify.io/recorder/store/camera";
-import { useFetchUserCameraDevices } from "@screenify.io/recorder/hooks/use-camera";
+import { useFetchUserCameraDevices } from '../../hooks/use-camera';
+import { camera } from '../../store/camera';
+
+const CameraPluginCSS = css.resolve`
+  .camera-plugin-container {
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.space(5)};
+  }
+
+  .camera-select-input {
+    width: 100%;
+  }
+
+  .camera-select-value {
+    display: flex;
+    align-items: center;
+    gap: ${theme.space(3)};
+    flex: 1;
+  }
+
+  .camera-select-badge {
+    margin-left: auto;
+  }
+
+  .camera-flip,
+  .camera-effects {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: ${theme.space(3)};
+  }
+
+  .camera-flip-label,
+  .camera-effects-label {
+    font-size: 14px;
+  }
+`;
 
 const CameraPlugin = observer(() => {
   const cameras = useFetchUserCameraDevices();
 
   return (
-    <AccordionItem value="camera" className="shadow-none border-0 rounded-none">
-      <AccordionTrigger className="bg-background">Camera</AccordionTrigger>
-      <AccordionContent className="bg-background p-6 space-y-5">
+    <Fragment>
+      {CameraPluginCSS.styles}
+      <div className={clsx(CameraPluginCSS.className, 'camera-plugin-container')}>
         <Select value={camera.device} onValueChange={camera.changeDevice}>
-          <SelectTrigger className="">
-            <div className="flex items-center gap-2 flex-1">
-              {camera.device === "n/a" ? <VideoOffIcon size={20} /> : <VideoIcon size={20} />}
-              {camera.device === "n/a" ? "No Camera" : cameras.find((c) => c.deviceId === camera.device)?.label}
-              {camera.device === "n/a" ? <Badge className="ml-auto rounded-full">Off</Badge> : null}
+          <Select.Input className={clsx(CameraPluginCSS.className, 'camera-select-input')}>
+            <div className={clsx(CameraPluginCSS.className, 'camera-select-value')}>
+              {camera.device === 'n/a' ? <VideoCameraSlash size={20} /> : <VideoCamera size={20} />}
+              {camera.device === 'n/a' ? 'No Camera' : cameras.find((c) => c.deviceId === camera.device)?.label}
+              {camera.device === 'n/a' ? (
+                <StatusBadge className={clsx(CameraPluginCSS.className, 'camera-select-badge')} variant="error">
+                  Off
+                </StatusBadge>
+              ) : null}
             </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="n/a">No Camera</SelectItem>
+          </Select.Input>
+          <Select.Content>
+            <Select.Item value="n/a">No Camera</Select.Item>
             {cameras.map((camera, index) => (
-              <SelectItem key={camera.deviceId} value={camera.deviceId}>
+              <Select.Item key={camera.deviceId} value={camera.deviceId}>
                 {camera.label || `Camera ${index + 1}`}
-              </SelectItem>
+              </Select.Item>
             ))}
-          </SelectContent>
+          </Select.Content>
         </Select>
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="flip-camera">Flip Camera</Label>
-          <Switch id="flip-camera" checked={camera.flip} onCheckedChange={camera.updateFlip} />
+        <div className={clsx(CameraPluginCSS.className, 'camera-flip')}>
+          <label className={clsx(CameraPluginCSS.className, 'camera-flip-label')} htmlFor="flip-camera">
+            Flip Camera
+          </label>
+          <Switch id="flip-camera" size="small" checked={camera.flip} onCheckedChange={camera.updateFlip} />
         </div>
-      </AccordionContent>
-    </AccordionItem>
+        <div className={clsx(CameraPluginCSS.className, 'camera-effects')}>
+          <label className={clsx(CameraPluginCSS.className, 'camera-effects-label')} htmlFor="camera-effects">
+            Camera Effects
+          </label>
+          <Switch id="camera-effects" size="small" />
+        </div>
+      </div>
+    </Fragment>
   );
 });
 

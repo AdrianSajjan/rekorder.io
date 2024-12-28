@@ -6,7 +6,7 @@ import { theme } from '../../theme';
 
 interface SwitchProps extends SwitchPrimitive.SwitchProps {
   thumb?: SwitchPrimitive.SwitchThumbProps;
-  size: 'small' | 'medium';
+  size?: 'small' | 'medium';
 }
 
 const SwitchCSS = css.resolve`
@@ -59,7 +59,7 @@ const SwitchCSS = css.resolve`
   }
 
   .root:not(:disabled):active {
-    --thumb-scale: 0.85;
+    --thumb-scale: 0.9;
   }
 
   .root[data-state='checked'] {
@@ -100,7 +100,7 @@ const SwitchCSS = css.resolve`
   .thumb::before {
     content: '';
 
-    display: block;
+    display: flex;
     position: absolute;
 
     top: 50%;
@@ -118,8 +118,8 @@ const SwitchCSS = css.resolve`
   }
 
   .thumb.small::before {
-    width: ${theme.space(1.25)};
-    height: ${theme.space(1.25)};
+    width: ${theme.space(1)};
+    height: ${theme.space(1)};
   }
 
   .root:not(:disabled):hover .thumb::before {
