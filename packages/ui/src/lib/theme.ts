@@ -1,0 +1,177 @@
+interface Ring {
+  width: number;
+  color: string;
+}
+
+export const theme = {
+  colors: {
+    primary: {
+      light: '#6366f1',
+      main: '#4f46e5',
+      dark: '#4338ca',
+      text: '#fff',
+    },
+    destructive: {
+      light: '#ef4444',
+      main: '#dc2626',
+      dark: '#b91c1c',
+      text: '#fff',
+    },
+    accent: {
+      light: '#d3d3d3',
+      main: '#a3a3a3',
+      dark: '#5c5c5c',
+      text: '#000',
+    },
+    success: {
+      light: '#22c55e',
+      main: '#16a34a',
+      dark: '#15803d',
+      text: '#fff',
+    },
+    info: {
+      light: '#0ea5e9',
+      main: '#0284c7',
+      dark: '#0369a1',
+      text: '#fff',
+    },
+    warning: {
+      light: '#f59e0b',
+      main: '#d97706',
+      dark: '#b45309',
+      text: '#fff',
+    },
+    background: {
+      light: '#f5f5f5',
+      main: '#eaeaea',
+      dark: '#d6d6d6',
+      text: '#000',
+    },
+    borders: {
+      input: '#e1e4ea',
+    },
+    core: {
+      black: '#0a0d14',
+      white: '#ffffff',
+    },
+    text: {
+      muted: '#969696',
+    },
+  },
+
+  resetCSS: `
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    * {
+      margin: 0;
+    }
+
+    body {
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img,
+    picture,
+    video,
+    canvas,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    input,
+    button,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      overflow-wrap: break-word;
+    }
+
+    p {
+      text-wrap: pretty;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      text-wrap: balance;
+    }
+  `,
+
+  fonts: {
+    default: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      'Helvetica Neue',
+      'Arial',
+      'sans-serif',
+    ].join(', '),
+  },
+
+  shadow(_color?: string) {
+    const color = _color || theme.alpha(this.colors.core.black, 0.1);
+    const lighter = color || theme.alpha(this.colors.core.black, 0.05);
+    const darker = color || theme.alpha(this.colors.core.black, 0.25);
+    return {
+      xs: `0px 1px 2px 0px ${lighter}`,
+      sm: `0 1px 3px 0px ${color}, 0 1px 2px -1px ${color}`,
+      md: `0 4px 6px -1px ${color}, 0 2px 4px -2px ${color}`,
+      lg: `0 10px 15px -3px ${color}, 0 4px 6px -4px ${color}`,
+      xl: `0 20px 25px -5px ${color}, 0 8px 10px -6px ${color}`,
+      '2xl': `0 25px 50px -12px ${darker}`,
+      inner: `inset 0 2px 4px 0 ${lighter}`,
+    };
+  },
+
+  space(multiplier: number) {
+    return multiplier * 4 + 'px';
+  },
+
+  ring(props?: { ring?: Partial<Ring>; offset?: Partial<Ring> }) {
+    const ringWidth = props?.ring?.width || 2;
+    const ringOffsetWidth = props?.offset?.width || 0;
+    const ringOffsetColor = props?.offset?.color || this.colors.core.white;
+    const ringColor = props?.ring?.color || this.alpha(this.colors.borders.input, 0.75);
+    return `0 0 0 ${ringOffsetWidth}px ${ringOffsetColor}, 0 0 0 ${ringWidth + ringOffsetWidth}px ${ringColor}`;
+  },
+
+  alpha(hex: string, opacity: number) {
+    if (!/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/.test(hex)) {
+      throw new Error('Invalid HEX color format');
+    }
+
+    if (hex.length === 4) {
+      hex = `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`;
+    }
+
+    const clamped = Math.min(1, Math.max(0, opacity));
+    const alpha = Math.round(clamped * 255)
+      .toString(16)
+      .padStart(2, '0');
+
+    return `${hex}${alpha}`;
+  },
+
+  createStyles<T>(styles: Record<keyof T, React.CSSProperties>) {
+    return styles;
+  },
+} as const;
