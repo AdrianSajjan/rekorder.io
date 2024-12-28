@@ -174,4 +174,8 @@ export const theme = {
   createStyles<T>(styles: Record<keyof T, React.CSSProperties>) {
     return styles;
   },
+
+  zIndex: (multiplier: number) => {
+    return 9999 + multiplier;
+  },
 } as const;

@@ -1,12 +1,15 @@
 import { StrictMode } from 'react';
-import * as ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { Recorder } from './recorder';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const exists = document.getElementById('rekorder-ui');
+if (exists) document.removeChild(exists);
 
-root.render(
+const root = document.createElement('div');
+root.id = 'rekorder-ui';
+document.body.appendChild(root);
+
+createRoot(root).render(
   <StrictMode>
     <Recorder />
   </StrictMode>

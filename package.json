@@ -5,6 +5,7 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@mediapipe/selfie_segmentation": "^0.1.1675465747",
     "@phosphor-icons/react": "^2.1.7",
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-popover": "^1.1.4",
@@ -15,10 +16,18 @@
     "@radix-ui/react-toggle": "^1.1.1",
     "@radix-ui/react-toggle-group": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@tensorflow-models/body-segmentation": "^1.0.2",
+    "@tensorflow/tfjs-backend-webgpu": "^4.22.0",
+    "@tensorflow/tfjs-converter": "^4.22.0",
+    "@tensorflow/tfjs-core": "^4.22.0",
     "clsx": "^2.1.1",
+    "fix-webm-duration": "^1.0.6",
     "framer-motion": "^11.15.0",
+    "mobx": "^6.13.5",
+    "mobx-react": "^9.2.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-draggable": "^4.4.6",
     "styled-jsx": "5.1.2"
   },
   "devDependencies": {
