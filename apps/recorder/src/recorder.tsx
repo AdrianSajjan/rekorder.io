@@ -3,9 +3,9 @@ import css from 'styled-jsx/css';
 import { AnimationsProvider, theme } from '@rekorder.io/ui';
 
 import { PluginCard } from './components/plugin/plugin';
-import { Timer } from './components/timer';
 import { CameraPreview } from './components/camera';
-// import { PluginToolbar } from './components/toolbar/toolbar';
+import { PluginToolbar } from './components/toolbar/toolbar';
+import { Timer } from './components/timer';
 
 const RecorderCSS = css.resolve`
   .container {
@@ -25,7 +25,7 @@ export function Recorder() {
       {RecorderCSS.styles}
       <section className={clsx(RecorderCSS.className, 'container')}>
         <PluginCard />
-        {/* <PluginToolbar /> */}
+        <PluginToolbar />
         <CameraPreview />
         <Timer />
       </section>

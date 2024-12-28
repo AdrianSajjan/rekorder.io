@@ -20,7 +20,7 @@ interface Tooltip extends React.ForwardRefExoticComponent<TooltipProps & React.R
 interface TooltipProps
   extends TooltipPrimitive.TooltipProps,
     ITooltopContentProps,
-    Pick<TooltipPrimitive.TooltipContentProps, 'side'> {
+    Pick<TooltipPrimitive.TooltipContentProps, 'side' | 'align' | 'sideOffset' | 'alignOffset'> {
   content?: React.ReactNode;
 }
 
@@ -95,20 +95,13 @@ const TooltipCSS = css.resolve`
 `;
 
 const TooltipRoot = React.forwardRef<HTMLDivElement, TooltipProps>(
-  ({ content, arrow, portal, side, colorScheme, ...props }, ref) => {
+  ({ content, arrow, portal, side, sideOffset = 4, align, alignOffset, colorScheme, ...props }, ref) => {
     return (
       <AnimationsProvider>
         {TooltipCSS.styles}
         <TooltipPrimitive.Root {...props}>
           <TooltipPrimitive.Trigger asChild>{props.children}</TooltipPrimitive.Trigger>
-          <TooltipContent
-            ref={ref}
-            arrow={arrow}
-            portal={portal}
-            side={side}
-            colorScheme={colorScheme}
-            sideOffset={arrow ? 2 : 4}
-          >
+          <TooltipContent ref={ref} {...{ arrow, portal, side, align, sideOffset, alignOffset, colorScheme }}>
             {content}
           </TooltipContent>
         </TooltipPrimitive.Root>
