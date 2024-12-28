@@ -67,6 +67,11 @@ const SegmentedControlCSS = css.resolve`
     justify-content: center;
   }
 
+  .trigger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   .control.small .trigger {
     height: ${theme.space(9)};
     border-radius: ${theme.space(1.5)};

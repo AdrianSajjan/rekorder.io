@@ -1,44 +1,83 @@
-import { observer } from "mobx-react";
+import clsx from 'clsx';
+import css from 'styled-jsx/css';
 
-import { AccordionContent, AccordionItem, AccordionTrigger } from "@screenify.io/ui/components/ui/accordion";
-import { Label } from "@screenify.io/ui/components/ui/label";
-import { Switch } from "@screenify.io/ui/components/ui/switch";
+import { animations, Switch, theme } from '@rekorder.io/ui';
+import { observer } from 'mobx-react';
+import { Fragment } from 'react/jsx-runtime';
+
+const ToolbarPluginCSS = css.resolve`
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.space(5)};
+
+    animation-name: ${animations['fade-in']};
+    animation-duration: 300ms;
+    animation-timing-function: ease-out;
+  }
+
+  .toggle-control {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: ${theme.space(3)};
+  }
+
+  .toggle-control-label {
+    font-size: 14px;
+  }
+`;
 
 const ToolbarPlugin = observer(() => {
   return (
-    <AccordionItem value="toolbar" className="shadow-none border-0 rounded-none">
-      <AccordionTrigger className="bg-background">Toolbar</AccordionTrigger>
-      <AccordionContent className="bg-background p-6 space-y-5">
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="hide-toolbar">Enabled</Label>
+    <Fragment>
+      {ToolbarPluginCSS.styles}
+      <div className={clsx(ToolbarPluginCSS.className, 'container')}>
+        <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="hide-toolbar">
+            Enabled
+          </label>
           <Switch id="hide-toolbar" />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="camera-controls">Camera Controls</Label>
+        <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="camera-controls">
+            Camera Controls
+          </label>
           <Switch id="camera-controls" />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="mic-controls">Microphone Controls</Label>
+        <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="mic-controls">
+            Microphone Controls
+          </label>
           <Switch id="mic-controls" />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="cursor-controls">Cursor Controls</Label>
+        <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="cursor-controls">
+            Cursor Controls
+          </label>
           <Switch id="cursor-controls" />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="effects-controls">Effects Controls</Label>
+        <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="effects-controls">
+            Effects Controls
+          </label>
           <Switch id="effects-controls" />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="blur-controls">Blur Controls</Label>
+        <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="blur-controls">
+            Blur Controls
+          </label>
           <Switch id="blur-controls" />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="drawing-controls">Drawing Controls</Label>
+        <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="drawing-controls">
+            Drawing Controls
+          </label>
           <Switch id="drawing-controls" />
         </div>
-      </AccordionContent>
-    </AccordionItem>
+      </div>
+    </Fragment>
   );
 });
 

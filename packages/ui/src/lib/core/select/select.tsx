@@ -71,7 +71,6 @@ const SelectInputCSS = css.resolve`
   }
 
   .trigger:hover {
-    border-color: ${theme.colors.background.light};
     background-color: ${theme.colors.background.light};
   }
 
@@ -174,6 +173,7 @@ const SelectContentCSS = css.resolve`
     padding: ${theme.space(1.5)};
     font-family: ${theme.fonts.default};
     border: 1px solid ${theme.colors.borders.input};
+    z-index: ${theme.zIndex(100)};
   }
 
   .content[data-state='open'] {
@@ -227,7 +227,7 @@ const SelectContentCSS = css.resolve`
   .content .separator {
     height: 1px;
     background-color: ${theme.colors.borders.input};
-    margin: ${theme.space(2.5)} 0;
+    margin: ${theme.space(1.5)} 0;
   }
 `;
 

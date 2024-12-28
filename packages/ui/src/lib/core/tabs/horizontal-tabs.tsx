@@ -42,9 +42,16 @@ const HorizontalTabsCSS = css.resolve`
     font-weight: 500;
     font-size: 14px;
     border-bottom: 1px solid ${theme.colors.borders.input};
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  .trigger {
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .list .trigger {
     width: 100%;
     position: relative;
 
@@ -56,7 +63,7 @@ const HorizontalTabsCSS = css.resolve`
   .content {
     position: relative;
     color: ${theme.colors.accent.dark};
-    padding: ${theme.space(3)} 0;
+    padding: ${theme.space(3)};
     transition: color 300ms ease;
     z-index: 10;
 

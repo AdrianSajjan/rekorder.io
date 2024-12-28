@@ -19,7 +19,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 const ButtonRootCSS = css.resolve`
   @property --gradient-form {
     syntax: '<color>';
-    initial-value: rgba(255, 255, 255, 0.15);
+    initial-value: rgba(255, 255, 255, 0.2);
     inherits: false;
   }
 
@@ -53,7 +53,7 @@ const ButtonRootCSS = css.resolve`
     transition: --gradient-form 200ms ease-in-out;
   }
   .button:hover {
-    --gradient-form: rgba(255, 255, 255, 0.25);
+    --gradient-form: rgba(255, 255, 255, 0.3);
   }
 
   .button.primary {

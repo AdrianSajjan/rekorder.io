@@ -5,35 +5,38 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 
-import { Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 
 import { useFetchUserCameraDevices } from '../../hooks/use-camera';
 import { camera } from '../../store/camera';
 
 const CameraPluginCSS = css.resolve`
-  .camera-plugin-container {
+  .container {
     display: flex;
     flex-direction: column;
     gap: ${theme.space(5)};
+
+    animation-name: ${animations['fade-in']};
+    animation-duration: 300ms;
+    animation-timing-function: ease-out;
   }
 
-  .camera-select-input {
+  .select-input {
     width: 100%;
   }
 
-  .camera-select-value {
+  .select-value {
     display: flex;
     align-items: center;
     gap: ${theme.space(3)};
     flex: 1;
   }
 
-  .camera-select-badge {
+  .select-badge {
     margin-left: auto;
   }
 
-  .camera-flip,
-  .camera-effects {
+  .toggle-control {
     width: 100%;
     display: flex;
     align-items: center;
@@ -41,8 +44,7 @@ const CameraPluginCSS = css.resolve`
     gap: ${theme.space(3)};
   }
 
-  .camera-flip-label,
-  .camera-effects-label {
+  .toggle-control-label {
     font-size: 14px;
   }
 `;
@@ -53,14 +55,14 @@ const CameraPlugin = observer(() => {
   return (
     <Fragment>
       {CameraPluginCSS.styles}
-      <div className={clsx(CameraPluginCSS.className, 'camera-plugin-container')}>
+      <div className={clsx(CameraPluginCSS.className, 'container')}>
         <Select value={camera.device} onValueChange={camera.changeDevice}>
-          <Select.Input className={clsx(CameraPluginCSS.className, 'camera-select-input')}>
-            <div className={clsx(CameraPluginCSS.className, 'camera-select-value')}>
-              {camera.device === 'n/a' ? <VideoCameraSlash size={20} /> : <VideoCamera size={20} />}
+          <Select.Input className={clsx(CameraPluginCSS.className, 'select-input')}>
+            <div className={clsx(CameraPluginCSS.className, 'select-value')}>
+              {camera.device === 'n/a' ? <VideoCameraSlash size={16} /> : <VideoCamera size={16} />}
               {camera.device === 'n/a' ? 'No Camera' : cameras.find((c) => c.deviceId === camera.device)?.label}
               {camera.device === 'n/a' ? (
-                <StatusBadge className={clsx(CameraPluginCSS.className, 'camera-select-badge')} variant="error">
+                <StatusBadge className={clsx(CameraPluginCSS.className, 'select-badge')} variant="error">
                   Off
                 </StatusBadge>
               ) : null}
@@ -68,6 +70,7 @@ const CameraPlugin = observer(() => {
           </Select.Input>
           <Select.Content>
             <Select.Item value="n/a">No Camera</Select.Item>
+            <Select.Separator />
             {cameras.map((camera, index) => (
               <Select.Item key={camera.deviceId} value={camera.deviceId}>
                 {camera.label || `Camera ${index + 1}`}
@@ -75,17 +78,17 @@ const CameraPlugin = observer(() => {
             ))}
           </Select.Content>
         </Select>
-        <div className={clsx(CameraPluginCSS.className, 'camera-flip')}>
-          <label className={clsx(CameraPluginCSS.className, 'camera-flip-label')} htmlFor="flip-camera">
+        <div className={clsx(CameraPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(CameraPluginCSS.className, 'toggle-control-label')} htmlFor="flip-camera">
             Flip Camera
           </label>
-          <Switch id="flip-camera" size="small" checked={camera.flip} onCheckedChange={camera.updateFlip} />
+          <Switch id="flip-camera" checked={camera.flip} onCheckedChange={camera.updateFlip} />
         </div>
-        <div className={clsx(CameraPluginCSS.className, 'camera-effects')}>
-          <label className={clsx(CameraPluginCSS.className, 'camera-effects-label')} htmlFor="camera-effects">
+        <div className={clsx(CameraPluginCSS.className, 'toggle-control')}>
+          <label className={clsx(CameraPluginCSS.className, 'toggle-control-label')} htmlFor="effects">
             Camera Effects
           </label>
-          <Switch id="camera-effects" size="small" />
+          <Switch id="effects" />
         </div>
       </div>
     </Fragment>

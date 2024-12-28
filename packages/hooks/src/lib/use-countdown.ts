@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
 export function useCountdown(startTime = 3, endTime = 0, autoStart = false) {
   const [time, setTime] = useState(startTime);
@@ -17,7 +17,7 @@ export function useCountdown(startTime = 3, endTime = 0, autoStart = false) {
 
   useEffect(() => {
     if (!running) return;
-    let timer: number;
+    let timer: NodeJS.Timer;
 
     if (time > endTime) {
       timer = setInterval(() => {

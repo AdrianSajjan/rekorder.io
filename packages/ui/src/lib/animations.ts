@@ -128,9 +128,39 @@ export const AnimationCSS = css.global`
       transform: translateX(4px);
     }
   }
+
+  @keyframes rekorder-io-ping {
+    75%,
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  @keyframes rekorder-io-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes rekorder-io-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 `;
 
 export const animations = {
+  spin: 'rekorder-io-spin',
+  ping: 'rekorder-io-ping',
+  pulse: 'rekorder-io-pulse',
   'slide-up-fade-in': 'rekorder-io-slide-up-fade-in',
   'slide-down-fade-in': 'rekorder-io-slide-down-fade-in',
   'slide-left-fade-in': 'rekorder-io-slide-left-fade-in',
@@ -143,4 +173,10 @@ export const animations = {
   'slide-down-fade-out': 'rekorder-io-slide-down-fade-out',
   'slide-left-fade-out': 'rekorder-io-slide-left-fade-out',
   'slide-right-fade-out': 'rekorder-io-slide-right-fade-out',
+};
+
+export const animate = {
+  ping: 'rekorder-io-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+  pulse: 'rekorder-io-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+  spin: 'spin 1s linear infinite',
 };

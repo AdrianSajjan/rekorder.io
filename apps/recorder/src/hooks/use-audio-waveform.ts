@@ -1,5 +1,5 @@
-import { AudioWaveform } from "@screenify.io/recorder/lib/waveform";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
+import { AudioWaveform } from '../lib/waveform';
 
 export function useAudioWaveform(audio: string, pushToTalk: boolean) {
   const [waveform, setWaveform] = useState<AudioWaveform>();
@@ -9,7 +9,7 @@ export function useAudioWaveform(audio: string, pushToTalk: boolean) {
   }, []);
 
   useEffect(() => {
-    if (!waveform || audio === "n/a") return;
+    if (!waveform || audio === 'n/a') return;
     waveform.start({ audio: { deviceId: audio } });
     return () => waveform.stop();
   }, [waveform, audio]);

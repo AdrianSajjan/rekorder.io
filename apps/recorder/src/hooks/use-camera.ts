@@ -1,5 +1,5 @@
-import { UserMediaDevice } from "@screenify.io/recorder/types/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import { UserMediaDevice } from '../types/core';
 
 export function useFetchUserCameraDevices() {
   const [cameras, setCameras] = useState<UserMediaDevice[]>([]);
@@ -8,9 +8,7 @@ export function useFetchUserCameraDevices() {
     navigator.mediaDevices
       .getUserMedia({ video: true })
       .then(() => navigator.mediaDevices.enumerateDevices())
-      .then((devices) =>
-        setCameras(devices.filter((device) => device.kind === "videoinput")),
-      );
+      .then((devices) => setCameras(devices.filter((device) => device.kind === 'videoinput' && !!device.deviceId)));
   }, []);
 
   return cameras;
