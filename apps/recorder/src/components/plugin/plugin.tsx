@@ -3,18 +3,16 @@ import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
-import { Fragment, useRef } from 'react';
-import { SquaresFour, VideoCamera } from '@phosphor-icons/react';
+import { Fragment } from 'react';
 
-import { useWindowDimensions } from '@rekorder.io/hooks';
+import { SquaresFour, VideoCamera } from '@phosphor-icons/react';
 import { AnimateHeight, Button, HorizontalTabs, SegmentedControl, theme } from '@rekorder.io/ui';
 
-import { measureElement } from '../../lib/utils';
 import { recorder } from '../../store/recorder';
-import { SAFE_AREA_PADDING } from '../../constants/layout';
+import { useDragControls } from '../../hooks/use-drag-controls';
 
-import { CameraPlugin } from './camera';
 import { AudioPlugin } from './audio';
+import { CameraPlugin } from './camera';
 import { ScreenPlugin } from './screen';
 import { ToolbarPlugin } from './toolbar';
 
@@ -30,11 +28,11 @@ const PluginCardCSS = css.resolve`
     width: 100%;
     padding-top: ${theme.space(8)};
     padding-bottom: ${theme.space(6)};
+    border-radius: ${theme.space(4)};
 
-    box-shadow: ${theme.shadow().lg};
     border: 1px solid ${theme.colors.borders.input};
     background-color: ${theme.colors.core.white};
-    border-radius: ${theme.space(4)};
+    box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.light, 0.1)).xl};
   }
 
   .segmented-list {
@@ -47,8 +45,11 @@ const PluginCardCSS = css.resolve`
   }
 
   .horizontal-panel {
-    padding: ${theme.space(6)};
     background-color: ${theme.colors.background.light};
+  }
+
+  .horizontal-panel-content {
+    padding: ${theme.space(6)};
   }
 
   .footer {
@@ -81,10 +82,7 @@ const PluginCardHOC = observer(() => {
 });
 
 const PluginCard = observer(() => {
-  const plugin$ = useRef<HTMLDivElement>(null!);
-
-  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
-  const { height: pluginHeight, width: pluginWidth } = measureElement(plugin$.current, { height: 526, width: 448 });
+  const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 526, width: 448 } });
 
   const handleScreenCapture = () => {
     switch (recorder.status) {
@@ -97,23 +95,11 @@ const PluginCard = observer(() => {
     }
   };
 
-  const defaultPosition = {
-    x: screenWidth - pluginWidth - SAFE_AREA_PADDING,
-    y: SAFE_AREA_PADDING,
-  };
-
-  const bounds = {
-    left: SAFE_AREA_PADDING,
-    top: SAFE_AREA_PADDING,
-    right: screenWidth - pluginWidth - SAFE_AREA_PADDING,
-    bottom: screenHeight - pluginHeight - SAFE_AREA_PADDING,
-  };
-
   return (
     <Fragment>
       {PluginCardCSS.styles}
-      <Draggable nodeRef={plugin$} defaultPosition={defaultPosition} bounds={bounds}>
-        <div ref={plugin$} className={clsx(PluginCardCSS.className, 'rekorder-plugin-container')}>
+      <Draggable nodeRef={drag.ref} position={drag.position} onStop={drag.onChangePosition} bounds={drag.bounds}>
+        <div ref={drag.ref} className={clsx(PluginCardCSS.className, 'rekorder-plugin-container')}>
           <article className={clsx(PluginCardCSS.className, 'card')}>
             <SegmentedControl
               size="small"
@@ -142,8 +128,8 @@ const PluginCard = observer(() => {
                     <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
                     <HorizontalTabs.Trigger value="toolbar">Toolbar</HorizontalTabs.Trigger>
                   </HorizontalTabs.List>
-                  <div className={clsx(PluginCardCSS.className, 'horizontal-panel')}>
-                    <AnimateHeight>
+                  <AnimateHeight className={clsx(PluginCardCSS.className, 'horizontal-panel')}>
+                    <div className={clsx(PluginCardCSS.className, 'horizontal-panel-content')}>
                       <HorizontalTabs.Panel value="screen">
                         <ScreenPlugin />
                       </HorizontalTabs.Panel>
@@ -156,8 +142,8 @@ const PluginCard = observer(() => {
                       <HorizontalTabs.Panel value="toolbar">
                         <ToolbarPlugin />
                       </HorizontalTabs.Panel>
-                    </AnimateHeight>
-                  </div>
+                    </div>
+                  </AnimateHeight>
                 </HorizontalTabs>
                 <div className={clsx(PluginCardCSS.className, 'footer')}>
                   <Button onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'record-button')}>

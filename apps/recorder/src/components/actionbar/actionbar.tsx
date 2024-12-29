@@ -16,10 +16,11 @@ const ActionbarCSS = css.resolve`
   .content {
     position: relative;
     z-index: ${theme.zIndex(50)};
-    background-color: ${theme.colors.core.white};
     box-shadow: ${theme.shadow().xl};
-    border-radius: ${theme.space(4)};
-    mask: radial-gradient(circle farthest-side at center 70px, transparent 25px, #000000 20px 100%) 50% 50%/100% 100%
+    border-radius: ${theme.space(3)};
+
+    background-color: ${theme.colors.core.white};
+    mask: radial-gradient(circle farthest-side at center 67px, transparent 28px, #000000 20px 100%) 50% 50%/100% 100%
       no-repeat;
   }
 
@@ -43,7 +44,7 @@ export function Actionbar({ children, content, ...props }: ActionbarProps) {
       <PopoverTrigger asChild>
         <div className="popover-area">{children}</div>
       </PopoverTrigger>
-      <PopoverContent side="top" sideOffset={16} align="center" className={clsx(ActionbarCSS.className, 'content')}>
+      <PopoverContent side="top" sideOffset={14} align="center" className={clsx(ActionbarCSS.className, 'content')}>
         {content}
       </PopoverContent>
     </Popover>

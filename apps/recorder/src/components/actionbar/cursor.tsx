@@ -26,8 +26,8 @@ const CursorActionbarCSS = css.resolve`
     width: fit-content;
     gap: ${theme.space(1)};
 
-    height: ${theme.space(13)};
-    border-radius: ${theme.space(4)};
+    height: ${theme.space(11)};
+    border-radius: ${theme.space(3)};
     padding: ${theme.space(2)} ${theme.space(3)};
   }
 
@@ -45,23 +45,23 @@ export function CursorActionbar() {
       <ToggleGroup type="single" className={clsx(CursorActionbarCSS.className, 'rekorder-cursor-actionbar-container')}>
         <ToolbarAction asChild tooltip="Default cursor">
           <ToggleGroupItem value="draw">
-            <Cursor size={18} weight="bold" />
+            <Cursor size={16} weight="bold" />
           </ToggleGroupItem>
         </ToolbarAction>
         <Divider orientation="vertical" className={clsx(CursorActionbarCSS.className, 'divider')} />
         <ToolbarAction asChild tooltip="Highlight click">
           <ToggleGroupItem value="highlight-click">
-            <CursorClickIcon height={18} width={18} />
+            <CursorClickIcon height={16} width={16} />
           </ToggleGroupItem>
         </ToolbarAction>
         <ToolbarAction asChild tooltip="Highlight cursor">
           <ToggleGroupItem value="highlight-cursor">
-            <CursorHighlightIcon height={18} width={18} />
+            <CursorHighlightIcon height={16} width={16} />
           </ToggleGroupItem>
         </ToolbarAction>
         <ToolbarAction asChild tooltip="Spotlight cursor">
           <ToggleGroupItem value="spotlight-cursor">
-            <CursorSpotlightIcon height={18} width={18} />
+            <CursorSpotlightIcon height={16} width={16} />
           </ToggleGroupItem>
         </ToolbarAction>
       </ToggleGroup>

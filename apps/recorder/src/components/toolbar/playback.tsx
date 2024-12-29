@@ -9,14 +9,14 @@ const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivEl
   return (
     <div {...props}>
       <ToolbarAction tooltip="Download recording">
-        <Record size={19} weight="fill" />
+        <Record size={16} weight="fill" />
       </ToolbarAction>
       <ToolbarRecorderPlayPause />
       <ToolbarAction tooltip="Restart recording">
-        <ArrowCounterClockwise size={18} weight="bold" />
+        <ArrowCounterClockwise size={16} weight="bold" />
       </ToolbarAction>
-      <ToolbarAction tooltip="Restart recording">
-        <Trash size={18} weight="bold" />
+      <ToolbarAction tooltip="Discard recording">
+        <Trash size={16} weight="bold" />
       </ToolbarAction>
     </div>
   );
@@ -25,11 +25,11 @@ const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivEl
 const ToolbarRecorderPlayPause = observer(() => {
   return recorder.status === 'active' ? (
     <ToolbarAction tooltip="Pause recording" onClick={recorder.pauseScreenCapture}>
-      <Pause size={18} weight="fill" />
+      <Pause size={16} weight="fill" />
     </ToolbarAction>
   ) : (
     <ToolbarAction tooltip="Resume recording" onClick={recorder.resumeScreenCapture}>
-      <Play size={18} weight="fill" />
+      <Play size={16} weight="fill" />
     </ToolbarAction>
   );
 });

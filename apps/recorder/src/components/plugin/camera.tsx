@@ -70,7 +70,7 @@ const CameraPlugin = observer(() => {
           </Select.Input>
           <Select.Content>
             <Select.Item value="n/a">No Camera</Select.Item>
-            <Select.Separator />
+            {cameras.length ? <Select.Separator /> : null}
             {cameras.map((camera, index) => (
               <Select.Item key={camera.deviceId} value={camera.deviceId}>
                 {camera.label || `Camera ${index + 1}`}

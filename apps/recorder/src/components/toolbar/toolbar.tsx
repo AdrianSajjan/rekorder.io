@@ -3,17 +3,14 @@ import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
 
 import { DotsSixVertical } from '@phosphor-icons/react';
-import { Fragment, useRef } from 'react';
+import { Fragment } from 'react';
 
-import { useWindowDimensions } from '@rekorder.io/hooks';
 import { theme, Tooltip } from '@rekorder.io/ui';
 
-import { SAFE_AREA_PADDING } from '../../constants/layout';
-import { measureElement } from '../../lib/utils';
-
+import { useDragControls } from '../../hooks/use-drag-controls';
 import { ToolbarActionbarControls } from './actionbar';
-import { ToolbarRecordTimer } from './timer';
 import { ToolbarRecordingControls } from './playback';
+import { ToolbarRecordTimer } from './timer';
 
 const PluginToolbarCSS = css.resolve`
   * {
@@ -30,9 +27,9 @@ const PluginToolbarCSS = css.resolve`
     display: flex;
     align-items: center;
 
-    height: ${theme.space(13)};
-    border-radius: ${theme.space(4)};
-    box-shadow: ${theme.shadow().md};
+    height: ${theme.space(11)};
+    border-radius: ${theme.space(3)};
+    box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.light, 0.1)).xl};
 
     padding-top: ${theme.space(2)};
     padding-bottom: ${theme.space(2)};
@@ -72,28 +69,19 @@ const PluginToolbarCSS = css.resolve`
 `;
 
 function PluginToolbar() {
-  const toolbar$ = useRef<HTMLDivElement>(null!);
-
-  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
-  const { height: toolbarHeight, width: toolbarWidth } = measureElement(toolbar$.current, { height: 40, width: 200 });
-
-  const defaultPosition = {
-    x: SAFE_AREA_PADDING,
-    y: screenHeight - SAFE_AREA_PADDING - toolbarHeight,
-  };
-
-  const bounds = {
-    top: SAFE_AREA_PADDING,
-    left: SAFE_AREA_PADDING,
-    right: screenWidth - SAFE_AREA_PADDING - toolbarWidth,
-    bottom: screenHeight - SAFE_AREA_PADDING - toolbarHeight,
-  };
+  const drag = useDragControls<HTMLDivElement>({ position: 'bottom-left', dimension: { height: 40, width: 200 } });
 
   return (
     <Fragment>
       {PluginToolbarCSS.styles}
-      <Draggable nodeRef={toolbar$} handle="#toolbar-handle" defaultPosition={defaultPosition} bounds={bounds}>
-        <article ref={toolbar$} className={clsx(PluginToolbarCSS.className, 'toolbar')}>
+      <Draggable
+        nodeRef={drag.ref}
+        bounds={drag.bounds}
+        handle="#toolbar-handle"
+        position={drag.position}
+        onStop={drag.onChangePosition}
+      >
+        <article ref={drag.ref} className={clsx(PluginToolbarCSS.className, 'toolbar')}>
           <Tooltip.Provider disableHoverableContent delayDuration={500}>
             <div id="toolbar-handle" className={clsx(PluginToolbarCSS.className, 'toolbar-controls toolbar-handle')}>
               <DotsSixVertical weight="bold" size={20} color={theme.colors.accent.main} />

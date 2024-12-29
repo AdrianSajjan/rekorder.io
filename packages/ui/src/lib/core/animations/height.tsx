@@ -2,12 +2,13 @@ import { motion, Transition } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface AnimateHeightProps {
-  children: React.ReactNode;
   className?: string;
   transition?: Transition;
+  containerClassName?: string;
+  children: React.ReactNode;
 }
 
-export function AnimateHeight({ children, className, transition }: AnimateHeightProps) {
+export function AnimateHeight({ children, className, containerClassName, transition }: AnimateHeightProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [height, setHeight] = useState<number | 'auto'>('auto');
 
@@ -40,7 +41,7 @@ export function AnimateHeight({ children, className, transition }: AnimateHeight
         ...transition,
       }}
     >
-      <div id="animate-height-content" ref={ref}>
+      <div id="animate-height-content" className={containerClassName} ref={ref}>
         {children}
       </div>
     </motion.div>

@@ -1,16 +1,16 @@
-import css from 'styled-jsx/css';
-import Draggable from 'react-draggable';
 import clsx from 'clsx';
+import Draggable from 'react-draggable';
+import css from 'styled-jsx/css';
 
-import { Fragment, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
-import { ArrowsOutSimple, X } from '@phosphor-icons/react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 
-import { useWindowDimensions } from '@rekorder.io/hooks';
+import { ArrowsOutSimple, X } from '@phosphor-icons/react';
 import { animations, theme } from '@rekorder.io/ui';
 
+import { CAMERA_DIMENTIONS } from '../constants/layout';
 import { camera } from '../store/camera';
-import { CAMERA_DIMENTIONS, SAFE_AREA_PADDING } from '../constants/layout';
+import { useDragControls } from '../hooks/use-drag-controls';
 
 const CameraPreviewHOC = observer(() => {
   if (camera.device === 'n/a' || !camera.enabled) {
@@ -78,7 +78,7 @@ const CameraPreviewCSS = css.resolve`
     overflow: hidden;
     border-radius: 100%;
     animation: ${animations['zoom-in-fade-in']} 0.5s;
-    box-shadow: ${theme.shadow(theme.alpha(theme.colors.core.black, 0.1)).xl};
+    box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.main, 0.1)).xl};
   }
 
   .camera-controls {
@@ -101,10 +101,9 @@ const CameraPreviewCSS = css.resolve`
 const CameraPreview = observer(() => {
   const video$ = useRef<HTMLVideoElement>(null);
   const canvas$ = useRef<HTMLCanvasElement>(null);
-  const container$ = useRef<HTMLDivElement>(null!);
 
   const [cameraSize, setCameraSize] = useState(200);
-  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+  const drag = useDragControls<HTMLDivElement>({ position: 'top-left' });
 
   useEffect(() => {
     if (!video$.current || !canvas$.current) return;
@@ -114,23 +113,17 @@ const CameraPreview = observer(() => {
   const boxSize = cameraSize / Math.sqrt(2);
   const boxPosition = (cameraSize - boxSize) / 2;
 
-  const defaultPosition = {
-    x: SAFE_AREA_PADDING,
-    y: SAFE_AREA_PADDING,
-  };
-
-  const bounds = {
-    left: SAFE_AREA_PADDING,
-    top: SAFE_AREA_PADDING,
-    right: screenWidth - cameraSize - SAFE_AREA_PADDING,
-    bottom: screenHeight - cameraSize - SAFE_AREA_PADDING,
-  };
-
   return (
     <Fragment>
       {CameraPreviewCSS.styles}
-      <Draggable handle="#camera-handle" nodeRef={container$} defaultPosition={defaultPosition} bounds={bounds}>
-        <div ref={container$} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
+      <Draggable
+        handle="#camera-handle"
+        nodeRef={drag.ref}
+        position={drag.position}
+        bounds={drag.bounds}
+        onStop={drag.onChangePosition}
+      >
+        <div ref={drag.ref} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
           <div
             id="camera-handle"
             className={clsx(CameraPreviewCSS.className, 'camera-handle')}
@@ -138,11 +131,11 @@ const CameraPreview = observer(() => {
           >
             <canvas ref={canvas$} className={clsx(CameraPreviewCSS.className, 'canvas')} />
             <video
+              playsInline
               ref={video$}
               height={CAMERA_DIMENTIONS}
               width={CAMERA_DIMENTIONS}
               className={clsx(CameraPreviewCSS.className, 'video')}
-              playsInline
               muted
             />
           </div>

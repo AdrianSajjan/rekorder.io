@@ -51,6 +51,7 @@ const SwitchCSS = css.resolve`
 
   .root:focus {
     outline: none;
+    box-shadow: ${theme.ring({ ring: { width: 2, color: theme.alpha(theme.colors.primary.main, 0.4) } })};
   }
 
   .root:not(:disabled):hover {

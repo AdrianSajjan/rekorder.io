@@ -8,6 +8,7 @@ echo "Running nx build..."
 nx run-many -t=build
 
 # Step 2: Define paths
+TEMP_PATH="./tmp"
 DIST_PATH="./dist/apps"
 EXTENSION_PATH="./extension/build"
 BACKGROUND_FILE="$DIST_PATH/background/background.js"
@@ -21,5 +22,11 @@ echo "Copying files to extension directory..."
 cp "$BACKGROUND_FILE" "$EXTENSION_PATH/background.js"
 cp "$RECORDER_FILE" "$EXTENSION_PATH/content-script.js"
 
+# check if tmp folder exists and remove its folder and its content
+if [ -d "$TEMP_PATH" ]; then
+  rm -rf "$TEMP_PATH"
+fi
+
 # Build and copy process completed successfully
 echo "Build and copy process completed successfully!"
+

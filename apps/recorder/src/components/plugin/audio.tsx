@@ -83,7 +83,7 @@ const AudioPlugin = observer(() => {
           </Select.Input>
           <Select.Content>
             <Select.Item value="n/a">No Microphone</Select.Item>
-            <Select.Separator />
+            {microphones.length ? <Select.Separator /> : null}
             {microphones.map((microphone, index) => (
               <Select.Item key={microphone.deviceId} value={microphone.deviceId}>
                 {microphone.label || `Microphone ${index + 1}`}

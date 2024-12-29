@@ -27,8 +27,8 @@ const ToolbarActionCSS = css.resolve`
     justify-content: center;
     align-items: center;
 
-    width: ${theme.space(9)};
-    height: ${theme.space(9)};
+    width: ${theme.space(8)};
+    height: ${theme.space(8)};
 
     border-radius: 100%;
     background-color: transparent;
@@ -49,8 +49,8 @@ const ToolbarActionCSS = css.resolve`
   .toolbar-action[data-state='on'],
   .toolbar-action[aria-pressed='true'],
   .toolbar-action[aria-checked='true'] {
-    background-color: ${theme.colors.primary.main};
-    color: ${theme.colors.core.white};
+    background-color: ${theme.alpha(theme.colors.primary.main, 0.15)};
+    color: ${theme.colors.primary.dark};
   }
 
   .toolbar-action::before {
@@ -62,12 +62,12 @@ const ToolbarActionCSS = css.resolve`
     border-radius: 80px 80px 0% 0%;
 
     position: absolute;
-    z-index: -999999;
-    top: -14px;
+    z-index: -${theme.zIndex(1)};
+    top: -${theme.space(3)};
 
-    border-right: 4px solid ${theme.colors.core.white};
-    border-top: 8px solid ${theme.colors.core.white};
-    border-left: 4px solid ${theme.colors.core.white};
+    border-right: ${theme.space(1)} solid ${theme.colors.core.white};
+    border-top: ${theme.space(2)} solid ${theme.colors.core.white};
+    border-left: ${theme.space(1)} solid ${theme.colors.core.white};
 
     opacity: 0;
     background-color: transparent;
