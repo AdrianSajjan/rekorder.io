@@ -6,7 +6,7 @@
     "noEmit": false,
     "emitDeclarationOnly": true,
     "outDir": "../../dist/out-tsc",
-    "types": ["node"]
+    "types": ["node","@types/chrome"],
   },
   "exclude": [
     "src/**/*.spec.ts",
