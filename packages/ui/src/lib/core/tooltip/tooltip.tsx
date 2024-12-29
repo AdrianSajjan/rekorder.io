@@ -42,9 +42,10 @@ const TooltipCSS = css.resolve`
 
     font-size: 13px;
     font-family: ${theme.fonts.default};
+    z-index: ${theme.zIndex(100)};
 
     animation-duration: 300ms;
-    animation-timing-function: ease;
+    animation-timing-function: ease-out;
   }
 
   .content.dark {

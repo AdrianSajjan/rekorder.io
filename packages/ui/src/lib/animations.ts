@@ -56,14 +56,14 @@ export const AnimationCSS = css.global`
     }
   }
 
-  @keyframes rekorder-io-zoom-out-fade-in {
+  @keyframes rekorder-io-zoom-out-fade-out {
     from {
-      opacity: 0;
-      transform: scale(1.1);
-    }
-    to {
       opacity: 1;
       transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.9);
     }
   }
 
@@ -165,8 +165,8 @@ export const animations = {
   'slide-down-fade-in': 'rekorder-io-slide-down-fade-in',
   'slide-left-fade-in': 'rekorder-io-slide-left-fade-in',
   'slide-right-fade-in': 'rekorder-io-slide-right-fade-in',
-  'zoom-out-fade-in': 'rekorder-io-zoom-out-fade-in',
   'zoom-in-fade-in': 'rekorder-io-zoom-in-fade-in',
+  'zoom-out-fade-out': 'rekorder-io-zoom-out-fade-out',
   'fade-in': 'rekorder-io-fade-in',
   'fade-out': 'rekorder-io-fade-out',
   'slide-up-fade-out': 'rekorder-io-slide-up-fade-out',

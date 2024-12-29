@@ -6,8 +6,7 @@ export function useFetchUserCameraDevices() {
 
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then(() => navigator.mediaDevices.enumerateDevices())
+      .enumerateDevices()
       .then((devices) => setCameras(devices.filter((device) => device.kind === 'videoinput' && !!device.deviceId)));
   }, []);
 

@@ -1,14 +1,14 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable } from 'mobx';
 
 class Toolbar {
   enabled: boolean;
-  actionbarState: string | false;
+  actionbarState: string;
   visibilityState: Record<string, boolean>;
 
   constructor() {
     this.enabled = false;
+    this.actionbarState = '';
     this.visibilityState = {};
-    this.actionbarState = false;
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -16,12 +16,12 @@ class Toolbar {
     return new Toolbar();
   }
 
-  updateEnabled(enabled: boolean | "toggle") {
-    this.enabled = enabled === "toggle" ? !this.enabled : enabled;
+  updateEnabled(enabled: boolean | 'toggle') {
+    this.enabled = enabled === 'toggle' ? !this.enabled : enabled;
   }
 
-  updateActionbarState(actionbarState: string, toggle?: boolean) {
-    this.actionbarState = !toggle || this.actionbarState !== actionbarState ? actionbarState : false;
+  updateActionbarState(actionbarState: string) {
+    this.actionbarState = this.actionbarState === actionbarState ? '' : actionbarState;
   }
 
   updateVisibilityState(state: Record<string, boolean>) {

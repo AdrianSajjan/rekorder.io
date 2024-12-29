@@ -2,20 +2,24 @@ import clsx from 'clsx';
 import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
 
+import { DotsSixVertical } from '@phosphor-icons/react';
 import { Fragment, useRef } from 'react';
-import { DotsSixVertical, Download } from '@phosphor-icons/react';
 
 import { useWindowDimensions } from '@rekorder.io/hooks';
 import { theme, Tooltip } from '@rekorder.io/ui';
 
-import { measureElement } from '../../lib/utils';
 import { SAFE_AREA_PADDING } from '../../constants/layout';
-import { ToolbarAction } from '../ui/toolbar-action';
+import { measureElement } from '../../lib/utils';
 
+import { ToolbarActionbarControls } from './actionbar';
 import { ToolbarRecordTimer } from './timer';
-import { ToolbarRecorderPlayback } from './playback';
+import { ToolbarRecordingControls } from './playback';
 
 const PluginToolbarCSS = css.resolve`
+  * {
+    box-sizing: border-box;
+  }
+
   .toolbar {
     position: absolute;
     pointer-events: auto;
@@ -26,22 +30,44 @@ const PluginToolbarCSS = css.resolve`
     display: flex;
     align-items: center;
 
-    border-radius: ${theme.space(2)};
-    height: ${theme.space(12)};
+    height: ${theme.space(13)};
+    border-radius: ${theme.space(4)};
     box-shadow: ${theme.shadow().md};
+
+    padding-top: ${theme.space(2)};
+    padding-bottom: ${theme.space(2)};
   }
 
-  .toolbar-handle {
-    padding-left: ${theme.space(2)};
-    padding-right: ${theme.space(2)};
+  .toolbar > * {
+    border-right: 1.5px solid ${theme.colors.borders.input};
   }
 
-  .toolbar-grab {
-    cursor: grab !important;
+  .toolbar > *:last-child {
+    border-right: none;
   }
 
-  .toolbar-grab:active {
-    cursor: grabbing !important;
+  .toolbar-controls {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: ${theme.space(1)};
+    padding-left: ${theme.space(3)};
+    padding-right: ${theme.space(3)};
+  }
+
+  .toolbar-controls.toolbar-handle {
+    cursor: grab;
+  }
+
+  .toolbar-controls.toolbar-handle:active {
+    cursor: grabbing;
+  }
+
+  .toolbar-controls.toolbar-timer {
+    padding-left: ${theme.space(5)};
+    padding-right: ${theme.space(5)};
   }
 `;
 
@@ -69,18 +95,12 @@ function PluginToolbar() {
       <Draggable nodeRef={toolbar$} handle="#toolbar-handle" defaultPosition={defaultPosition} bounds={bounds}>
         <article ref={toolbar$} className={clsx(PluginToolbarCSS.className, 'toolbar')}>
           <Tooltip.Provider disableHoverableContent delayDuration={500}>
-            <div id="toolbar-handle" className={clsx(PluginToolbarCSS.className, 'toolbar-handle')}>
-              <ToolbarAction className={clsx(PluginToolbarCSS.className, 'toolbar-grab')}>
-                <DotsSixVertical weight="bold" size={20} />
-              </ToolbarAction>
+            <div id="toolbar-handle" className={clsx(PluginToolbarCSS.className, 'toolbar-controls toolbar-handle')}>
+              <DotsSixVertical weight="bold" size={20} color={theme.colors.accent.main} />
             </div>
-            <ToolbarRecordTimer />
-            <div>
-              <ToolbarAction tooltip="Download recording">
-                <Download weight="fill" size={18} />
-              </ToolbarAction>
-              <ToolbarRecorderPlayback />
-            </div>
+            <ToolbarRecordTimer className={clsx(PluginToolbarCSS.className, 'toolbar-controls toolbar-timer')} />
+            <ToolbarRecordingControls className={clsx(PluginToolbarCSS.className, 'toolbar-controls')} />
+            <ToolbarActionbarControls className={clsx(PluginToolbarCSS.className, 'toolbar-controls')} />
           </Tooltip.Provider>
         </article>
       </Draggable>

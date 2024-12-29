@@ -6,8 +6,7 @@ export function useFetchUserMicrophoneDevices() {
 
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(() => navigator.mediaDevices.enumerateDevices())
+      .enumerateDevices()
       .then((devices) => setMicrophones(devices.filter((device) => device.kind === 'audioinput' && !!device.deviceId)));
   }, []);
 
