@@ -50,6 +50,8 @@ const PluginCardCSS = css.resolve`
 
   .horizontal-panel-content {
     padding: ${theme.space(6)};
+    max-height: ${theme.space(60)};
+    overflow-y: auto;
   }
 
   .footer {

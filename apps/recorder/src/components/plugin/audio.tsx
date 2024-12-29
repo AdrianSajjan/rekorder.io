@@ -5,11 +5,12 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { useFetchUserAudioDevices } from '@rekorder.io/hooks';
 import { Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 
 import { microphone } from '../../store/microphone';
-import { useFetchUserMicrophoneDevices } from '../../hooks/use-microphone';
 import { useAudioWaveform } from '../../hooks/use-audio-waveform';
+import { useState } from 'react';
 
 const AudioPluginCSS = css.resolve`
   .rekorder-audio-container {
@@ -60,14 +61,26 @@ const AudioPluginCSS = css.resolve`
 `;
 
 const AudioPlugin = observer(() => {
-  const microphones = useFetchUserMicrophoneDevices();
   const waveform = useAudioWaveform(microphone.device, microphone.pushToTalk);
+
+  const { microphones, permission } = useFetchUserAudioDevices();
+  const [isMicrophoneSelectOpen, setMicrophoneSelectOpen] = useState(false);
+
+  const handleMicrophoneSelectOpenChange = (open: boolean) => {
+    setMicrophoneSelectOpen(open);
+    if (!open || permission !== 'denied') return;
+  };
 
   return (
     <Fragment>
       {AudioPluginCSS.styles}
       <div className={clsx(AudioPluginCSS.className, 'rekorder-audio-container')}>
-        <Select value={microphone.device} onValueChange={microphone.changeDevice}>
+        <Select
+          value={microphone.device}
+          onValueChange={microphone.changeDevice}
+          open={isMicrophoneSelectOpen}
+          onOpenChange={handleMicrophoneSelectOpenChange}
+        >
           <Select.Input className={clsx(AudioPluginCSS.className, 'select-input')}>
             <div className={clsx(AudioPluginCSS.className, 'select-value')}>
               {microphone.device === 'n/a' ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}

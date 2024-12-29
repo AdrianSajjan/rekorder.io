@@ -7,8 +7,9 @@ import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 
 import { animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 
-import { useFetchUserCameraDevices } from '../../hooks/use-camera';
 import { camera } from '../../store/camera';
+import { useFetchUserCameraDevices } from '@rekorder.io/hooks';
+import { useState } from 'react';
 
 const CameraPluginCSS = css.resolve`
   .rekorder-camera-plugin-container {
@@ -50,13 +51,25 @@ const CameraPluginCSS = css.resolve`
 `;
 
 const CameraPlugin = observer(() => {
-  const cameras = useFetchUserCameraDevices();
+  const { cameras, permission } = useFetchUserCameraDevices();
+
+  const [isCameraSelectOpen, setCameraSelectOpen] = useState(false);
+
+  const handleCameraSelectOpenChange = (open: boolean) => {
+    setCameraSelectOpen(open);
+    if (!open || permission !== 'denied') return;
+  };
 
   return (
     <Fragment>
       {CameraPluginCSS.styles}
       <div className={clsx(CameraPluginCSS.className, 'rekorder-camera-plugin-container')}>
-        <Select value={camera.device} onValueChange={camera.changeDevice}>
+        <Select
+          value={camera.device}
+          onValueChange={camera.changeDevice}
+          open={isCameraSelectOpen}
+          onOpenChange={handleCameraSelectOpenChange}
+        >
           <Select.Input className={clsx(CameraPluginCSS.className, 'select-input')}>
             <div className={clsx(CameraPluginCSS.className, 'select-value')}>
               {camera.device === 'n/a' ? <VideoCameraSlash size={16} /> : <VideoCamera size={16} />}
