@@ -6,7 +6,7 @@ import { Fragment } from 'react/jsx-runtime';
 import { animations, Switch, theme } from '@rekorder.io/ui';
 
 const ScreenPluginCSS = css.resolve`
-  .container {
+  .rekorder-screen-container {
     display: flex;
     flex-direction: column;
     gap: ${theme.space(5)};
@@ -33,7 +33,7 @@ const ScreenPlugin = observer(() => {
   return (
     <Fragment>
       {ScreenPluginCSS.styles}
-      <div className={clsx(ScreenPluginCSS.className, 'container')}>
+      <div className={clsx(ScreenPluginCSS.className, 'rekorder-screen-container')}>
         <div className={clsx('toggle-control', ScreenPluginCSS.className)}>
           <label htmlFor="capture-device-audio" className={clsx(ScreenPluginCSS.className, 'toggle-control-label')}>
             Capture Device Audio

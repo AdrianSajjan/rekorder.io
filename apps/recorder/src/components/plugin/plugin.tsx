@@ -19,7 +19,7 @@ import { ScreenPlugin } from './screen';
 import { ToolbarPlugin } from './toolbar';
 
 const PluginCardCSS = css.resolve`
-  .container {
+  .rekorder-plugin-container {
     position: absolute;
     width: 100%;
     max-width: ${theme.screens.xs}px;
@@ -113,7 +113,7 @@ const PluginCard = observer(() => {
     <Fragment>
       {PluginCardCSS.styles}
       <Draggable nodeRef={plugin$} defaultPosition={defaultPosition} bounds={bounds}>
-        <div ref={plugin$} className={clsx(PluginCardCSS.className, 'container')}>
+        <div ref={plugin$} className={clsx(PluginCardCSS.className, 'rekorder-plugin-container')}>
           <article className={clsx(PluginCardCSS.className, 'card')}>
             <SegmentedControl
               size="small"
@@ -142,20 +142,22 @@ const PluginCard = observer(() => {
                     <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
                     <HorizontalTabs.Trigger value="toolbar">Toolbar</HorizontalTabs.Trigger>
                   </HorizontalTabs.List>
-                  <AnimateHeight className={clsx(PluginCardCSS.className, 'horizontal-panel')}>
-                    <HorizontalTabs.Panel value="screen">
-                      <ScreenPlugin />
-                    </HorizontalTabs.Panel>
-                    <HorizontalTabs.Panel value="camera">
-                      <CameraPlugin />
-                    </HorizontalTabs.Panel>
-                    <HorizontalTabs.Panel value="audio">
-                      <AudioPlugin />
-                    </HorizontalTabs.Panel>
-                    <HorizontalTabs.Panel value="toolbar">
-                      <ToolbarPlugin />
-                    </HorizontalTabs.Panel>
-                  </AnimateHeight>
+                  <div className={clsx(PluginCardCSS.className, 'horizontal-panel')}>
+                    <AnimateHeight>
+                      <HorizontalTabs.Panel value="screen">
+                        <ScreenPlugin />
+                      </HorizontalTabs.Panel>
+                      <HorizontalTabs.Panel value="camera">
+                        <CameraPlugin />
+                      </HorizontalTabs.Panel>
+                      <HorizontalTabs.Panel value="audio">
+                        <AudioPlugin />
+                      </HorizontalTabs.Panel>
+                      <HorizontalTabs.Panel value="toolbar">
+                        <ToolbarPlugin />
+                      </HorizontalTabs.Panel>
+                    </AnimateHeight>
+                  </div>
                 </HorizontalTabs>
                 <div className={clsx(PluginCardCSS.className, 'footer')}>
                   <Button onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'record-button')}>

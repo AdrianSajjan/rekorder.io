@@ -11,7 +11,7 @@ import { useFetchUserCameraDevices } from '../../hooks/use-camera';
 import { camera } from '../../store/camera';
 
 const CameraPluginCSS = css.resolve`
-  .container {
+  .rekorder-camera-plugin-container {
     display: flex;
     flex-direction: column;
     gap: ${theme.space(5)};
@@ -55,7 +55,7 @@ const CameraPlugin = observer(() => {
   return (
     <Fragment>
       {CameraPluginCSS.styles}
-      <div className={clsx(CameraPluginCSS.className, 'container')}>
+      <div className={clsx(CameraPluginCSS.className, 'rekorder-camera-plugin-container')}>
         <Select value={camera.device} onValueChange={camera.changeDevice}>
           <Select.Input className={clsx(CameraPluginCSS.className, 'select-input')}>
             <div className={clsx(CameraPluginCSS.className, 'select-value')}>

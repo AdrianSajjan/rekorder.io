@@ -26,6 +26,7 @@ export function AnimateHeight({ children, className, transition }: AnimateHeight
 
   return (
     <motion.div
+      id="animate-height-container"
       className={className}
       style={{
         height,
@@ -39,7 +40,7 @@ export function AnimateHeight({ children, className, transition }: AnimateHeight
         ...transition,
       }}
     >
-      <div id="animate-height-container" ref={ref}>
+      <div id="animate-height-content" ref={ref}>
         {children}
       </div>
     </motion.div>

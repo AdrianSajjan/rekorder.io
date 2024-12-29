@@ -16,7 +16,7 @@ const CursorActionbarCSS = css.resolve`
     box-sizing: border-box;
   }
 
-  .container {
+  .rekorder-cursor-actionbar-container {
     pointer-events: auto;
     position: relative;
     font-family: ${theme.fonts.default};
@@ -42,7 +42,7 @@ export function CursorActionbar() {
   return (
     <Fragment>
       {CursorActionbarCSS.styles}
-      <ToggleGroup type="single" className={clsx(CursorActionbarCSS.className, 'container')}>
+      <ToggleGroup type="single" className={clsx(CursorActionbarCSS.className, 'rekorder-cursor-actionbar-container')}>
         <ToolbarAction asChild tooltip="Default cursor">
           <ToggleGroupItem value="draw">
             <Cursor size={18} weight="bold" />

@@ -12,7 +12,7 @@ import { useFetchUserMicrophoneDevices } from '../../hooks/use-microphone';
 import { useAudioWaveform } from '../../hooks/use-audio-waveform';
 
 const AudioPluginCSS = css.resolve`
-  .container {
+  .rekorder-audio-container {
     display: flex;
     flex-direction: column;
     gap: ${theme.space(5)};
@@ -66,7 +66,7 @@ const AudioPlugin = observer(() => {
   return (
     <Fragment>
       {AudioPluginCSS.styles}
-      <div className={clsx(AudioPluginCSS.className, 'container')}>
+      <div className={clsx(AudioPluginCSS.className, 'rekorder-audio-container')}>
         <Select value={microphone.device} onValueChange={microphone.changeDevice}>
           <Select.Input className={clsx(AudioPluginCSS.className, 'select-input')}>
             <div className={clsx(AudioPluginCSS.className, 'select-value')}>

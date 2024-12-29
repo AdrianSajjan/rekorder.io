@@ -29,7 +29,7 @@ const CameraPreviewCSS = css.resolve`
     all: unset;
   }
 
-  .container {
+  .rekorder-camera-container {
     position: absolute;
     pointer-events: all;
   }
@@ -67,8 +67,8 @@ const CameraPreviewCSS = css.resolve`
     background-color: ${theme.alpha(theme.colors.core.black, 0.8)};
   }
 
-  .container:hover .close-button,
-  .container:hover .resize-button {
+  .rekorder-camera-container:hover .close-button,
+  .rekorder-camera-container:hover .resize-button {
     opacity: 1;
     pointer-events: auto;
   }
@@ -130,7 +130,7 @@ const CameraPreview = observer(() => {
     <Fragment>
       {CameraPreviewCSS.styles}
       <Draggable handle="#camera-handle" nodeRef={container$} defaultPosition={defaultPosition} bounds={bounds}>
-        <div ref={container$} className={clsx(CameraPreviewCSS.className, 'container')}>
+        <div ref={container$} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
           <div
             id="camera-handle"
             className={clsx(CameraPreviewCSS.className, 'camera-handle')}

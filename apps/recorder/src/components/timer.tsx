@@ -18,7 +18,7 @@ const TimerHOC = observer(() => {
 });
 
 const TimerCSS = css.resolve`
-  .container {
+  .rekorder-timer-container {
     position: absolute;
     transform: translate(-50%, -50%);
     pointer-events: auto;
@@ -41,7 +41,7 @@ const Timer = observer(() => {
   return (
     <Fragment>
       {TimerCSS.styles}
-      <div className={clsx(TimerCSS.className, 'container')}>
+      <div className={clsx(TimerCSS.className, 'rekorder-timer-container')}>
         <span className={clsx(TimerCSS.className, 'text')}>{time}</span>
       </div>
     </Fragment>

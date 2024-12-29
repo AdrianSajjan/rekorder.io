@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
 const ToolbarPluginCSS = css.resolve`
-  .container {
+  .rekorder-toolbar-plugin-container {
     display: flex;
     flex-direction: column;
     gap: ${theme.space(5)};
@@ -33,7 +33,7 @@ const ToolbarPlugin = observer(() => {
   return (
     <Fragment>
       {ToolbarPluginCSS.styles}
-      <div className={clsx(ToolbarPluginCSS.className, 'container')}>
+      <div className={clsx(ToolbarPluginCSS.className, 'rekorder-toolbar-plugin-container')}>
         <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
           <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="hide-toolbar">
             Enabled
