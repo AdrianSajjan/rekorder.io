@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 
-import { animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 
 import { camera } from '../../store/camera';
 import { useFetchUserCameraDevices } from '@rekorder.io/hooks';
@@ -53,11 +53,13 @@ const CameraPluginCSS = css.resolve`
 const CameraPlugin = observer(() => {
   const { cameras, permission } = useFetchUserCameraDevices();
 
+  const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
   const [isCameraSelectOpen, setCameraSelectOpen] = useState(false);
 
   const handleCameraSelectOpenChange = (open: boolean) => {
     setCameraSelectOpen(open);
     if (!open || permission !== 'denied') return;
+    setAlertDialogOpen(true);
   };
 
   return (
@@ -104,6 +106,15 @@ const CameraPlugin = observer(() => {
           <Switch id="effects" />
         </div>
       </div>
+      <AlertDialog
+        open={isAlertDialogOpen}
+        onOpenChange={setAlertDialogOpen}
+        title="Permission Denied"
+        description="Please allow access to your camera to use this feature."
+        onAction={() => {
+          console.log('hello');
+        }}
+      />
     </Fragment>
   );
 });
