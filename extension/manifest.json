@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "Rekorder.io",
+    "description": "AI powered product demo creator and editor",
+    "version": "1.0.0",
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "action": {},
+    "background": {
+        "service_worker": "build/background.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "build/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "permissions": [
+        "tabs",
+        "scripting",
+        "storage",
+        "activeTab"
+    ]
+}

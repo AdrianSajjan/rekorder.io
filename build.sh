@@ -9,7 +9,7 @@ nx run-many -t=build
 
 # Step 2: Define paths
 DIST_PATH="./dist/apps"
-EXTENSION_PATH="./extension"
+EXTENSION_PATH="./extension/build"
 BACKGROUND_FILE="$DIST_PATH/background/background.js"
 RECORDER_FILE="$DIST_PATH/recorder/content-script.js"
 

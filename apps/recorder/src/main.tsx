@@ -2,8 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Recorder } from './recorder';
 
-const exists = document.getElementById('rekorder-ui');
-if (exists) document.removeChild(exists);
+const node = document.getElementById('rekorder-ui');
+if (node) node.parentNode?.removeChild(node);
 
 const root = document.createElement('div');
 root.id = 'rekorder-ui';

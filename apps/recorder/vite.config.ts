@@ -15,6 +15,9 @@ export default defineConfig({
     port: 4300,
     host: 'localhost',
   },
+  define: {
+    'process.env': {},
+  },
   plugins: [
     react({
       babel: {
