@@ -31,5 +31,14 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    lib: {
+      entry: 'src/main.tsx',
+      name: 'recorder',
+    },
+    rollupOptions: {
+      output: {
+        entryFileNames: `content-script.js`,
+      },
+    },
   },
 });

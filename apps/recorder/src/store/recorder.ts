@@ -1,5 +1,8 @@
 import exportWebmBlob from 'fix-webm-duration';
+
+import { RuntimeMessage } from '@rekorder.io/types';
 import { makeAutoObservable, runInAction } from 'mobx';
+
 import { RECORD_TIMEOUT } from '../constants/recorder';
 import { microphone } from './microphone';
 
@@ -15,6 +18,8 @@ class Recorder {
   private interval: NodeJS.Timer | null;
   private timeout: NodeJS.Timeout | null;
 
+  private helperAudioContext: AudioContext | null;
+
   constructor() {
     this.status = 'idle';
     this.timestamp = 0;
@@ -26,6 +31,7 @@ class Recorder {
 
     this.interval = null;
     this.timeout = null;
+    this.helperAudioContext = null;
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -70,6 +76,12 @@ class Recorder {
     this.chunks = [];
   }
 
+  private __preventTabSilence(media: MediaStream) {
+    this.helperAudioContext = new AudioContext();
+    const source = this.helperAudioContext.createMediaStreamSource(media);
+    source.connect(this.helperAudioContext.destination);
+  }
+
   private __captureStreamSuccess([video, audio]: [MediaStream, MediaStream | null]) {
     this.status = 'active';
     this.stream = video;
@@ -80,10 +92,15 @@ class Recorder {
       ...(this.audio ? video.getAudioTracks() : []),
     ]);
 
+    const output = new AudioContext();
+    const source = output.createMediaStreamSource(video);
+    source.connect(output.destination);
+
     this.recorder = new MediaRecorder(combined, { mimeType: 'video/webm; codecs=vp9,opus' });
     this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable);
     this.recorder.addEventListener('stop', this.__recorderDataSaved);
 
+    this.__preventTabSilence(video);
     this.recorder.start();
     this.__startTimer();
   }
@@ -94,8 +111,31 @@ class Recorder {
   }
 
   private __createStream() {
-    const constraints = { video: true, audio: true };
-    return navigator.mediaDevices.getDisplayMedia(constraints);
+    return new Promise<MediaStream>((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        {
+          type: 'capture.tab',
+          payload: null,
+        } satisfies RuntimeMessage,
+
+        (response: RuntimeMessage) => {
+          switch (response.type) {
+            case 'capture.tab.sucesss': {
+              const constraints = {
+                audio: {
+                  mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: response.payload.streamId },
+                },
+                video: {
+                  mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: response.payload.streamId },
+                },
+              } as DisplayMediaStreamOptions;
+
+              navigator.mediaDevices.getDisplayMedia(constraints).then(resolve).catch(reject);
+            }
+          }
+        }
+      );
+    });
   }
 
   startScreenCapture() {

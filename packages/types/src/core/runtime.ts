@@ -2,7 +2,7 @@ import { Autocomplete } from './autocomplete';
 
 export interface RuntimeMessage {
   type: RuntimeMessageEnum;
-  payload: unknown;
+  payload: any;
 }
 
-export type RuntimeMessageEnum = Autocomplete<'recorder.capture.tab'>;
+export type RuntimeMessageEnum = Autocomplete<'capture.tab' | 'capture.tab.sucesss' | 'capture.tab.error'>;
