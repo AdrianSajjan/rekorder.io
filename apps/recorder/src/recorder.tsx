@@ -7,6 +7,8 @@ import { AnimationsProvider, theme } from '@rekorder.io/ui';
 import { CameraPreview } from './components/camera';
 import { PluginCard } from './components/plugin/plugin';
 import { PluginToolbar } from './components/toolbar/toolbar';
+
+import { Overlay } from './components/overlay';
 import { TimerCountdown } from './components/timer';
 import { SAFE_AREA_PADDING } from './constants/layout';
 
@@ -18,12 +20,10 @@ const RecorderCSS = css.resolve`
   }
 
   .rekorder-container {
-    position: fixed;
     inset: 0;
+    position: fixed;
     pointer-events: none;
-
     z-index: ${theme.zIndex(1)};
-    background-color: ${theme.alpha(theme.colors.core.black, 0.1)};
   }
 `;
 
@@ -31,6 +31,7 @@ export function Recorder() {
   return (
     <AnimationsProvider>
       {RecorderCSS.styles}
+      <Overlay />
       <section className={clsx(RecorderCSS.className, 'rekorder-container')}>
         <PluginCard />
         <PluginToolbar />

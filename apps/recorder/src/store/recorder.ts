@@ -3,8 +3,8 @@ import exportWebmBlob from 'fix-webm-duration';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { toast } from 'sonner';
 
-import { unwrapError } from '@rekorder.io/utils';
 import { RuntimeMessage } from '@rekorder.io/types';
+import { unwrapError } from '@rekorder.io/utils';
 
 import { RECORD_TIMEOUT } from '../constants/recorder';
 import { microphone } from './microphone';
