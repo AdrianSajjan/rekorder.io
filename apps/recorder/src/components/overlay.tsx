@@ -25,7 +25,7 @@ const Overlay = observer(() => {
   return (
     <Fragment>
       {OverlayCSS.styles}
-      <div className={clsx(OverlayCSS.className, 'rekorder-overlay')} />;
+      <div className={clsx(OverlayCSS.className, 'rekorder-overlay')} />
     </Fragment>
   );
 });

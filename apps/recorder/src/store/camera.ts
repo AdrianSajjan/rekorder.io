@@ -71,9 +71,9 @@ class Camera {
   private async __renderBlurBackground() {
     const segmenter = await this.__createSelfieSegmentationModel();
     const segmentation = await segmenter.segmentPeople(this.video);
-    await BodySegmentation.drawBokehEffect(this.preview, this.video, segmentation, 0.5, 5, 15, false);
-
     this.__resizeCanvas();
+
+    await BodySegmentation.drawBokehEffect(this.preview, this.video, segmentation, 0.5, 5, 15, false);
     this.__drawCanvas(this.preview);
     this.tick = requestAnimationFrame(this.__renderBlurBackground);
   }
