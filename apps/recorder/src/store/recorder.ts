@@ -1,7 +1,10 @@
 import exportWebmBlob from 'fix-webm-duration';
 
-import { RuntimeMessage } from '@rekorder.io/types';
 import { makeAutoObservable, runInAction } from 'mobx';
+import { toast } from 'sonner';
+
+import { unwrapError } from '@rekorder.io/utils';
+import { RuntimeMessage } from '@rekorder.io/types';
 
 import { RECORD_TIMEOUT } from '../constants/recorder';
 import { microphone } from './microphone';
@@ -96,9 +99,10 @@ class Recorder {
     this.__startTimer();
   }
 
-  private __captureStreamError(_: unknown) {
+  private __captureStreamError(error: unknown) {
     this.status = 'error';
     this.__stopTimer(true);
+    toast.error(unwrapError(error));
   }
 
   private __createStream() {

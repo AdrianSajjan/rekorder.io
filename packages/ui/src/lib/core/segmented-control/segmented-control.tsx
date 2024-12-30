@@ -6,7 +6,8 @@ import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
 
 import { useStateObserver } from '@rekorder.io/hooks';
-import { isFunction } from '@rekorder.io/utils';
+import { isFunction } from 'lodash';
+
 import { theme } from '../../theme';
 
 const SegmentedControlCSS = css.resolve`
@@ -120,8 +121,7 @@ const SegmentedControlCSS = css.resolve`
   }
 `;
 
-interface SegmenedControl
-  extends React.ForwardRefExoticComponent<SegmentedControlRootProps & React.RefAttributes<HTMLDivElement>> {
+interface SegmenedControl extends React.ForwardRefExoticComponent<SegmentedControlRootProps & React.RefAttributes<HTMLDivElement>> {
   List: typeof SegmentedControlList;
   Trigger: typeof SegmentedControlTrigger;
   Panel: typeof SegmentedControlPanel;
@@ -137,12 +137,7 @@ const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRo
     return (
       <React.Fragment>
         {SegmentedControlCSS.styles}
-        <Tabs.Root
-          ref={ref}
-          orientation={orientation}
-          className={clsx(SegmentedControlCSS.className, 'control', orientation, size, className)}
-          {...props}
-        />
+        <Tabs.Root ref={ref} orientation={orientation} className={clsx(SegmentedControlCSS.className, 'control', orientation, size, className)} {...props} />
       </React.Fragment>
     );
   }
@@ -157,59 +152,44 @@ const SegmentedControlList = React.forwardRef<HTMLDivElement, Tabs.TabsListProps
   );
 });
 
-const SegmentedControlTrigger = React.forwardRef<HTMLButtonElement, Tabs.TabsTriggerProps>(
-  ({ className, children, ...props }, forwardedRef) => {
-    const ref = React.useRef<HTMLButtonElement | null>(null);
+const SegmentedControlTrigger = React.forwardRef<HTMLButtonElement, Tabs.TabsTriggerProps>(({ className, children, ...props }, forwardedRef) => {
+  const ref = React.useRef<HTMLButtonElement | null>(null);
 
-    const handleAssignRefs = React.useCallback(
-      (node: HTMLButtonElement | null) => {
-        if (forwardedRef) {
-          if (isFunction(forwardedRef)) forwardedRef(node);
-          else forwardedRef.current = node;
-        }
-        ref.current = node;
-      },
-      [forwardedRef]
-    );
+  const handleAssignRefs = React.useCallback(
+    (node: HTMLButtonElement | null) => {
+      if (forwardedRef) {
+        if (isFunction(forwardedRef)) forwardedRef(node);
+        else forwardedRef.current = node;
+      }
+      ref.current = node;
+    },
+    [forwardedRef]
+  );
 
-    const state = useStateObserver(ref, {
-      options: {
-        attributes: true,
-        attributeFilter: ['data-state'],
-      },
-      onGetState: (element) => element.getAttribute('data-state'),
-      onCheckState: (mutation) => mutation.type === 'attributes' && mutation.attributeName === 'data-state',
-    });
+  const state = useStateObserver(ref, {
+    options: {
+      attributes: true,
+      attributeFilter: ['data-state'],
+    },
+    onGetState: (element) => element.getAttribute('data-state'),
+    onCheckState: (mutation) => mutation.type === 'attributes' && mutation.attributeName === 'data-state',
+  });
 
-    return (
-      <Tabs.Trigger
-        ref={handleAssignRefs}
-        className={clsx(SegmentedControlCSS.className, 'trigger', className)}
-        {...props}
-      >
-        <div className={clsx(SegmentedControlCSS.className, 'content')}>{children}</div>
-        {state === 'active' ? (
-          <motion.div
-            layoutId="rekorder-segmented-controls-indictor"
-            className={clsx(SegmentedControlCSS.className, 'indicator')}
-          />
-        ) : null}
-      </Tabs.Trigger>
-    );
-  }
-);
+  return (
+    <Tabs.Trigger ref={handleAssignRefs} className={clsx(SegmentedControlCSS.className, 'trigger', className)} {...props}>
+      <div className={clsx(SegmentedControlCSS.className, 'content')}>{children}</div>
+      {state === 'active' ? <motion.div layoutId="rekorder-segmented-controls-indictor" className={clsx(SegmentedControlCSS.className, 'indicator')} /> : null}
+    </Tabs.Trigger>
+  );
+});
 
-const SegmentedControlTriggerIcon = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
-  ({ className, ...props }, ref) => {
-    return <span className={clsx(SegmentedControlCSS.className, 'icon', className)} ref={ref} {...props} />;
-  }
-);
+const SegmentedControlTriggerIcon = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(({ className, ...props }, ref) => {
+  return <span className={clsx(SegmentedControlCSS.className, 'icon', className)} ref={ref} {...props} />;
+});
 
-const SegmentedControlPanel = React.forwardRef<HTMLDivElement, Tabs.TabsContentProps>(
-  ({ className, ...props }, ref) => {
-    return <Tabs.Content {...props} ref={ref} className={clsx(SegmentedControlCSS.className, 'panel', className)} />;
-  }
-);
+const SegmentedControlPanel = React.forwardRef<HTMLDivElement, Tabs.TabsContentProps>(({ className, ...props }, ref) => {
+  return <Tabs.Content {...props} ref={ref} className={clsx(SegmentedControlCSS.className, 'panel', className)} />;
+});
 
 SegmentedControlRoot.List = SegmentedControlList;
 SegmentedControlRoot.Trigger = SegmentedControlTrigger;

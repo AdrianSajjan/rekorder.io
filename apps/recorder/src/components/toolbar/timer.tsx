@@ -16,6 +16,7 @@ const RecordTimerCSS = css.resolve`
   .time {
     font-size: 14px;
     font-weight: 500;
+    font-variant-numeric: tabular-nums;
     color: ${theme.colors.background.text};
   }
 `;

@@ -84,7 +84,7 @@ const PluginCardHOC = observer(() => {
 });
 
 const PluginCard = observer(() => {
-  const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 526, width: 448 } });
+  const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 350, width: 420 } });
 
   const handleScreenCapture = () => {
     switch (recorder.status) {
@@ -92,6 +92,7 @@ const PluginCard = observer(() => {
         recorder.cancelScreenCapture();
         break;
       case 'idle':
+      case 'error':
         recorder.startScreenCapture();
         break;
     }
