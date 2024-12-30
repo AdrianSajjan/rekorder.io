@@ -15,11 +15,12 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@rekorder.io/ui": ["packages/ui/src/index.ts"],
+      "@rekorder.io/canvas": ["packages/canvas/src/index.ts"],
       "@rekorder.io/hooks": ["packages/hooks/src/index.ts"],
       "@rekorder.io/types": ["packages/types/src/index.ts"],
+      "@rekorder.io/ui": ["packages/ui/src/index.ts"],
       "@rekorder.io/utils": ["packages/utils/src/index.ts"]
     }
   },
-  "exclude": ["node_modules", "tmp"]
+  "exclude": ["node_modules", "tmp", "extensions"]
 }

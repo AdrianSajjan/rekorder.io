@@ -22,7 +22,6 @@
     "src/**/*.test.js",
     "src/**/*.spec.jsx",
     "src/**/*.test.jsx",
-    "jest.config.ts"
   ],
   "include": [
     "src/**/*",

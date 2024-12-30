@@ -15,7 +15,6 @@
     "src/**/*.test.tsx",
     "src/**/*.spec.jsx",
     "src/**/*.test.js",
-    "jest.config.ts"
   ],
   "include": [
     "src/**/*.stories.ts",

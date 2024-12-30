@@ -2,21 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
-    "moduleResolution": "node10",
-    "jsx": "react-jsx",
-    "types": [
-      "node",
-      "@nx/react/typings/styled-jsx.d.ts",
-      "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts",
-      "vite/client",
-      "vitest",
-      "vitest/globals",
-      "vitest/importMeta",
-    ],
+    "types": ["vitest/globals", "vitest/importMeta", "vite/client", "node", "vitest"],
     "composite": true,
-    "declaration": true
+    "declaration": true,
+    "emitDeclarationOnly": true
   },
   "include": [
     "vite.config.ts",
@@ -31,6 +20,8 @@
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ]
 }
