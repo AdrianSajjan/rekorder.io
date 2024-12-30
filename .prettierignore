@@ -2,4 +2,6 @@
 /dist
 /coverage
 /.nx/cache
+/extensions
 /.nx/workspace-data
+/tmp
