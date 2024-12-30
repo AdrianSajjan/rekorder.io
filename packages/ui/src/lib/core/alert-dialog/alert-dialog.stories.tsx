@@ -21,9 +21,14 @@ export const Default: Story = {
     action: 'Delete',
     cancel: 'Cancel',
     title: 'Are you sure?',
+    mode: 'destructive',
     description:
       'You are about to delete this item. It will be permanently removed from our server and you will not be able to recover it. Are you sure you want to continue?',
-    children: <Button variant="error">Delete product</Button>,
+    children: (
+      <Button variant="solid" color="error">
+        Delete product
+      </Button>
+    ),
   },
 };
 

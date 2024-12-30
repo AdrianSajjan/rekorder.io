@@ -1,9 +1,7 @@
-import { expect } from '@storybook/jest';
 import type { Meta, StoryObj } from '@storybook/react';
-import { within } from '@storybook/testing-library';
 
-import { Button } from './button';
 import { theme } from '../../theme';
+import { Button } from './button';
 
 const meta: Meta<typeof Button> = {
   component: Button,
@@ -18,74 +16,44 @@ const styles = theme.createStyles({
   },
 });
 
-export const Primary: Story = {
+export const Solid: Story = {
+  args: {
+    variant: 'solid',
+    style: styles.button,
+    children: 'Register Now',
+    color: "info"
+  },
+};
+
+export const Fancy: Story = {
   args: {
     style: styles.button,
     children: 'Register Now',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByText(/Register Now/gi)).toBeTruthy();
+    variant: 'fancy',
   },
 };
 
-export const Accent: Story = {
+export const Outline: Story = {
   args: {
     style: styles.button,
-    children: 'Sign In',
-    variant: 'accent',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByText(/Sign In/gi)).toBeTruthy();
+    children: 'Register Now',
+    variant: 'outline',
   },
 };
 
-export const Error: Story = {
+export const Light: Story = {
   args: {
     style: styles.button,
-    children: 'Delete',
-    variant: 'error',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByText(/Delete/gi)).toBeTruthy();
+    children: 'Register Now',
+    variant: 'light',
   },
 };
 
-export const Success: Story = {
+export const Ghost: Story = {
   args: {
     style: styles.button,
-    children: 'Save',
-    variant: 'success',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByText(/Save/gi)).toBeTruthy();
-  },
-};
-
-export const Warning: Story = {
-  args: {
-    style: styles.button,
-    children: 'Cancel',
-    variant: 'warning',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByText(/Cancel/gi)).toBeTruthy();
-  },
-};
-
-export const Info: Story = {
-  args: {
-    style: styles.button,
-    children: 'Help',
-    variant: 'info',
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    expect(canvas.getByText(/Help/gi)).toBeTruthy();
+    children: 'Register Now',
+    variant: 'ghost',
   },
 };
 

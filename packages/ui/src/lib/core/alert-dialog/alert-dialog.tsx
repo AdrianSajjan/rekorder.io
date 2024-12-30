@@ -6,7 +6,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
-import { Divider } from '../divider/divider';
+import { Button, ButtonProps } from '../button/button';
 
 const AlertDialogCSS = css.resolve`
   * {
@@ -23,6 +23,7 @@ const AlertDialogCSS = css.resolve`
   .alert-dialog-overlay {
     inset: 0;
     position: fixed;
+
     z-index: ${theme.zIndex(250)};
     background-color: ${theme.alpha(theme.colors.core.black, 0.8)};
   }
@@ -62,17 +63,20 @@ const AlertDialogCSS = css.resolve`
   .alert-dialog-header {
     display: flex;
     flex-direction: column;
-    gap: ${theme.space(3)};
-    padding: ${theme.space(6)};
     text-align: center;
+
+    gap: ${theme.space(2.5)};
+    padding: ${theme.space(6)};
   }
 
   .alert-dialog-footer {
     display: flex;
-    gap: ${theme.space(4)};
     align-items: center;
     flex-direction: row-reverse;
+
+    gap: ${theme.space(4)};
     padding: ${theme.space(4)} ${theme.space(5)};
+    border-top: 1px solid ${theme.colors.borders.input};
   }
 
   .alert-dialog-title {
@@ -82,6 +86,7 @@ const AlertDialogCSS = css.resolve`
 
   .alert-dialog-description {
     font-size: 14px;
+    line-height: 1.3;
     color: ${theme.colors.accent.dark};
   }
 
@@ -110,7 +115,7 @@ const AlertDialogCSS = css.resolve`
       opacity: 1;
     }
     to {
-      transform: translate(-50%, -65%) scale(0.9);
+      transform: translate(-50%, -60%) scale(0.9);
       opacity: 0;
     }
   }
@@ -176,36 +181,39 @@ const AlertDialogDescription = React.forwardRef<
   </React.Fragment>
 ));
 
-const AlertDialogAction = React.forwardRef<
-  React.ElementRef<typeof AlertDialogPrimitive.Action>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action>
->(({ className, ...props }, ref) => (
+const AlertDialogAction = React.forwardRef<React.ElementRef<typeof AlertDialogPrimitive.Action>, ButtonProps>(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Action className={clsx(AlertDialogCSS.className, 'alert-dialog-action', className)} ref={ref} {...props} />
+    <AlertDialogPrimitive.Action asChild>
+      <Button className={clsx(AlertDialogCSS.className, 'alert-dialog-action', className)} ref={ref} {...props} />
+    </AlertDialogPrimitive.Action>
   </React.Fragment>
 ));
 
-const AlertDialogCancel = React.forwardRef<
-  React.ElementRef<typeof AlertDialogPrimitive.Cancel>,
-  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
->(({ className, ...props }, ref) => (
-  <React.Fragment>
-    {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Cancel className={clsx(AlertDialogCSS.className, 'alert-dialog-cancel', className)} ref={ref} {...props} />
-  </React.Fragment>
-));
+const AlertDialogCancel = React.forwardRef<React.ElementRef<typeof AlertDialogPrimitive.Cancel>, ButtonProps>(
+  ({ className, variant = 'light', color = 'accent', ...props }, ref) => (
+    <React.Fragment>
+      {AlertDialogCSS.styles}
+      <AlertDialogPrimitive.Cancel asChild>
+        <Button className={clsx(AlertDialogCSS.className, 'alert-dialog-cancel', className)} variant={variant} color={color} ref={ref} {...props} />
+      </AlertDialogPrimitive.Cancel>
+    </React.Fragment>
+  )
+);
 
 interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
   title: string;
   description: string;
+  mode: 'destructive' | 'default';
   action?: React.ReactNode;
   cancel?: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
 }
 
-function AlertDialog({ children, title, description, action, cancel, onConfirm, onCancel, ...props }: AlertDialogProps) {
+function AlertDialog({ children, title, description, action, cancel, mode, onConfirm, onCancel, ...props }: AlertDialogProps) {
+  const actionColor = mode === 'destructive' ? 'error' : 'primary';
+
   return (
     <AlertDialogRoot {...props}>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
@@ -216,9 +224,10 @@ function AlertDialog({ children, title, description, action, cancel, onConfirm, 
             <AlertDialogTitle>{title}</AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>
           </AlertDialogHeader>
-          <Divider />
           <AlertDialogFooter>
-            <AlertDialogAction onClick={onConfirm}>{action || 'Continue'}</AlertDialogAction>
+            <AlertDialogAction color={actionColor} onClick={onConfirm}>
+              {action || 'Continue'}
+            </AlertDialogAction>
             <AlertDialogCancel onClick={onCancel}>{cancel || 'Cancel'}</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
