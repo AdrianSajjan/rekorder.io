@@ -28,6 +28,7 @@ const PluginToolbarCSS = css.resolve`
 
     height: ${theme.space(11)};
     border-radius: ${theme.space(3)};
+    border: 1px solid ${theme.colors.borders.input};
     box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.light, 0.1)).xl};
 
     padding-top: ${theme.space(2)};

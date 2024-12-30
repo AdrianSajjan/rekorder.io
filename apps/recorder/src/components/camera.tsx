@@ -76,7 +76,9 @@ const CameraPreviewCSS = css.resolve`
   .camera-handle {
     cursor: move;
     overflow: hidden;
+    position: relative;
     border-radius: 100%;
+
     animation: ${animations['zoom-in-fade-in']} 0.5s;
     box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.main, 0.1)).xl};
   }
@@ -87,9 +89,13 @@ const CameraPreviewCSS = css.resolve`
   }
 
   .canvas {
-    width: 100%;
+    width: auto;
     height: 100%;
-    border-radius: 100%;
+    transform: translate(-50%, -50%);
+
+    top: 50%;
+    left: 50%;
+    position: absolute;
   }
 
   .video {
@@ -116,43 +122,17 @@ const CameraPreview = observer(() => {
   return (
     <Fragment>
       {CameraPreviewCSS.styles}
-      <Draggable
-        handle="#camera-handle"
-        nodeRef={drag.ref}
-        position={drag.position}
-        bounds={drag.bounds}
-        onStop={drag.onChangePosition}
-      >
+      <Draggable handle="#camera-handle" nodeRef={drag.ref} position={drag.position} bounds={drag.bounds} onStop={drag.onChangePosition}>
         <div ref={drag.ref} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
-          <div
-            id="camera-handle"
-            className={clsx(CameraPreviewCSS.className, 'camera-handle')}
-            style={{ width: cameraSize, height: cameraSize }}
-          >
+          <div id="camera-handle" className={clsx(CameraPreviewCSS.className, 'camera-handle')} style={{ width: cameraSize, height: cameraSize }}>
             <canvas ref={canvas$} className={clsx(CameraPreviewCSS.className, 'canvas')} />
-            <video
-              playsInline
-              ref={video$}
-              height={CAMERA_DIMENTIONS}
-              width={CAMERA_DIMENTIONS}
-              className={clsx(CameraPreviewCSS.className, 'video')}
-              muted
-            />
+            <video playsInline ref={video$} height={CAMERA_DIMENTIONS} width={CAMERA_DIMENTIONS} className={clsx(CameraPreviewCSS.className, 'video')} muted />
           </div>
-          <div
-            className={clsx(CameraPreviewCSS.className, 'camera-controls')}
-            style={{ width: boxSize, height: boxSize, top: boxPosition, left: boxPosition }}
-          >
-            <button
-              onClick={() => camera.changeDevice('n/a')}
-              className={clsx(CameraPreviewCSS.className, 'close-button')}
-            >
+          <div className={clsx(CameraPreviewCSS.className, 'camera-controls')} style={{ width: boxSize, height: boxSize, top: boxPosition, left: boxPosition }}>
+            <button onClick={() => camera.changeDevice('n/a')} className={clsx(CameraPreviewCSS.className, 'close-button')}>
               <X size={16} weight="bold" color={theme.colors.core.white} />
             </button>
-            <button
-              className={clsx(CameraPreviewCSS.className, 'resize-button')}
-              onClick={() => setCameraSize(cameraSize === 200 ? 400 : 200)}
-            >
+            <button className={clsx(CameraPreviewCSS.className, 'resize-button')} onClick={() => setCameraSize(cameraSize === 200 ? 400 : 200)}>
               <ArrowsOutSimple weight="bold" size={16} color={theme.colors.core.white} />
             </button>
           </div>
