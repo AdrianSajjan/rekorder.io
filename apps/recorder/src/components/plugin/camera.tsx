@@ -1,15 +1,16 @@
 import css from 'styled-jsx/css';
 import clsx from 'clsx';
 
+import { useState } from 'react';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 
 import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { useFetchUserCameraDevices } from '@rekorder.io/hooks';
+import { openPermissionSettings } from '@rekorder.io/utils';
 
 import { camera } from '../../store/camera';
-import { useFetchUserCameraDevices } from '@rekorder.io/hooks';
-import { useState } from 'react';
 
 const CameraPluginCSS = css.resolve`
   .rekorder-camera-plugin-container {
@@ -57,21 +58,15 @@ const CameraPlugin = observer(() => {
   const [isCameraSelectOpen, setCameraSelectOpen] = useState(false);
 
   const handleCameraSelectOpenChange = (open: boolean) => {
-    setCameraSelectOpen(open);
-    if (!open || permission !== 'denied') return;
-    setAlertDialogOpen(true);
+    if (!open || permission !== 'denied') setCameraSelectOpen(open);
+    if (open && permission === 'denied') setAlertDialogOpen(true);
   };
 
   return (
     <Fragment>
       {CameraPluginCSS.styles}
       <div className={clsx(CameraPluginCSS.className, 'rekorder-camera-plugin-container')}>
-        <Select
-          value={camera.device}
-          onValueChange={camera.changeDevice}
-          open={isCameraSelectOpen}
-          onOpenChange={handleCameraSelectOpenChange}
-        >
+        <Select value={camera.device} onValueChange={camera.changeDevice} open={isCameraSelectOpen} onOpenChange={handleCameraSelectOpenChange}>
           <Select.Input className={clsx(CameraPluginCSS.className, 'select-input')}>
             <div className={clsx(CameraPluginCSS.className, 'select-value')}>
               {camera.device === 'n/a' ? <VideoCameraSlash size={16} /> : <VideoCamera size={16} />}
@@ -109,11 +104,9 @@ const CameraPlugin = observer(() => {
       <AlertDialog
         open={isAlertDialogOpen}
         onOpenChange={setAlertDialogOpen}
-        title="Permission Denied"
-        description="Please allow access to your camera to use this feature."
-        onAction={() => {
-          console.log('hello');
-        }}
+        title="Camera permission denied"
+        onConfirm={openPermissionSettings}
+        description="Please allow access to your camera to use this feature. Click on the continue button to open the camera settings and allow access."
       />
     </Fragment>
   );

@@ -103,11 +103,7 @@ const PluginCard = observer(() => {
       <Draggable nodeRef={drag.ref} position={drag.position} onStop={drag.onChangePosition} bounds={drag.bounds}>
         <div ref={drag.ref} className={clsx(PluginCardCSS.className, 'rekorder-plugin-container')}>
           <article className={clsx(PluginCardCSS.className, 'card')}>
-            <SegmentedControl
-              size="small"
-              className={clsx(PluginCardCSS.className, 'segmented-controls')}
-              defaultValue="record"
-            >
+            <SegmentedControl size="small" className={clsx(PluginCardCSS.className, 'segmented-controls')} defaultValue="record">
               <SegmentedControl.List className={clsx(PluginCardCSS.className, 'segmented-list')}>
                 <SegmentedControl.Trigger value="record">
                   <SegmentedControl.TriggerIcon>
@@ -148,7 +144,7 @@ const PluginCard = observer(() => {
                   </AnimateHeight>
                 </HorizontalTabs>
                 <div className={clsx(PluginCardCSS.className, 'footer')}>
-                  <Button onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'record-button')}>
+                  <Button variant="fancy" onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'record-button')}>
                     <span>{recorder.status === 'pending' ? 'Cancel Recording' : 'Start Recording'}</span>
                     <span className={clsx(PluginCardCSS.className, 'record-button-command')}>⌥⇧D</span>
                   </Button>

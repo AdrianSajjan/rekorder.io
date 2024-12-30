@@ -35,7 +35,8 @@ const ButtonRootCSS = css.resolve`
   }
 
   button {
-    all: unset;
+    font: inherit;
+    border: unset;
   }
 
   .button {

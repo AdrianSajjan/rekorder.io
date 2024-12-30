@@ -204,14 +204,14 @@ const AlertDialogCancel = React.forwardRef<React.ElementRef<typeof AlertDialogPr
 interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
   title: string;
   description: string;
-  mode: 'destructive' | 'default';
+  mode?: 'destructive' | 'default';
   action?: React.ReactNode;
   cancel?: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
 }
 
-function AlertDialog({ children, title, description, action, cancel, mode, onConfirm, onCancel, ...props }: AlertDialogProps) {
+function AlertDialog({ children, title, description, action, cancel, mode = 'default', onConfirm, onCancel, ...props }: AlertDialogProps) {
   const actionColor = mode === 'destructive' ? 'error' : 'primary';
 
   return (
