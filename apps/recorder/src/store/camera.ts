@@ -2,7 +2,7 @@ import '@tensorflow/tfjs-backend-webgpu';
 
 import * as BodySegmentation from '@tensorflow-models/body-segmentation';
 import { makeAutoObservable } from 'mobx';
-import { Autocomplete } from '../types/core';
+import { Autocomplete } from '@rekorder.io/types';
 
 type CameraEffects = 'none' | 'blur' | 'image';
 
@@ -50,7 +50,7 @@ class Camera {
   }
 
   private __drawCanvas(source: CanvasImageSource) {
-    const context = this.canvas.getContext('2d')!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    const context = this.canvas.getContext('2d')!;
     context.save();
 
     if (this.flip) {
@@ -86,14 +86,11 @@ class Camera {
 
   private async __createSelfieSegmentationModel() {
     if (!this.segmenter) {
-      this.segmenter = await BodySegmentation.createSegmenter(
-        BodySegmentation.SupportedModels.MediaPipeSelfieSegmentation,
-        {
-          runtime: 'mediapipe',
-          solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation',
-          modelType: 'general',
-        }
-      );
+      this.segmenter = await BodySegmentation.createSegmenter(BodySegmentation.SupportedModels.MediaPipeSelfieSegmentation, {
+        runtime: 'mediapipe',
+        solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation',
+        modelType: 'general',
+      });
     }
     return this.segmenter;
   }

@@ -4,13 +4,14 @@ import css from 'styled-jsx/css';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
-import { animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 import { useFetchUserAudioDevices } from '@rekorder.io/hooks';
 import { Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 
 import { microphone } from '../../store/microphone';
 import { useAudioWaveform } from '../../hooks/use-audio-waveform';
 import { useState } from 'react';
+import { openPermissionSettings } from '@rekorder.io/utils';
 
 const AudioPluginCSS = css.resolve`
   .rekorder-audio-container {
@@ -63,30 +64,25 @@ const AudioPluginCSS = css.resolve`
 const AudioPlugin = observer(() => {
   const waveform = useAudioWaveform(microphone.device, microphone.pushToTalk);
 
+  const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+
   const { microphones, permission } = useFetchUserAudioDevices();
   const [isMicrophoneSelectOpen, setMicrophoneSelectOpen] = useState(false);
 
   const handleMicrophoneSelectOpenChange = (open: boolean) => {
-    setMicrophoneSelectOpen(open);
-    if (!open || permission !== 'denied') return;
+    if (!open || permission !== 'denied') setMicrophoneSelectOpen(open);
+    if (open && permission === 'denied') setAlertDialogOpen(true);
   };
 
   return (
     <Fragment>
       {AudioPluginCSS.styles}
       <div className={clsx(AudioPluginCSS.className, 'rekorder-audio-container')}>
-        <Select
-          value={microphone.device}
-          onValueChange={microphone.changeDevice}
-          open={isMicrophoneSelectOpen}
-          onOpenChange={handleMicrophoneSelectOpenChange}
-        >
+        <Select value={microphone.device} onValueChange={microphone.changeDevice} open={isMicrophoneSelectOpen} onOpenChange={handleMicrophoneSelectOpenChange}>
           <Select.Input className={clsx(AudioPluginCSS.className, 'select-input')}>
             <div className={clsx(AudioPluginCSS.className, 'select-value')}>
               {microphone.device === 'n/a' ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
-              {microphone.device === 'n/a'
-                ? 'No Microphone'
-                : microphones.find((m) => m.deviceId === microphone.device)?.label}
+              {microphone.device === 'n/a' ? 'No Microphone' : microphones.find((m) => m.deviceId === microphone.device)?.label}
               {microphone.device === 'n/a' ? (
                 <StatusBadge variant="error" className={clsx(AudioPluginCSS.className, 'select-badge')}>
                   Off
@@ -110,10 +106,15 @@ const AudioPlugin = observer(() => {
           </label>
           <Switch checked={microphone.pushToTalk} onCheckedChange={microphone.updatePushToTalk} id="push-to-talk" />
         </div>
-        {microphone.device !== 'n/a' ? (
-          <canvas id="waveform" ref={waveform} className={clsx(AudioPluginCSS.className, 'waveform')} />
-        ) : null}
+        {microphone.device !== 'n/a' ? <canvas id="waveform" ref={waveform} className={clsx(AudioPluginCSS.className, 'waveform')} /> : null}
       </div>
+      <AlertDialog
+        open={isAlertDialogOpen}
+        onOpenChange={setAlertDialogOpen}
+        title="Microphone permission denied"
+        onConfirm={openPermissionSettings}
+        description="Please allow access to your microphone to use this feature. Click on the continue button to open the microphone settings and allow access."
+      />
     </Fragment>
   );
 });

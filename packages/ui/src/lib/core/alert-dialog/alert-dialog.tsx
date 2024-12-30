@@ -29,7 +29,7 @@ const AlertDialogCSS = css.resolve`
   }
 
   .alert-dialog-overlay[data-state='open'] {
-    animation: ${animations['fade-in']} cubic-bezier(0.16, 1, 0.3, 1) 150ms;
+    animation: ${animations['fade-in']} cubic-bezier(0.2, 0.5, 0.1, 0.8) 150ms;
   }
 
   .alert-dialog-overlay[data-state='closed'] {
