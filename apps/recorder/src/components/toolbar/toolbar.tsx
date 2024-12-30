@@ -2,15 +2,14 @@ import clsx from 'clsx';
 import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
 
-import { DotsSixVertical } from '@phosphor-icons/react';
 import { Fragment } from 'react';
-
+import { DotsSixVertical } from '@phosphor-icons/react';
 import { theme, Tooltip } from '@rekorder.io/ui';
 
-import { useDragControls } from '../../hooks/use-drag-controls';
+import { ToolbarRecordTimer } from './timer';
 import { ToolbarActionbarControls } from './actionbar';
 import { ToolbarRecordingControls } from './playback';
-import { ToolbarRecordTimer } from './timer';
+import { useDragControls } from '../../hooks/use-drag-controls';
 
 const PluginToolbarCSS = css.resolve`
   * {
@@ -74,13 +73,7 @@ function PluginToolbar() {
   return (
     <Fragment>
       {PluginToolbarCSS.styles}
-      <Draggable
-        nodeRef={drag.ref}
-        bounds={drag.bounds}
-        handle="#toolbar-handle"
-        position={drag.position}
-        onStop={drag.onChangePosition}
-      >
+      <Draggable nodeRef={drag.ref} bounds={drag.bounds} handle="#toolbar-handle" position={drag.position} onStop={drag.onChangePosition}>
         <article ref={drag.ref} className={clsx(PluginToolbarCSS.className, 'toolbar')}>
           <Tooltip.Provider disableHoverableContent delayDuration={500}>
             <div id="toolbar-handle" className={clsx(PluginToolbarCSS.className, 'toolbar-controls toolbar-handle')}>

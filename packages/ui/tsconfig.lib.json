@@ -8,7 +8,9 @@
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts",
       "vite/client"
-    ]
+    ],
+    "composite": true,
+    "declaration": true
   },
   "exclude": [
     "**/*.spec.ts",
@@ -20,7 +22,7 @@
     "**/*.spec.jsx",
     "**/*.test.jsx",
     "vite.config.ts",
-    "vite.config.mts",
+    "vite.config.ts",
     "vitest.config.ts",
     "vitest.config.mts",
     "src/**/*.test.ts",

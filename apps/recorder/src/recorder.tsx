@@ -2,10 +2,10 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 import { AnimationsProvider, theme } from '@rekorder.io/ui';
 
-import { PluginCard } from './components/plugin/plugin';
 import { CameraPreview } from './components/camera';
+import { PluginCard } from './components/plugin/plugin';
 import { PluginToolbar } from './components/toolbar/toolbar';
-import { Timer } from './components/timer';
+import { TimerCountdown } from './components/timer';
 
 const RecorderCSS = css.resolve`
   * {
@@ -32,7 +32,7 @@ export function Recorder() {
         <PluginCard />
         <PluginToolbar />
         <CameraPreview />
-        <Timer />
+        <TimerCountdown />
       </section>
     </AnimationsProvider>
   );

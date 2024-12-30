@@ -9,7 +9,7 @@ import { recorder } from '../store/recorder';
 import { RECORD_TIMEOUT } from '../constants/recorder';
 import { Fragment } from 'react/jsx-runtime';
 
-const TimerHOC = observer(() => {
+const TimerCountdown = observer(() => {
   if (recorder.status === 'pending') {
     return <Timer />;
   } else {
@@ -48,4 +48,4 @@ const Timer = observer(() => {
   );
 });
 
-export { TimerHOC as Timer };
+export { TimerCountdown };

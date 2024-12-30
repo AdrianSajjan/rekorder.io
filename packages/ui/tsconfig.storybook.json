@@ -2,7 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "emitDecoratorMetadata": true,
-    "outDir": ""
+    "outDir": "",
+    "composite": true,
+    "declaration": true
   },
   "exclude": [
     "src/**/*.spec.ts",

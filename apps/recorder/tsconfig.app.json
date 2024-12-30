@@ -9,8 +9,11 @@
       "@nx/react/typings/image.d.ts",
       "vite/client",
       "@types/chrome"
-    ]
+    ],
+    "composite": true,
+    "declaration": true
   },
+
   "exclude": [
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
