@@ -8,9 +8,9 @@ import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 
 import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 import { useFetchUserCameraDevices } from '@rekorder.io/hooks';
-import { openPermissionSettings } from '@rekorder.io/utils';
 
 import { camera } from '../../store/camera';
+import { openPermissionSettings } from '../../lib/utils';
 
 const CameraPluginCSS = css.resolve`
   .rekorder-camera-plugin-container {

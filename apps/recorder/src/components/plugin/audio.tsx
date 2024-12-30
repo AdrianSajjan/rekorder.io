@@ -3,6 +3,7 @@ import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
+import { useState } from 'react';
 
 import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 import { useFetchUserAudioDevices } from '@rekorder.io/hooks';
@@ -10,8 +11,7 @@ import { Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 
 import { microphone } from '../../store/microphone';
 import { useAudioWaveform } from '../../hooks/use-audio-waveform';
-import { useState } from 'react';
-import { openPermissionSettings } from '@rekorder.io/utils';
+import { openPermissionSettings } from '../../lib/utils';
 
 const AudioPluginCSS = css.resolve`
   .rekorder-audio-container {

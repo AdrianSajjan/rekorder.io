@@ -25,6 +25,9 @@ export default defineConfig({
       tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
     }),
   ],
+  define: {
+    'process.env': {},
+  },
   build: {
     outDir: '../../dist/packages/ui',
     emptyOutDir: true,

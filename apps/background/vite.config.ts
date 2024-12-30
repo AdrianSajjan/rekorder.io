@@ -14,6 +14,9 @@ export default defineConfig({
     host: 'localhost',
   },
   plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
+  define: {
+    'process.env': {},
+  },
   build: {
     outDir: '../../dist/apps/background',
 
