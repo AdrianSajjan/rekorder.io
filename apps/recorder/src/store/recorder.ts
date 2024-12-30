@@ -86,11 +86,9 @@ class Recorder {
     this.status = 'active';
     this.stream = video;
 
-    const combined = new MediaStream([
-      ...video.getVideoTracks(),
-      ...(audio ? audio.getAudioTracks() : []),
-      ...(this.audio ? video.getAudioTracks() : []),
-    ]);
+    console.log(video, audio);
+
+    const combined = new MediaStream([...video.getVideoTracks(), ...(audio ? audio.getAudioTracks() : []), ...(this.audio ? video.getAudioTracks() : [])]);
 
     const output = new AudioContext();
     const source = output.createMediaStreamSource(video);
@@ -105,9 +103,10 @@ class Recorder {
     this.__startTimer();
   }
 
-  private __captureStreamError() {
+  private __captureStreamError(error: Error) {
     this.status = 'error';
     this.__stopTimer(true);
+    console.error(error);
   }
 
   private __createStream() {
@@ -117,21 +116,35 @@ class Recorder {
           type: 'capture.tab',
           payload: null,
         } satisfies RuntimeMessage,
-
         (response: RuntimeMessage) => {
           switch (response.type) {
-            case 'capture.tab.sucesss': {
-              const constraints = {
-                audio: {
-                  mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: response.payload.streamId },
-                },
-                video: {
-                  mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: response.payload.streamId },
-                },
-              } as DisplayMediaStreamOptions;
+            case 'capture.tab.sucesss':
+              navigator.mediaDevices
+                .getUserMedia({
+                  audio: {
+                    mandatory: {
+                      chromeMediaSource: 'tab',
+                      chromeMediaSourceId: response.payload.streamId,
+                    },
+                  },
+                  video: {
+                    mandatory: {
+                      chromeMediaSource: 'tab',
+                      chromeMediaSourceId: response.payload.streamId,
+                    },
+                  },
+                } as MediaStreamConstraints)
+                .then(resolve)
+                .catch(reject);
+              break;
 
-              navigator.mediaDevices.getDisplayMedia(constraints).then(resolve).catch(reject);
-            }
+            case 'capture.tab.error':
+              reject(response.payload.error);
+              break;
+
+            default:
+              reject({ message: 'Unhandled message: ' + response.type });
+              break;
           }
         }
       );

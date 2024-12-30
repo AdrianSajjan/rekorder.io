@@ -5,7 +5,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
   switch (message.type) {
     case 'capture.tab': {
       try {
-        chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, (streamId) => {
+        chrome.tabCapture.getMediaStreamId({ consumerTabId: sender.tab?.id }, (streamId) => {
           respond({ type: 'capture.tab.sucesss', payload: { streamId } });
         });
         return true;
