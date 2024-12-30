@@ -17,7 +17,6 @@ class Recorder {
 
   private interval: NodeJS.Timer | null;
   private timeout: NodeJS.Timeout | null;
-
   private helperAudioContext: AudioContext | null;
 
   constructor() {
@@ -83,30 +82,23 @@ class Recorder {
   }
 
   private __captureStreamSuccess([video, audio]: [MediaStream, MediaStream | null]) {
-    this.status = 'active';
     this.stream = video;
-
-    console.log(video, audio);
+    this.status = 'active';
+    this.__preventTabSilence(video);
 
     const combined = new MediaStream([...video.getVideoTracks(), ...(audio ? audio.getAudioTracks() : []), ...(this.audio ? video.getAudioTracks() : [])]);
-
-    const output = new AudioContext();
-    const source = output.createMediaStreamSource(video);
-    source.connect(output.destination);
-
     this.recorder = new MediaRecorder(combined, { mimeType: 'video/webm; codecs=vp9,opus' });
+
     this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable);
     this.recorder.addEventListener('stop', this.__recorderDataSaved);
 
-    this.__preventTabSilence(video);
     this.recorder.start();
     this.__startTimer();
   }
 
-  private __captureStreamError(error: Error) {
+  private __captureStreamError(_: unknown) {
     this.status = 'error';
     this.__stopTimer(true);
-    console.error(error);
   }
 
   private __createStream() {
@@ -116,6 +108,7 @@ class Recorder {
           type: 'capture.tab',
           payload: null,
         } satisfies RuntimeMessage,
+
         (response: RuntimeMessage) => {
           switch (response.type) {
             case 'capture.tab.sucesss':
