@@ -48,7 +48,7 @@ const ButtonRootCSS = css.resolve`
     background-image: linear-gradient(to bottom, var(--gradient-form), rgba(255, 255, 255, 0));
 
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 400;
     font-family: ${theme.fonts.default};
     transition: --gradient-form 200ms ease-in-out;
   }
@@ -142,11 +142,7 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <React.Fragment>
         {ButtonRootCSS.styles}
-        <Component
-          ref={forwardedRef}
-          className={clsx(ButtonRootCSS.className, 'button', variant, size, className)}
-          {...rest}
-        >
+        <Component ref={forwardedRef} className={clsx(ButtonRootCSS.className, 'button', variant, size, className)} {...rest}>
           {children}
         </Component>
       </React.Fragment>

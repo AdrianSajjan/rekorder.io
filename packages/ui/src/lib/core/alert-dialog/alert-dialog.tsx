@@ -1,86 +1,117 @@
-import * as React from 'react';
-import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
-
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
+import * as React from 'react';
+import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
+
 import { theme } from '../../theme';
+import { animations } from '../../animations';
+import { Divider } from '../divider/divider';
 
 const AlertDialogCSS = css.resolve`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: ${theme.fonts.default};
+  }
+
+  button {
+    all: unset;
+  }
+
   .alert-dialog-overlay {
-    position: fixed;
     inset: 0;
+    position: fixed;
     z-index: ${theme.zIndex(250)};
-    background-color: rgba(0, 0, 0, 0.8);
-    animation: fade-in 0.2s ease-out;
+    background-color: ${theme.alpha(theme.colors.core.black, 0.8)};
+  }
+
+  .alert-dialog-overlay[data-state='open'] {
+    animation: ${animations['fade-in']} cubic-bezier(0.16, 1, 0.3, 1) 150ms;
+  }
+
+  .alert-dialog-overlay[data-state='closed'] {
+    animation: ${animations['fade-out']} ease-out 100ms;
   }
 
   .alert-dialog-content {
-    position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    position: fixed;
+
+    display: flex;
+    flex-direction: column;
+
     z-index: ${theme.zIndex(250)};
-    background-color: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    animation: fade-in 0.2s ease-out;
+    border-radius: ${theme.space(5)};
+
+    max-width: ${theme.screens.xs}px;
+    box-shadow: ${theme.shadow().lg};
+    background-color: ${theme.colors.core.white};
+  }
+
+  .alert-dialog-content[data-state='open'] {
+    animation: alert-entry cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards;
+  }
+
+  .alert-dialog-content[data-state='closed'] {
+    animation: alert-exit ease-out 100ms;
   }
 
   .alert-dialog-header {
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.space(3)};
+    padding: ${theme.space(6)};
+    text-align: center;
   }
 
   .alert-dialog-footer {
-    margin-top: 1rem;
     display: flex;
-    justify-content: flex-end;
+    gap: ${theme.space(4)};
+    align-items: center;
+    flex-direction: row-reverse;
+    padding: ${theme.space(4)} ${theme.space(5)};
   }
 
   .alert-dialog-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 500;
   }
 
   .alert-dialog-description {
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    color: rgba(107, 114, 128, 1);
+    font-size: 14px;
+    color: ${theme.colors.accent.dark};
   }
 
   .alert-dialog-action {
-    background-color: rgba(59, 130, 246, 1);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .alert-dialog-action:hover {
-    background-color: rgba(37, 99, 235, 1);
+    flex: 1;
   }
 
   .alert-dialog-cancel {
-    background-color: rgba(229, 231, 235, 1);
-    color: rgba(55, 65, 81, 1);
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    flex: 1;
   }
 
-  .alert-dialog-cancel:hover {
-    background-color: rgba(209, 213, 219, 1);
-  }
-
-  @keyframes fade-in {
+  @keyframes alert-entry {
     from {
       opacity: 0;
+      transform: translate(-50%, -65%) scale(0.9);
     }
     to {
+      transform: translate(-50%, -50%) scale(1);
       opacity: 1;
+    }
+  }
+
+  @keyframes alert-exit {
+    from {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translate(-50%, -65%) scale(0.9);
+      opacity: 0;
     }
   }
 `;
@@ -97,11 +128,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Overlay
-      className={clsx(AlertDialogCSS.className, 'alert-dialog-overlay', className)}
-      {...props}
-      ref={ref}
-    />
+    <AlertDialogPrimitive.Overlay className={clsx(AlertDialogCSS.className, 'alert-dialog-overlay', className)} {...props} ref={ref} />
   </React.Fragment>
 ));
 
@@ -111,11 +138,7 @@ const AlertDialogContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Content
-      className={clsx(AlertDialogCSS.className, 'alert-dialog-content', className)}
-      {...props}
-      ref={ref}
-    />
+    <AlertDialogPrimitive.Content className={clsx(AlertDialogCSS.className, 'alert-dialog-content', className)} {...props} ref={ref} />
   </React.Fragment>
 ));
 
@@ -139,11 +162,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Title
-      ref={ref}
-      className={clsx(AlertDialogCSS.className, 'alert-dialog-title', className)}
-      {...props}
-    />
+    <AlertDialogPrimitive.Title ref={ref} className={clsx(AlertDialogCSS.className, 'alert-dialog-title', className)} {...props} />
   </React.Fragment>
 ));
 
@@ -153,11 +172,7 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Description
-      ref={ref}
-      className={clsx(AlertDialogCSS.className, 'alert-dialog-description', className)}
-      {...props}
-    />
+    <AlertDialogPrimitive.Description ref={ref} className={clsx(AlertDialogCSS.className, 'alert-dialog-description', className)} {...props} />
   </React.Fragment>
 ));
 
@@ -167,11 +182,7 @@ const AlertDialogAction = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Action
-      ref={ref}
-      className={clsx(AlertDialogCSS.className, 'alert-dialog-action', className)}
-      {...props}
-    />
+    <AlertDialogPrimitive.Action className={clsx(AlertDialogCSS.className, 'alert-dialog-action', className)} ref={ref} {...props} />
   </React.Fragment>
 ));
 
@@ -181,23 +192,20 @@ const AlertDialogCancel = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Cancel
-      ref={ref}
-      className={clsx(AlertDialogCSS.className, 'alert-dialog-cancel', className)}
-      {...props}
-    />
+    <AlertDialogPrimitive.Cancel className={clsx(AlertDialogCSS.className, 'alert-dialog-cancel', className)} ref={ref} {...props} />
   </React.Fragment>
 ));
 
 interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
   title: string;
   description: string;
-  onAction: () => void;
-  onDontShowAgain?: () => void;
-  isDontShowAgainVisible?: boolean;
+  action?: React.ReactNode;
+  cancel?: React.ReactNode;
+  onCancel?: () => void;
+  onConfirm?: () => void;
 }
 
-function AlertDialog({ children, title, description, onAction, ...props }: AlertDialogProps) {
+function AlertDialog({ children, title, description, action, cancel, onConfirm, onCancel, ...props }: AlertDialogProps) {
   return (
     <AlertDialogRoot {...props}>
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
@@ -208,9 +216,10 @@ function AlertDialog({ children, title, description, onAction, ...props }: Alert
             <AlertDialogTitle>{title}</AlertDialogTitle>
             <AlertDialogDescription>{description}</AlertDialogDescription>
           </AlertDialogHeader>
+          <Divider />
           <AlertDialogFooter>
-            <AlertDialogAction onClick={onAction}>Action</AlertDialogAction>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm}>{action || 'Continue'}</AlertDialogAction>
+            <AlertDialogCancel onClick={onCancel}>{cancel || 'Cancel'}</AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialogPortal>
