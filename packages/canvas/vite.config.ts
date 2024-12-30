@@ -1,3 +1,5 @@
+/// <reference types='vitest' />
+
 import * as path from 'path';
 
 import react from '@vitejs/plugin-react';
@@ -10,7 +12,22 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/packages/canvas',
-  plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md']), dts({ entryRoot: 'src', tsconfigPath: path.join(__dirname, 'tsconfig.lib.json') })],
+  plugins: [
+    react({
+      babel: {
+        plugins: ['styled-jsx/babel'],
+      },
+    }),
+    nxViteTsPaths(),
+    nxCopyAssetsPlugin(['*.md']),
+    dts({
+      entryRoot: 'src',
+      tsconfigPath: path.join(__dirname, 'tsconfig.lib.json'),
+    }),
+  ],
+  define: {
+    'process.env': {},
+  },
   build: {
     outDir: '../../dist/packages/canvas',
     emptyOutDir: true,
