@@ -3,22 +3,13 @@ import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useState } from 'react';
 
 import { ArrowsOutSimple, X } from '@phosphor-icons/react';
 import { animations, theme } from '@rekorder.io/ui';
 
-import { CAMERA_DIMENTIONS } from '../constants/layout';
-import { camera } from '../store/camera';
 import { useDragControls } from '../hooks/use-drag-controls';
-
-const CameraPreviewHOC = observer(() => {
-  if (camera.device === 'n/a' || !camera.enabled) {
-    return null;
-  } else {
-    return <CameraPreview />;
-  }
-});
+import { camera } from '../store/camera';
 
 const CameraPreviewCSS = css.resolve`
   * {
@@ -34,8 +25,8 @@ const CameraPreviewCSS = css.resolve`
     pointer-events: all;
   }
 
-  .close-button,
-  .resize-button {
+  .rekorder-close-button,
+  .rekorder-resize-button {
     height: 32px;
     width: 32px;
     border-radius: 100%;
@@ -50,30 +41,30 @@ const CameraPreviewCSS = css.resolve`
     transition: opacity 0.2s;
   }
 
-  .close-button {
+  .rekorder-close-button {
     top: 0;
     left: 0;
     transform: translate(-50%, -50%);
   }
 
-  .resize-button {
+  .rekorder-resize-button {
     right: 0;
     bottom: 0;
     transform: translate(50%, 50%) rotate(90deg);
   }
 
-  .close-button:hover,
-  .resize-button:hover {
+  .rekorder-close-button:hover,
+  .rekorder-resize-button:hover {
     background-color: ${theme.alpha(theme.colors.core.black, 0.8)};
   }
 
-  .rekorder-camera-container:hover .close-button,
-  .rekorder-camera-container:hover .resize-button {
+  .rekorder-camera-container:hover .rekorder-close-button,
+  .rekorder-camera-container:hover .rekorder-resize-button {
     opacity: 1;
     pointer-events: auto;
   }
 
-  .camera-handle {
+  .rekorder-camera-handle {
     cursor: move;
     overflow: hidden;
     position: relative;
@@ -83,56 +74,46 @@ const CameraPreviewCSS = css.resolve`
     box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.main, 0.1)).xl};
   }
 
-  .camera-controls {
+  .rekorder-camera-controls {
     position: absolute;
     pointer-events: none;
   }
-
-  .canvas {
-    width: auto;
-    height: 100%;
-    transform: translate(-50%, -50%);
-
-    top: 50%;
-    left: 50%;
-    position: absolute;
-  }
-
-  .video {
-    object-fit: cover;
-    display: none;
-  }
 `;
 
+const CameraPreviewHOC = observer(() => {
+  if (camera.device === 'n/a' || !camera.enabled) {
+    return null;
+  } else {
+    return <CameraPreview />;
+  }
+});
+
 const CameraPreview = observer(() => {
-  const video$ = useRef<HTMLVideoElement>(null);
-  const canvas$ = useRef<HTMLCanvasElement>(null);
-
   const [cameraSize, setCameraSize] = useState(200);
-  const drag = useDragControls<HTMLDivElement>({ position: 'top-left' });
 
-  useEffect(() => {
-    if (!video$.current || !canvas$.current) return;
-    camera.initializeElements(video$.current, canvas$.current).createStream();
-  }, []);
+  const drag = useDragControls<HTMLDivElement>({ position: 'top-left' });
 
   const boxSize = cameraSize / Math.sqrt(2);
   const boxPosition = (cameraSize - boxSize) / 2;
+  const style = { width: cameraSize, height: cameraSize, top: boxPosition, left: boxPosition };
 
   return (
     <Fragment>
       {CameraPreviewCSS.styles}
-      <Draggable handle="#camera-handle" nodeRef={drag.ref} position={drag.position} bounds={drag.bounds} onStop={drag.onChangePosition}>
+      <Draggable handle="#rekorder-camera-handle" nodeRef={drag.ref} position={drag.position} bounds={drag.bounds} onStop={drag.onChangePosition}>
         <div ref={drag.ref} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
-          <div id="camera-handle" className={clsx(CameraPreviewCSS.className, 'camera-handle')} style={{ width: cameraSize, height: cameraSize }}>
-            <canvas ref={canvas$} className={clsx(CameraPreviewCSS.className, 'canvas')} />
-            <video playsInline ref={video$} height={CAMERA_DIMENTIONS} width={CAMERA_DIMENTIONS} className={clsx(CameraPreviewCSS.className, 'video')} muted />
+          <div
+            id="rekorder-camera-handle"
+            className={clsx(CameraPreviewCSS.className, 'rekorder-camera-handle')}
+            style={{ width: cameraSize, height: cameraSize }}
+          >
+            <iframe src={chrome.runtime.getURL('build/camera.html')} title="Camera Preview" allow="camera" className="rekorder-camera-iframe" />
           </div>
-          <div className={clsx(CameraPreviewCSS.className, 'camera-controls')} style={{ width: boxSize, height: boxSize, top: boxPosition, left: boxPosition }}>
-            <button onClick={() => camera.changeDevice('n/a')} className={clsx(CameraPreviewCSS.className, 'close-button')}>
+          <div className={clsx(CameraPreviewCSS.className, 'rekorder-camera-controls')} style={style}>
+            <button onClick={() => camera.changeDevice('n/a')} className={clsx(CameraPreviewCSS.className, 'rekorder-close-button')}>
               <X size={16} weight="bold" color={theme.colors.core.white} />
             </button>
-            <button className={clsx(CameraPreviewCSS.className, 'resize-button')} onClick={() => setCameraSize(cameraSize === 200 ? 400 : 200)}>
+            <button className={clsx(CameraPreviewCSS.className, 'rekorder-resize-button')} onClick={() => setCameraSize(cameraSize === 200 ? 400 : 200)}>
               <ArrowsOutSimple weight="bold" size={16} color={theme.colors.core.white} />
             </button>
           </div>
