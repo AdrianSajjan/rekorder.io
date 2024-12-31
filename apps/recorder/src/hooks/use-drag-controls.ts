@@ -37,11 +37,7 @@ export function useDragControls<T extends HTMLElement>(props: DragControlsProps)
   const { height: elementHeight, width: elementWidth } = measureElement(ref.current, props.dimension);
 
   const [position, setPosition] = useState<ControlPosition>(() =>
-    initializeDefaultPosition(
-      props.position,
-      { height: screenHeight, width: screenWidth },
-      { height: elementHeight, width: elementWidth }
-    )
+    initializeDefaultPosition(props.position, { height: screenHeight, width: screenWidth }, { height: elementHeight, width: elementWidth })
   );
 
   const onChangePosition: DraggableEventHandler = useCallback((event, data) => {
@@ -49,20 +45,24 @@ export function useDragControls<T extends HTMLElement>(props: DragControlsProps)
   }, []);
 
   useEffect(() => {
-    if (position.x < SAFE_AREA_PADDING) {
-      setPosition((state) => ({ ...state, x: SAFE_AREA_PADDING }));
+    if (screenWidth > elementWidth + SAFE_AREA_PADDING * 2) {
+      if (position.x < SAFE_AREA_PADDING) {
+        setPosition((state) => ({ ...state, x: SAFE_AREA_PADDING }));
+      }
+
+      if (position.x > screenWidth - elementWidth - SAFE_AREA_PADDING) {
+        setPosition((state) => ({ ...state, x: screenWidth - elementWidth - SAFE_AREA_PADDING }));
+      }
     }
 
-    if (position.y < SAFE_AREA_PADDING) {
-      setPosition((state) => ({ ...state, y: SAFE_AREA_PADDING }));
-    }
+    if (screenHeight > elementHeight + SAFE_AREA_PADDING * 2) {
+      if (position.y < SAFE_AREA_PADDING) {
+        setPosition((state) => ({ ...state, y: SAFE_AREA_PADDING }));
+      }
 
-    if (position.x > screenWidth - elementWidth - SAFE_AREA_PADDING) {
-      setPosition((state) => ({ ...state, x: screenWidth - elementWidth - SAFE_AREA_PADDING }));
-    }
-
-    if (position.y > screenHeight - elementHeight - SAFE_AREA_PADDING) {
-      setPosition((state) => ({ ...state, y: screenHeight - elementHeight - SAFE_AREA_PADDING }));
+      if (position.y > screenHeight - elementHeight - SAFE_AREA_PADDING) {
+        setPosition((state) => ({ ...state, y: screenHeight - elementHeight - SAFE_AREA_PADDING }));
+      }
     }
   }, [screenHeight, screenWidth, elementHeight, elementWidth, position]);
 

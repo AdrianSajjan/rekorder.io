@@ -17,11 +17,12 @@ const ActionbarCSS = css.resolve`
     position: relative;
     z-index: ${theme.zIndex(50)};
     box-shadow: ${theme.shadow().xl};
-    border-radius: ${theme.space(3)};
 
+    border-radius: ${theme.space(3)};
     background-color: ${theme.colors.core.white};
-    mask: radial-gradient(circle farthest-side at center 67px, transparent 28px, #000000 20px 100%) 50% 50%/100% 100%
-      no-repeat;
+    border: 1px solid ${theme.colors.borders.input};
+
+    mask: radial-gradient(circle farthest-side at center 67px, transparent 28px, #000000 20px 100%) 50% 50%/100% 100% no-repeat;
   }
 
   .content[data-state='open'] {

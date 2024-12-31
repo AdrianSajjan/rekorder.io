@@ -25,6 +25,10 @@
   ],
   "include": [
     "src/**/*",
-    "../../packages/utils/src/**/*"
+    "../../packages/utils/src/**/*",
+    "../../packages/ui/src/**/*",
+    "../../packages/canvas/src/**/*",
+    "../../packages/hooks/src/**/*",
+    "../../packages/types/src/**/*"
   ]
 }

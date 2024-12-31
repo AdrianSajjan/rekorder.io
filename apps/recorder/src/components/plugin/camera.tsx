@@ -48,6 +48,7 @@ const CameraPluginCSS = css.resolve`
 
   .toggle-control-label {
     font-size: 14px;
+    color: ${theme.colors.background.text};
   }
 `;
 

@@ -1,5 +1,5 @@
+import { Autocomplete } from '@rekorder.io/types';
 import { makeAutoObservable } from 'mobx';
-import { Autocomplete } from '../types/core';
 
 class Microphone {
   enabled: boolean;

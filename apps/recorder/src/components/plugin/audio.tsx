@@ -49,10 +49,12 @@ const AudioPluginCSS = css.resolve`
 
   .toggle-control-label {
     font-size: 14px;
+    color: ${theme.colors.background.text};
   }
 
   .push-to-talk-command {
     font-size: 12px;
+    color: ${theme.colors.background.text};
   }
 
   .waveform {

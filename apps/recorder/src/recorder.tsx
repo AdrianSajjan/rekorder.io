@@ -11,6 +11,7 @@ import { PluginToolbar } from './components/toolbar/toolbar';
 import { Overlay } from './components/overlay';
 import { TimerCountdown } from './components/timer';
 import { SAFE_AREA_PADDING } from './constants/layout';
+import { EditorArea } from './components/editor';
 
 const RecorderCSS = css.resolve`
   * {
@@ -23,7 +24,7 @@ const RecorderCSS = css.resolve`
     inset: 0;
     position: fixed;
     pointer-events: none;
-    z-index: ${theme.zIndex(1)};
+    z-index: ${theme.zIndex(2)};
   }
 `;
 
@@ -32,6 +33,7 @@ export function Recorder() {
     <AnimationsProvider>
       {RecorderCSS.styles}
       <Overlay />
+      <EditorArea />
       <section className={clsx(RecorderCSS.className, 'rekorder-container')}>
         <PluginCard />
         <PluginToolbar />
