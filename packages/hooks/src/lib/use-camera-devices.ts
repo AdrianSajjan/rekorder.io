@@ -6,9 +6,7 @@ export function useFetchUserCameraDevices() {
   const [permission, setPermission] = useState<PermissionState>();
 
   const handleQueryDevices = useCallback(() => {
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((devices) => setCameras(devices.filter((device) => device.kind === 'videoinput' && !!device.deviceId)));
+    navigator.mediaDevices.enumerateDevices().then((devices) => setCameras(devices.filter((device) => device.kind === 'videoinput' && !!device.deviceId)));
   }, []);
 
   const handlePermissionChange = useCallback(() => {
