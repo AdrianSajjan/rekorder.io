@@ -1,4 +1,5 @@
 import * as fabric from 'fabric';
+import { EraserBrush } from '@erase2d/fabric';
 
 import { makeAutoObservable } from 'mobx';
 import { throttle } from 'lodash';
@@ -16,14 +17,19 @@ class Editor {
   width: number;
   mode: EditorMode;
 
-  private resizeObserver?: ResizeObserver;
+  private _eraser: EraserBrush | null = null;
+  private _observer: ResizeObserver | null = null;
+  private _pencil: fabric.PencilBrush | null = null;
+  private _disposables: VoidFunction[] = [];
 
   constructor() {
     this.canvas = null;
     this.workspace = null;
+
+    this.width = 10;
     this.mode = 'pencil';
     this.color = '#000000';
-    this.width = 10;
+
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -41,9 +47,19 @@ class Editor {
   private __setupResizeObserver() {
     if (!this.workspace) return;
 
-    this.resizeObserver = new ResizeObserver(throttle(this.__resizeCanvas, 200));
-    this.resizeObserver.observe(this.workspace);
+    this._observer = new ResizeObserver(throttle(this.__resizeCanvas, 200));
+    this._observer.observe(this.workspace);
     this.__resizeCanvas();
+  }
+
+  private __setupDrawingBrush() {
+    if (!this.canvas) return;
+
+    this._pencil = new fabric.PencilBrush(this.canvas);
+    this._eraser = new EraserBrush(this.canvas);
+
+    const dispose = this.canvas.on('path:created', ({ path }) => (path.erasable = true));
+    this._disposables.push(dispose);
   }
 
   private __toggleSelectionMode(mode: EditorMode) {
@@ -60,7 +76,7 @@ class Editor {
 
   private __toggleFreeDrawingMode(mode: EditorMode) {
     if (!this.canvas) return;
-    this.canvas.isDrawingMode = mode === 'pencil' || mode === 'highlighter';
+    this.canvas.isDrawingMode = mode === 'pencil' || mode === 'highlighter' || mode === 'eraser';
     this.canvas.requestRenderAll();
   }
 
@@ -68,10 +84,27 @@ class Editor {
     this.canvas = canvas;
     this.workspace = workspace;
     this.__setupResizeObserver();
+    this.__setupDrawingBrush();
+  }
+
+  updateColor(color: string) {
+    this.color = color;
+    if (this.canvas?.freeDrawingBrush) {
+      this.canvas.freeDrawingBrush.color = color;
+      this.canvas.requestRenderAll();
+    }
+  }
+
+  updateWidth(width: number) {
+    this.width = width;
+    if (this.canvas?.freeDrawingBrush) {
+      this.canvas.freeDrawingBrush.width = width;
+      this.canvas.requestRenderAll();
+    }
   }
 
   toggleDrawingMode(mode?: EditorMode) {
-    if (!this.canvas) return;
+    if (!this.canvas || !this._pencil || !this._eraser) return;
 
     if (mode) this.mode = mode;
     this.__toggleSelectionMode(this.mode);
@@ -79,19 +112,20 @@ class Editor {
 
     switch (this.mode) {
       case 'pencil':
-        this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
+        this.canvas.freeDrawingBrush = this._pencil;
         this.canvas.freeDrawingBrush.width = this.width;
         this.canvas.freeDrawingBrush.color = this.color;
         break;
 
       case 'highlighter':
-        this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
+        this.canvas.freeDrawingBrush = this._pencil;
         this.canvas.freeDrawingBrush.width = this.width;
         this.canvas.freeDrawingBrush.color = theme.alpha(this.color, 0.3);
         break;
 
       case 'eraser':
-        // TODO: Implement eraser brush
+        this.canvas.freeDrawingBrush = this._eraser;
+        this.canvas.freeDrawingBrush.width = this.width;
         break;
 
       case 'rectangle':
@@ -115,7 +149,9 @@ class Editor {
   }
 
   dispose() {
-    this.resizeObserver?.disconnect();
+    this._observer?.disconnect();
+    this._disposables.forEach((dispose) => dispose());
+
     this.canvas = null;
     this.workspace = null;
   }

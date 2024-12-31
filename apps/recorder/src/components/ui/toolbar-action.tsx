@@ -9,6 +9,7 @@ import { Slot } from '@radix-ui/react-slot';
 interface ToolbarActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   tooltip?: string;
   asChild?: boolean;
+  actionbarIndicator?: boolean;
 }
 
 const ToolbarActionCSS = css.resolve`
@@ -46,14 +47,16 @@ const ToolbarActionCSS = css.resolve`
     outline: none;
     box-shadow: ${theme.ring({ ring: { width: 2, color: theme.alpha(theme.colors.primary.main, 0.4) } })};
   }
+
   .toolbar-action[data-state='on'],
+  .toolbar-action[data-state='open'],
   .toolbar-action[aria-pressed='true'],
   .toolbar-action[aria-checked='true'] {
     background-color: ${theme.alpha(theme.colors.primary.main, 0.15)};
     color: ${theme.colors.primary.dark};
   }
 
-  .toolbar-action::before {
+  .toolbar-action.actionbar-indicator::before {
     content: '';
 
     width: 100%;
@@ -75,15 +78,15 @@ const ToolbarActionCSS = css.resolve`
     transition: transform 0.25s ease-out, opacity 0.25s ease-in-out;
   }
 
-  .toolbar-action[data-state='on']::before,
-  .toolbar-action[aria-pressed='true']::before,
-  .toolbar-action[aria-checked='true']::before {
+  .toolbar-action.actionbar-indicator[data-state='on']::before,
+  .toolbar-action.actionbar-indicator[aria-pressed='true']::before,
+  .toolbar-action.actionbar-indicator[aria-checked='true']::before {
     transform: scale(1);
     opacity: 1;
   }
 `;
 
-function ToolbarAction({ tooltip, className, children, asChild, ...props }: ToolbarActionProps) {
+function ToolbarAction({ tooltip, className, children, actionbarIndicator, asChild, ...props }: ToolbarActionProps) {
   const Component = asChild ? Slot : 'button';
 
   return (
@@ -92,7 +95,11 @@ function ToolbarAction({ tooltip, className, children, asChild, ...props }: Tool
       {tooltip ? (
         <Tooltip content={tooltip} arrow={false} sideOffset={12}>
           <div className="tooltip-area" aria-label={tooltip}>
-            <Component aria-label={tooltip} className={clsx(ToolbarActionCSS.className, 'toolbar-action', className)} {...props}>
+            <Component
+              aria-label={tooltip}
+              className={clsx(ToolbarActionCSS.className, actionbarIndicator ? 'actionbar-indicator' : null, 'toolbar-action', className)}
+              {...props}
+            >
               {children}
             </Component>
           </div>
@@ -106,4 +113,4 @@ function ToolbarAction({ tooltip, className, children, asChild, ...props }: Tool
   );
 }
 
-export { ToolbarAction };
+export { ToolbarAction, ToolbarActionCSS };

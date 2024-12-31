@@ -12,24 +12,24 @@ const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, '
   return (
     <ToggleGroup value={toolbar.actionbarState} onValueChange={toolbar.updateActionbarState} type="single" {...props}>
       <Actionbar open={toolbar.actionbarState === 'draw'} content={<DrawingActionbar />}>
-        <ToolbarAction asChild tooltip="Toggle drawing mode">
+        <ToolbarAction actionbarIndicator asChild tooltip="Toggle drawing mode">
           <ToggleGroupItem value="draw">
             <PencilSimple size={16} weight="bold" />
           </ToggleGroupItem>
         </ToolbarAction>
       </Actionbar>
-      <ToolbarAction asChild tooltip="Toggle blur mode">
+      <ToolbarAction actionbarIndicator asChild tooltip="Toggle blur mode">
         <ToggleGroupItem value="blur">
           <Subtract size={16} weight="fill" />
         </ToggleGroupItem>
       </ToolbarAction>
-      <ToolbarAction asChild tooltip="Toggle zoom area">
+      <ToolbarAction actionbarIndicator asChild tooltip="Toggle zoom area">
         <ToggleGroupItem value="zoom">
           <CornersIn size={16} weight="bold" />
         </ToggleGroupItem>
       </ToolbarAction>
       <Actionbar open={toolbar.actionbarState === 'click'} content={<CursorActionbar />}>
-        <ToolbarAction asChild tooltip="Toggle click mode">
+        <ToolbarAction actionbarIndicator asChild tooltip="Toggle click mode">
           <ToggleGroupItem value="click">
             <Cursor size={16} weight="bold" />
           </ToggleGroupItem>

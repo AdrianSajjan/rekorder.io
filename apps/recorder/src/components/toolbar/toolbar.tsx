@@ -49,7 +49,7 @@ const PluginToolbarCSS = css.resolve`
     align-items: center;
     justify-content: space-between;
 
-    gap: ${theme.space(1)};
+    gap: ${theme.space(0.5)};
     padding-left: ${theme.space(3)};
     padding-right: ${theme.space(3)};
   }
