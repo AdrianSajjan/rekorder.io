@@ -13,7 +13,7 @@ class AudioWaveform {
   private pushToTalk: boolean;
 
   private stream: MediaStream | null;
-  private dataArray: Uint8Array<ArrayBuffer> | null;
+  private dataArray: Uint8Array | null;
   private bufferLength: number | null;
 
   constructor(canvas: HTMLCanvasElement) {
