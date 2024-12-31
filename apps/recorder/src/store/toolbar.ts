@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx';
+import { editor } from './editor';
 
 class Toolbar {
   enabled: boolean;
@@ -22,6 +23,7 @@ class Toolbar {
 
   updateActionbarState(actionbarState: string) {
     this.actionbarState = this.actionbarState === actionbarState ? '' : actionbarState;
+    if (this.actionbarState === 'draw') editor.toggleDrawingMode();
   }
 
   updateVisibilityState(state: Record<string, boolean>) {

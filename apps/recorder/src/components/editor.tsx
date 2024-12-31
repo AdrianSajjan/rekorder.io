@@ -42,8 +42,6 @@ const EditorArea = observer(() => {
     (canvas: fabric.Canvas) => {
       if (!workspace$.current) return;
       editor.initialize(canvas, workspace$.current);
-      editor.setupFreeDrawingBrush();
-      editor.toggleFreeDrawingMode(true);
     },
     [workspace$]
   );

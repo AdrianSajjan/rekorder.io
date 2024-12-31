@@ -2,19 +2,22 @@ import { ToggleGroup, ToggleGroupItem, ToggleGroupSingleProps } from '@radix-ui/
 import { CornersIn, Cursor, PencilSimple, Subtract } from '@phosphor-icons/react';
 import { observer } from 'mobx-react';
 
+import { toolbar } from '../../store/toolbar';
 import { ToolbarAction } from '../ui/toolbar-action';
 import { Actionbar } from '../actionbar/actionbar';
 import { CursorActionbar } from '../actionbar/cursor';
-import { toolbar } from '../../store/toolbar';
+import { DrawingActionbar } from '../actionbar/draw';
 
 const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, 'className'>) => {
   return (
     <ToggleGroup value={toolbar.actionbarState} onValueChange={toolbar.updateActionbarState} type="single" {...props}>
-      <ToolbarAction asChild tooltip="Toggle drawing mode">
-        <ToggleGroupItem value="draw">
-          <PencilSimple size={16} weight="bold" />
-        </ToggleGroupItem>
-      </ToolbarAction>
+      <Actionbar open={toolbar.actionbarState === 'draw'} content={<DrawingActionbar />}>
+        <ToolbarAction asChild tooltip="Toggle drawing mode">
+          <ToggleGroupItem value="draw">
+            <PencilSimple size={16} weight="bold" />
+          </ToggleGroupItem>
+        </ToolbarAction>
+      </Actionbar>
       <ToolbarAction asChild tooltip="Toggle blur mode">
         <ToggleGroupItem value="blur">
           <Subtract size={16} weight="fill" />

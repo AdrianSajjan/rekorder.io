@@ -31,7 +31,7 @@ const CursorActionbarCSS = css.resolve`
     padding: ${theme.space(2)} ${theme.space(3)};
   }
 
-  .divider {
+  .rekorder-cursor-actionbar-divider {
     height: ${theme.space(6)} !important;
     margin-left: ${theme.space(2)};
     margin-right: ${theme.space(2)};
@@ -48,7 +48,7 @@ export function CursorActionbar() {
             <Cursor size={16} weight="bold" />
           </ToggleGroupItem>
         </ToolbarAction>
-        <Divider orientation="vertical" className={clsx(CursorActionbarCSS.className, 'divider')} />
+        <Divider orientation="vertical" className={clsx(CursorActionbarCSS.className, 'rekorder-cursor-actionbar-divider')} />
         <ToolbarAction asChild tooltip="Highlight click">
           <ToggleGroupItem value="highlight-click">
             <CursorClickIcon height={16} width={16} />

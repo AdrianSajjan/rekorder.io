@@ -5,7 +5,7 @@ import { isFunction } from 'lodash';
 
 interface FabricJSCanvasProps extends Omit<React.CanvasHTMLAttributes<HTMLCanvasElement>, 'onLoad'> {
   onLoad?: (canvas: fabric.Canvas) => void;
-  options?: fabric.CanvasOptions;
+  options?: Partial<fabric.CanvasOptions>;
 }
 
 const FabricJSCanvas = React.forwardRef<fabric.Canvas, FabricJSCanvasProps>(({ onLoad, options, ...props }, ref) => {

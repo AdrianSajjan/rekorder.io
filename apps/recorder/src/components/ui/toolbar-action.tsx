@@ -90,13 +90,9 @@ function ToolbarAction({ tooltip, className, children, asChild, ...props }: Tool
     <React.Fragment>
       {ToolbarActionCSS.styles}
       {tooltip ? (
-        <Tooltip content={tooltip} arrow={false} portal={false} sideOffset={12}>
+        <Tooltip content={tooltip} arrow={false} sideOffset={12}>
           <div className="tooltip-area" aria-label={tooltip}>
-            <Component
-              aria-label={tooltip}
-              className={clsx(ToolbarActionCSS.className, 'toolbar-action', className)}
-              {...props}
-            >
+            <Component aria-label={tooltip} className={clsx(ToolbarActionCSS.className, 'toolbar-action', className)} {...props}>
               {children}
             </Component>
           </div>
