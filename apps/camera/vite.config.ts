@@ -8,6 +8,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig({
   root: __dirname,
+  base: './',
   cacheDir: '../../node_modules/.vite/apps/camera',
   server: {
     port: 4200,
@@ -26,16 +27,21 @@ export default defineConfig({
     nxViteTsPaths(),
     nxCopyAssetsPlugin(['*.md']),
   ],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
+  define: {
+    'process.env': {},
+  },
   build: {
     outDir: '../../dist/apps/camera',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
       transformMixedEsModules: true,
+    },
+    rollupOptions: {
+      input: 'camera.html',
+      output: {
+        entryFileNames: `camera.js`,
+      },
     },
   },
   test: {

@@ -19,7 +19,6 @@ export default defineConfig({
   },
   build: {
     outDir: '../../dist/apps/background',
-
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {

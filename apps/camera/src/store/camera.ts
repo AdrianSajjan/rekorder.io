@@ -47,16 +47,31 @@ class Camera {
 
   private __setupEvents() {
     chrome.runtime.onMessage.addListener(this.__runtimeMessageHandler);
+    window.addEventListener('message', this.__windowMessageHandler);
   }
 
   private __disposeEvents() {
     chrome.runtime.onMessage.removeListener(this.__runtimeMessageHandler);
+    window.removeEventListener('message', this.__windowMessageHandler);
   }
 
   private __runtimeMessageHandler(message: RuntimeMessage, sender: chrome.runtime.MessageSender, response: (message: RuntimeMessage) => void) {
     switch (message.type) {
       case '':
         this.createStream();
+        break;
+    }
+  }
+
+  private __windowMessageHandler(event: MessageEvent<RuntimeMessage>) {
+    switch (event.data.type) {
+      case 'camera:device':
+        this.device = event.data.payload.device;
+        chrome.storage.local.set({ 'camera-device': this.device });
+        break;
+      case 'camera:effect':
+        this.effect = event.data.payload.effect;
+        chrome.storage.local.set({ 'camera-effect': this.effect });
         break;
     }
   }

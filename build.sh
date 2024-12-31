@@ -11,8 +11,6 @@ nx run-many -t=build
 TEMP_PATH="./tmp"
 DIST_PATH="./dist/apps"
 EXTENSION_PATH="./extension/build"
-BACKGROUND_FILE="$DIST_PATH/background/background.js"
-RECORDER_FILE="$DIST_PATH/recorder/content-script.js"
 
 # Step 3: Delete the extension build folder if it exists
 echo "Deleting extension build folder..."
@@ -24,12 +22,16 @@ fi
 echo "Creating extension build folder..."
 mkdir -p "$EXTENSION_PATH"
 
-# Step 5: Copy files to the extension build directory
+# Step 5: Copy all files from dist subfolders to extension build directory
 echo "Copying files to extension build directory..."
-cp "$BACKGROUND_FILE" "$EXTENSION_PATH/background.js"
-cp "$RECORDER_FILE" "$EXTENSION_PATH/content-script.js"
+for dir in "$DIST_PATH"/*/ ; do
+    if [ -d "$dir" ]; then
+        # Copy all files from each subfolder
+        cp -r "$dir"* "$EXTENSION_PATH/"
+    fi
+done
 
-# Step 6: check if tmp folder exists and remove its folder and its content
+# Step 6: check if temporary folders exists and remove its folder and its content
 echo "Cleaning up files and folders..."
 if [ -d "$TEMP_PATH" ]; then
   rm -rf "$TEMP_PATH"
