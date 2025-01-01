@@ -1,14 +1,10 @@
-import exportWebmBlob from 'fix-webm-duration';
-
 import { makeAutoObservable, runInAction } from 'mobx';
-import { toast } from 'sonner';
 
-import { RuntimeMessage } from '@rekorder.io/types';
-import { unwrapError } from '@rekorder.io/utils';
-
+import { EventConfig } from '@rekorder.io/constants';
 import { RECORD_TIMEOUT } from '../constants/recorder';
-import { microphone } from './microphone';
-import { StreamConfig } from '@rekorder.io/constants';
+import { RuntimeMessage } from '@rekorder.io/types';
+import { toast } from 'sonner';
+import { unwrapError } from '@rekorder.io/utils';
 
 class Recorder {
   audio: boolean;
@@ -25,6 +21,7 @@ class Recorder {
 
     this.interval = null;
     this.timeout = null;
+
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -52,33 +49,93 @@ class Recorder {
     this.interval = null;
   }
 
+  private __runtimeEvents(message: RuntimeMessage) {
+    switch (message.type) {
+      case EventConfig.StreamCaptureError: {
+        this.__stopTimer();
+        this.status = 'error';
+        toast.error(unwrapError(message.payload.error, 'Something went wrong while capturing your screen.'));
+        break;
+      }
+
+      case EventConfig.StreamSaveSuccess: {
+        this.status = 'idle';
+        window.open(message.payload.url, '_blank');
+        this.__removeEvents();
+        break;
+      }
+
+      case EventConfig.StreamSaveError: {
+        this.status = 'error';
+        toast.error(unwrapError(message.payload.error, 'Something went wrong while saving your recording.'));
+        this.__removeEvents();
+        break;
+      }
+
+      default: {
+        console.warn('Unhandled message type:', message.type);
+      }
+    }
+  }
+
+  private __setupEvents() {
+    chrome.runtime.onMessage.addListener(this.__runtimeEvents);
+  }
+
+  private __removeEvents() {
+    chrome.runtime.onMessage.removeListener(this.__runtimeEvents);
+  }
+
   startScreenCapture() {
     this.status = 'pending';
-    this.timeout = setTimeout(() => {}, RECORD_TIMEOUT * 1000);
+    this.timeout = setTimeout(() => {
+      chrome.runtime.sendMessage({ type: EventConfig.TabCapture }, (response) => {
+        switch (response.type) {
+          case EventConfig.TabCaptureSuccess: {
+            this.status = 'active';
+            this.__startTimer();
+            this.__setupEvents();
+            break;
+          }
+
+          case EventConfig.TabCaptureError: {
+            this.status = 'error';
+            this.__removeEvents();
+            break;
+          }
+
+          default: {
+            console.warn('Unhandled message type:', response.type);
+            break;
+          }
+        }
+      });
+    }, RECORD_TIMEOUT * 1000);
   }
 
   stopScreenCapture() {
     this.status = 'saving';
-    chrome.runtime.sendMessage({ type: StreamConfig.StopCapture });
+    chrome.runtime.sendMessage({ type: EventConfig.StreamStopCapture });
   }
 
   cancelScreenCapture() {
     if (this.timeout) clearTimeout(this.timeout);
     this.status = 'idle';
+    chrome.runtime.sendMessage({ type: EventConfig.StreamStopCapture, payload: { timestamp: this.timestamp } });
   }
 
   pauseScreenCapture() {
-    if (this.recorder) {
-      if (this.recorder.state === 'recording') this.recorder.pause();
+    if (this.status === 'active') {
       this.status = 'paused';
+      chrome.runtime.sendMessage({ type: EventConfig.StreamPauseCapture });
       this.__stopTimer();
     }
   }
 
   resumeScreenCapture() {
-    if (this.recorder) {
-      if (this.recorder.state === 'paused') this.recorder.resume();
+    if (this.status === 'paused') {
       this.status = 'active';
+      chrome.runtime.sendMessage({ type: EventConfig.StreamResumeCapture });
       this.__startTimer();
     }
   }
