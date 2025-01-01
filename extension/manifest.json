@@ -25,6 +25,7 @@
         "scripting",
         "storage",
         "activeTab",
-        "tabCapture"
+        "tabCapture",
+        "offscreen"
     ]
 }

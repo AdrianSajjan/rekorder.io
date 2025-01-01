@@ -1,5 +1,5 @@
 import exportWebmBlob from 'fix-webm-duration';
-import { StreamConfig } from '@rekorder.io/constants';
+import { EventConfig } from '@rekorder.io/constants';
 
 class OffscreenRecorder {
   chunks: Blob[];
@@ -37,13 +37,16 @@ class OffscreenRecorder {
   }
 
   private __exportWebmBlob(blob: Blob) {
+    console.log('Exporting webm blob');
     const url = URL.createObjectURL(blob);
-    chrome.runtime.sendMessage({ type: StreamConfig.SaveSuccess, payload: { url } });
+    console.log('Sending url', url);
+    chrome.runtime.sendMessage({ type: EventConfig.StreamSaveSuccess, payload: { url } });
   }
 
   private __recorderDataSaved() {
+    console.log('Recorder data saved');
     const blob = new Blob(this.chunks, { type: 'video/webm' });
-    exportWebmBlob(blob, this.timestamp, this.__exportWebmBlob, { logger: false });
+    exportWebmBlob(blob, this.timestamp, this.__exportWebmBlob.bind(this), { logger: false });
     this.chunks = [];
   }
 
@@ -57,7 +60,7 @@ class OffscreenRecorder {
     if (!this.video) return;
 
     this.__preventTabSilence(this.video);
-    chrome.runtime.sendMessage({ type: StreamConfig.CaptureSuccess, payload: null });
+    chrome.runtime.sendMessage({ type: EventConfig.StreamCaptureSuccess, payload: null });
 
     const combined = [...this.video.getVideoTracks()];
     if (this.audio) combined.push(...this.audio.getAudioTracks());
@@ -66,17 +69,18 @@ class OffscreenRecorder {
     this.stream = new MediaStream(combined);
     this.recorder = new MediaRecorder(this.stream, { mimeType: 'video/webm; codecs=vp9,opus' });
 
-    this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable);
-    this.recorder.addEventListener('stop', this.__recorderDataSaved);
+    this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable.bind(this));
+    this.recorder.addEventListener('stop', this.__recorderDataSaved.bind(this));
     this.recorder.start();
   }
 
   private __captureStreamError(error: unknown) {
-    chrome.runtime.sendMessage({ type: StreamConfig.CaptureError, payload: { error } });
+    chrome.runtime.sendMessage({ type: EventConfig.StreamCaptureError, payload: { error } });
   }
 
   async start(sourceId: string, microphoneId: string) {
     try {
+      console.log('Starting video capture', sourceId, microphoneId, navigator.mediaDevices);
       this.video = await navigator.mediaDevices.getUserMedia({
         audio: {
           mandatory: {
@@ -91,25 +95,29 @@ class OffscreenRecorder {
           },
         },
       } as MediaStreamConstraints);
+      console.log('Video capture success');
 
-      if (microphoneId !== 'n/a') {
+      if (!!microphoneId && microphoneId !== 'n/a') {
+        console.log('Starting audio capture', microphoneId);
         this.audio = await navigator.mediaDevices.getUserMedia({
           audio: {
             deviceId: microphoneId,
           },
         });
+        console.log('Audio capture success');
       }
 
+      console.log('Capture stream success');
       this.__captureStreamSuccess();
     } catch (error) {
+      console.log('Capture stream error', error);
       this.__captureStreamError(error);
     }
   }
 
   stop() {
-    if (this.recorder?.state === 'recording') {
-      this.recorder.stop();
-    }
+    console.log('Stop recorder', this.recorder?.state);
+    this.recorder?.stop();
 
     if (this.stream) {
       this.stream.getTracks().forEach((track) => track.stop());

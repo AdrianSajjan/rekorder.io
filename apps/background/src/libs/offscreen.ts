@@ -16,7 +16,7 @@ class Offscreen {
     } else {
       this.creating = chrome.offscreen.createDocument({
         url: path,
-        reasons: [chrome.offscreen.Reason.USER_MEDIA, chrome.offscreen.Reason.DISPLAY_MEDIA],
+        reasons: [chrome.offscreen.Reason.USER_MEDIA, chrome.offscreen.Reason.DISPLAY_MEDIA, chrome.offscreen.Reason.AUDIO_PLAYBACK],
         justification: 'Record users desktop screen and audio and microphone audio',
       });
       await this.creating;
