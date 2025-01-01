@@ -16,11 +16,13 @@ class Editor {
   color: string;
   width: number;
   mode: EditorMode;
+  scrollSync: boolean;
 
   private _eraser: EraserBrush | null = null;
   private _observer: ResizeObserver | null = null;
   private _pencil: fabric.PencilBrush | null = null;
   private _disposables: VoidFunction[] = [];
+  private _lastScrollY = 0;
 
   constructor() {
     this.canvas = null;
@@ -29,6 +31,7 @@ class Editor {
     this.width = 10;
     this.mode = 'pencil';
     this.color = '#000000';
+    this.scrollSync = true;
 
     makeAutoObservable(this, {}, { autoBind: true });
   }
@@ -50,6 +53,26 @@ class Editor {
     this._observer = new ResizeObserver(throttle(this.__resizeCanvas, 200));
     this._observer.observe(this.workspace);
     this.__resizeCanvas();
+  }
+
+  private __syncViewportWithScroll() {
+    if (!this.canvas || !this.scrollSync) return;
+
+    const currentScrollY = window.scrollY;
+    const scrollDelta = currentScrollY - this._lastScrollY;
+
+    const viewportTransform: fabric.TMat2D = [...this.canvas.viewportTransform];
+    viewportTransform[5] -= scrollDelta;
+    this.canvas.setViewportTransform(viewportTransform);
+    this._lastScrollY = currentScrollY;
+  }
+
+  private __setupEvents() {
+    document.addEventListener('scroll', this.__syncViewportWithScroll);
+  }
+
+  private __resetEvents() {
+    document.removeEventListener('scroll', this.__syncViewportWithScroll);
   }
 
   private __setupDrawingBrush() {
@@ -85,18 +108,25 @@ class Editor {
     this.workspace = workspace;
     this.__setupResizeObserver();
     this.__setupDrawingBrush();
+    this.__setupEvents();
   }
 
   updateColor(color: string) {
     this.color = color;
+
     if (this.canvas?.freeDrawingBrush) {
-      this.canvas.freeDrawingBrush.color = color;
+      if (this.mode === 'highlighter') {
+        this.canvas.freeDrawingBrush.color = theme.alpha(color, 0.3);
+      } else {
+        this.canvas.freeDrawingBrush.color = color;
+      }
       this.canvas.requestRenderAll();
     }
   }
 
   updateWidth(width: number) {
     this.width = width;
+
     if (this.canvas?.freeDrawingBrush) {
       this.canvas.freeDrawingBrush.width = width;
       this.canvas.requestRenderAll();
@@ -149,6 +179,7 @@ class Editor {
   }
 
   dispose() {
+    this.__resetEvents();
     this._observer?.disconnect();
     this._disposables.forEach((dispose) => dispose());
 
