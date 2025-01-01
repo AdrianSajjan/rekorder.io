@@ -7,7 +7,8 @@
       "@nx/react/typings/styled-jsx.d.ts",
       "@nx/react/typings/cssmodule.d.ts",
       "@nx/react/typings/image.d.ts",
-      "vite/client"
+      "vite/client",
+      "@types/chrome"
     ],
     "composite": true,
     "declaration": true
@@ -34,5 +35,12 @@
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../types/**/*.ts",
+    "../constants/**/*.ts"
+  ]
 }

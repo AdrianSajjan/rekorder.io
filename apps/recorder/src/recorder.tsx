@@ -7,11 +7,11 @@ import { AnimationsProvider, theme } from '@rekorder.io/ui';
 import { CameraPreview } from './components/camera';
 import { PluginCard } from './components/plugin/plugin';
 import { PluginToolbar } from './components/toolbar/toolbar';
-
+import { Permission } from './components/permission';
 import { Overlay } from './components/overlay';
 import { TimerCountdown } from './components/timer';
-import { SAFE_AREA_PADDING } from './constants/layout';
 import { EditorArea } from './components/editor';
+import { SAFE_AREA_PADDING } from './constants/layout';
 
 const RecorderCSS = css.resolve`
   * {
@@ -40,6 +40,7 @@ export function Recorder() {
         <CameraPreview />
         <TimerCountdown />
       </section>
+      <Permission />
       <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
     </AnimationsProvider>
   );

@@ -3,6 +3,7 @@ import * as BodySegmentation from '@tensorflow-models/body-segmentation';
 
 import { makeAutoObservable } from 'mobx';
 import { Autocomplete, CameraEffects, RuntimeMessage } from '@rekorder.io/types';
+import { CameraConfig, EventConfig } from '@rekorder.io/constants';
 
 class Camera {
   effect: CameraEffects;
@@ -39,9 +40,9 @@ class Camera {
   }
 
   private __setupStore() {
-    chrome.storage.local.get(['camera-device', 'camera-effect'], (result) => {
-      this.device = result['camera-device'] || 'n/a';
-      this.effect = result['camera-effect'] || 'none';
+    chrome.storage.local.get([CameraConfig.DeviceId, CameraConfig.Effect], (result) => {
+      this.device = result[CameraConfig.DeviceId] || 'n/a';
+      this.effect = result[CameraConfig.Effect] || 'none';
     });
   }
 
@@ -56,22 +57,16 @@ class Camera {
   }
 
   private __runtimeMessageHandler(message: RuntimeMessage, sender: chrome.runtime.MessageSender, response: (message: RuntimeMessage) => void) {
-    switch (message.type) {
-      case '':
-        this.createStream();
-        break;
-    }
+    // TODO: Implement runtime message handler if required
   }
 
   private __windowMessageHandler(event: MessageEvent<RuntimeMessage>) {
     switch (event.data.type) {
-      case 'camera:device':
+      case EventConfig.CameraDevice:
         this.device = event.data.payload.device;
-        chrome.storage.local.set({ 'camera-device': this.device });
         break;
-      case 'camera:effect':
+      case EventConfig.CameraEffect:
         this.effect = event.data.payload.effect;
-        chrome.storage.local.set({ 'camera-effect': this.effect });
         break;
     }
   }

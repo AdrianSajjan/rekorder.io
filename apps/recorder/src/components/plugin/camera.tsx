@@ -4,13 +4,13 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
-import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 
+import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
 import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
-import { useFetchUserCameraDevices } from '@rekorder.io/hooks';
 
 import { camera } from '../../store/camera';
 import { openPermissionSettings } from '../../lib/utils';
+import { useRequestCameraDevices } from '../../hooks/use-camera-devices';
 
 const CameraPluginCSS = css.resolve`
   .rekorder-camera-plugin-container {
@@ -53,7 +53,7 @@ const CameraPluginCSS = css.resolve`
 `;
 
 const CameraPlugin = observer(() => {
-  const { cameras, permission } = useFetchUserCameraDevices();
+  const { devices: cameras, permission } = useRequestCameraDevices();
 
   const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
   const [isCameraSelectOpen, setCameraSelectOpen] = useState(false);

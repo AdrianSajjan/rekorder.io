@@ -3,7 +3,7 @@ import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 
 import { ArrowsOutSimple, X } from '@phosphor-icons/react';
 import { animations, theme } from '@rekorder.io/ui';
@@ -78,6 +78,23 @@ const CameraPreviewCSS = css.resolve`
     position: absolute;
     pointer-events: none;
   }
+
+  .rekorder-camera-iframe {
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .rekorder-camera-iframe[data-flip='true'] {
+    transform: translate(-50%, -50%) scaleX(-1);
+  }
+
+  .rekorder-camera-iframe[data-flip='false'] {
+    transform: translate(-50%, -50%) scaleX(1);
+  }
 `;
 
 const CameraPreviewHOC = observer(() => {
@@ -93,23 +110,29 @@ const CameraPreview = observer(() => {
 
   const drag = useDragControls<HTMLDivElement>({ position: 'top-left' });
 
-  const boxSize = cameraSize / Math.sqrt(2);
-  const boxPosition = (cameraSize - boxSize) / 2;
-  const style = { width: cameraSize, height: cameraSize, top: boxPosition, left: boxPosition };
+  const styles = useMemo(() => {
+    const position = (cameraSize - cameraSize / Math.sqrt(2)) / 2;
+    return theme.createStyles({
+      handle: { width: cameraSize, height: cameraSize },
+      control: { width: cameraSize, height: cameraSize, top: position, left: position },
+    });
+  }, [cameraSize]);
 
   return (
     <Fragment>
       {CameraPreviewCSS.styles}
       <Draggable handle="#rekorder-camera-handle" nodeRef={drag.ref} position={drag.position} bounds={drag.bounds} onStop={drag.onChangePosition}>
         <div ref={drag.ref} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
-          <div
-            id="rekorder-camera-handle"
-            className={clsx(CameraPreviewCSS.className, 'rekorder-camera-handle')}
-            style={{ width: cameraSize, height: cameraSize }}
-          >
-            <iframe src={chrome.runtime.getURL('build/camera.html')} title="Camera Preview" allow="camera" className="rekorder-camera-iframe" />
+          <div id="rekorder-camera-handle" className={clsx(CameraPreviewCSS.className, 'rekorder-camera-handle')} style={styles.handle}>
+            <iframe
+              allow="camera"
+              title="Camera Preview"
+              src={chrome.runtime.getURL('build/camera.html')}
+              className={clsx(CameraPreviewCSS.className, 'rekorder-camera-iframe')}
+              data-flip={String(camera.flip)}
+            />
           </div>
-          <div className={clsx(CameraPreviewCSS.className, 'rekorder-camera-controls')} style={style}>
+          <div className={clsx(CameraPreviewCSS.className, 'rekorder-camera-controls')} style={styles.control}>
             <button onClick={() => camera.changeDevice('n/a')} className={clsx(CameraPreviewCSS.className, 'rekorder-close-button')}>
               <X size={16} weight="bold" color={theme.colors.core.white} />
             </button>

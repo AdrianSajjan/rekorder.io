@@ -1,0 +1,9 @@
+{
+  "name": "permissions",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/permissions/src",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project permissions --web",
+  "targets": {}
+}
