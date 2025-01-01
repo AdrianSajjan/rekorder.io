@@ -122,7 +122,7 @@ class Recorder {
 
   stopScreenCapture() {
     this.status = 'saving';
-    chrome.runtime.sendMessage({ type: EventConfig.StreamStopCapture });
+    chrome.runtime.sendMessage({ type: EventConfig.StreamStopCapture, payload: { timestamp: this.timestamp } });
   }
 
   cancelScreenCapture() {

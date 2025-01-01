@@ -115,8 +115,10 @@ class OffscreenRecorder {
     }
   }
 
-  stop() {
-    console.log('Stop recorder', this.recorder?.state);
+  stop(timestamp?: number) {
+    console.log('Stop recorder', timestamp, this.recorder?.state);
+
+    if (timestamp) this.timestamp = timestamp;
     this.recorder?.stop();
 
     if (this.stream) {

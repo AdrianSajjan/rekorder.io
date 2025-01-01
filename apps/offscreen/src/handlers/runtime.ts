@@ -12,7 +12,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
 
     case EventConfig.StreamStopCapture: {
       console.log('Stream stop capture', message.payload);
-      recorder.stop();
+      recorder.stop(message.payload.timestamp);
       return false;
     }
 

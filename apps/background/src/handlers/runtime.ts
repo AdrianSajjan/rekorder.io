@@ -43,6 +43,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
       console.log('Stream save success', message.payload);
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         console.log('Sending save success message to tab', tab.id);
+        chrome.tabs.create({ url: message.payload.url });
         if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
       });
       return false;
