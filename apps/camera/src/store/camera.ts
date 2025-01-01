@@ -74,8 +74,8 @@ class Camera {
   private __resizeCanvas() {
     this.canvas.width = this.video.videoWidth;
     this.canvas.height = this.video.videoHeight;
-    this.preview.width = this.video.videoWidth;
-    this.preview.height = this.video.videoHeight;
+    this.preview.width = this.canvas.width;
+    this.preview.height = this.canvas.height;
   }
 
   private __drawCanvas(source: CanvasImageSource) {
@@ -174,6 +174,7 @@ class Camera {
   }
 
   dispose() {
+    this.cancelStream();
     this.__disposeEvents();
   }
 }

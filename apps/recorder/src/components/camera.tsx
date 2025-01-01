@@ -107,14 +107,14 @@ const CameraPreviewHOC = observer(() => {
 
 const CameraPreview = observer(() => {
   const [cameraSize, setCameraSize] = useState(200);
-
   const drag = useDragControls<HTMLDivElement>({ position: 'top-left' });
 
   const styles = useMemo(() => {
-    const position = (cameraSize - cameraSize / Math.sqrt(2)) / 2;
+    const size = cameraSize / Math.sqrt(2);
+    const position = (cameraSize - size) / 2;
     return theme.createStyles({
       handle: { width: cameraSize, height: cameraSize },
-      control: { width: cameraSize, height: cameraSize, top: position, left: position },
+      control: { width: size, height: size, top: position, left: position },
     });
   }, [cameraSize]);
 

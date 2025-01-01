@@ -3,4 +3,8 @@ export const EventConfig = {
   CameraPermission: 'camera:permission',
   CameraDevice: 'camera:device',
   CameraEffect: 'camera:effect',
+
+  AudioDevices: 'audio:devices',
+  AudioPermission: 'audio:permission',
+  AudioDevice: 'audio:device',
 };
