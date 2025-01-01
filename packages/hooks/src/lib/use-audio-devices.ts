@@ -31,7 +31,7 @@ export function useRequestAudioDevices() {
   }, []);
 
   const handlePermissionChange = useCallback(async () => {
-    const status = await navigator.permissions.query({ name: 'Audio' as PermissionName });
+    const status = await navigator.permissions.query({ name: 'microphone' as PermissionName });
 
     if (status.state !== permission) {
       handleChangeAudioPermission(status.state);
@@ -50,7 +50,7 @@ export function useRequestAudioDevices() {
   useEffect(() => {
     let status: PermissionStatus;
 
-    navigator.permissions.query({ name: 'Audio' as PermissionName }).then((permission) => {
+    navigator.permissions.query({ name: 'microphone' as PermissionName }).then((permission) => {
       status = permission;
       handleChangeAudioPermission(permission.state);
       status.addEventListener('change', handlePermissionChange);

@@ -7,4 +7,5 @@ export const EventConfig = {
   AudioDevices: 'audio:devices',
   AudioPermission: 'audio:permission',
   AudioDevice: 'audio:device',
+  AudioPushToTalk: 'audio:push-to-talk',
 };

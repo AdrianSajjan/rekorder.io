@@ -6,12 +6,11 @@ import { Fragment } from 'react/jsx-runtime';
 import { useState } from 'react';
 
 import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
-import { useFetchUserAudioDevices } from '@rekorder.io/hooks';
 import { Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 
 import { microphone } from '../../store/microphone';
-import { useAudioWaveform } from '../../hooks/use-audio-waveform';
 import { openPermissionSettings } from '../../lib/utils';
+import { useRequestAudioDevices } from '../../hooks/use-audio-devices';
 
 const AudioPluginCSS = css.resolve`
   .rekorder-audio-container {
@@ -64,11 +63,9 @@ const AudioPluginCSS = css.resolve`
 `;
 
 const AudioPlugin = observer(() => {
-  const waveform = useAudioWaveform(microphone.device, microphone.pushToTalk);
+  const { devices: microphones, permission } = useRequestAudioDevices();
 
   const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
-
-  const { microphones, permission } = useFetchUserAudioDevices();
   const [isMicrophoneSelectOpen, setMicrophoneSelectOpen] = useState(false);
 
   const handleMicrophoneSelectOpenChange = (open: boolean) => {
@@ -108,7 +105,14 @@ const AudioPlugin = observer(() => {
           </label>
           <Switch checked={microphone.pushToTalk} onCheckedChange={microphone.updatePushToTalk} id="push-to-talk" />
         </div>
-        {microphone.device !== 'n/a' ? <canvas id="waveform" ref={waveform} className={clsx(AudioPluginCSS.className, 'waveform')} /> : null}
+        {microphone.device !== 'n/a' ? (
+          <iframe
+            title="Waveform"
+            src={chrome.runtime.getURL('/build/waveform.html')}
+            className={clsx(AudioPluginCSS.className, 'waveform')}
+            allow="microphone:*"
+          />
+        ) : null}
       </div>
       <AlertDialog
         open={isAlertDialogOpen}

@@ -1,5 +1,6 @@
 export const AudioConfig = {
   Devices: 'audio-devices',
   Permission: 'audio-permission',
-  Device: 'audio-device',
+  DeviceId: 'audio-device-id',
+  PushToTalk: 'audio-push-to-talk',
 };

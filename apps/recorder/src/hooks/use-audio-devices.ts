@@ -9,12 +9,15 @@ export function useRequestAudioDevices() {
 
   const handleMessageEvents = useCallback((event: MessageEvent) => {
     switch (event.data.type) {
-      case EventConfig.AudioPermission:
+      case EventConfig.AudioPermission: {
         setPermission(event.data.payload.permission);
         break;
-      case EventConfig.AudioDevices:
-        setDevices(event.data.payload.devices);
+      }
+      case EventConfig.AudioDevices: {
+        const devices = event.data.payload.devices as UserMediaDevice[];
+        if (devices) setDevices(devices.filter((device) => device.kind === 'audioinput' && !!device.deviceId));
         break;
+      }
     }
   }, []);
 
@@ -24,7 +27,7 @@ export function useRequestAudioDevices() {
       const devices = deserializeOrNull<UserMediaDevice[]>(result[AudioConfig.Devices]);
 
       if (permission) setPermission(permission);
-      if (devices) setDevices(devices.filter((device) => device.kind === 'videoinput' && !!device.deviceId));
+      if (devices) setDevices(devices.filter((device) => device.kind === 'audioinput' && !!device.deviceId));
     });
   }, []);
 

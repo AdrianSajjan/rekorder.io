@@ -9,12 +9,15 @@ export function useRequestCameraDevices() {
 
   const handleMessageEvents = useCallback((event: MessageEvent) => {
     switch (event.data.type) {
-      case EventConfig.CameraPermission:
+      case EventConfig.CameraPermission: {
         setPermission(event.data.payload.permission);
         break;
-      case EventConfig.CameraDevices:
-        setDevices(event.data.payload.devices);
+      }
+      case EventConfig.CameraDevices: {
+        const devices = event.data.payload.devices as UserMediaDevice[];
+        if (devices) setDevices(devices.filter((device) => device.kind === 'videoinput' && !!device.deviceId));
         break;
+      }
     }
   }, []);
 

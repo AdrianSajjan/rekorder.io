@@ -1,3 +1,5 @@
+import { clone } from '@rekorder.io/utils';
+import { EventConfig } from '@rekorder.io/constants';
 import { Autocomplete } from '@rekorder.io/types';
 import { makeAutoObservable } from 'mobx';
 
@@ -60,11 +62,13 @@ class Microphone {
 
   changeDevice(value: Autocomplete<'n/a'>) {
     this.device = value;
-    return this;
+    window.postMessage(clone({ type: EventConfig.AudioDevice, payload: { device: value } }), '*');
   }
 
   updatePushToTalk(value: boolean) {
     this.pushToTalk = value;
+    window.postMessage(clone({ type: EventConfig.AudioPushToTalk, payload: { pushToTalk: value } }), '*');
+
     if (this.enabled) {
       if (this.pushToTalk) {
         this.__disableAudioTracks();
@@ -74,7 +78,6 @@ class Microphone {
         this.__enableAudioTracks();
       }
     }
-    return this;
   }
 
   updateEnabled(value: boolean | 'toggle') {
@@ -84,7 +87,6 @@ class Microphone {
     } else {
       this.__disableAudioTracks();
     }
-    return this;
   }
 
   createStream() {
@@ -111,7 +113,6 @@ class Microphone {
     this.status = 'idle';
     this.stream?.getTracks().forEach((track) => track.stop());
     this.stream = null;
-    return this;
   }
 }
 
