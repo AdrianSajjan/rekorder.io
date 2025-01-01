@@ -8,32 +8,23 @@ import { unwrapError } from '@rekorder.io/utils';
 
 import { RECORD_TIMEOUT } from '../constants/recorder';
 import { microphone } from './microphone';
+import { StreamConfig } from '@rekorder.io/constants';
 
 class Recorder {
   audio: boolean;
   timestamp: number;
   status: 'idle' | 'active' | 'pending' | 'saving' | 'paused' | 'error';
 
-  private stream: MediaStream | null;
-  private recorder: MediaRecorder | null;
-  private chunks: Blob[];
-
   private interval: NodeJS.Timer | null;
   private timeout: NodeJS.Timeout | null;
-  private helperAudioContext: AudioContext | null;
 
   constructor() {
     this.status = 'idle';
     this.timestamp = 0;
     this.audio = false;
 
-    this.recorder = null;
-    this.chunks = [];
-    this.stream = null;
-
     this.interval = null;
     this.timeout = null;
-    this.helperAudioContext = null;
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -61,114 +52,14 @@ class Recorder {
     this.interval = null;
   }
 
-  private __recorderDataAvailable(event: BlobEvent) {
-    if (event.data.size > 0) this.chunks.push(event.data);
-  }
-
-  private __exportWebmBlob(blob: Blob) {
-    const url = URL.createObjectURL(blob);
-    window.open(url);
-    this.status = 'idle';
-  }
-
-  private __recorderDataSaved() {
-    const blob = new Blob(this.chunks, { type: 'video/webm' });
-    exportWebmBlob(blob, this.timestamp, this.__exportWebmBlob, { logger: false });
-    this.__stopTimer(true);
-    this.chunks = [];
-  }
-
-  private __preventTabSilence(media: MediaStream) {
-    this.helperAudioContext = new AudioContext();
-    const source = this.helperAudioContext.createMediaStreamSource(media);
-    source.connect(this.helperAudioContext.destination);
-  }
-
-  private __captureStreamSuccess([video, audio]: [MediaStream, MediaStream | null]) {
-    this.stream = video;
-    this.status = 'active';
-    this.__preventTabSilence(video);
-
-    const combined = new MediaStream([...video.getVideoTracks(), ...(audio ? audio.getAudioTracks() : []), ...(this.audio ? video.getAudioTracks() : [])]);
-    this.recorder = new MediaRecorder(combined, { mimeType: 'video/webm; codecs=vp9,opus' });
-
-    this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable);
-    this.recorder.addEventListener('stop', this.__recorderDataSaved);
-
-    this.recorder.start();
-    this.__startTimer();
-  }
-
-  private __captureStreamError(error: unknown) {
-    this.status = 'error';
-    this.__stopTimer(true);
-    toast.error(unwrapError(error));
-  }
-
-  private __createStream() {
-    return new Promise<MediaStream>((resolve, reject) => {
-      chrome.runtime.sendMessage(
-        {
-          type: 'capture.tab',
-          payload: null,
-        } satisfies RuntimeMessage,
-
-        (response: RuntimeMessage) => {
-          switch (response.type) {
-            case 'capture.tab.sucesss':
-              navigator.mediaDevices
-                .getUserMedia({
-                  audio: {
-                    mandatory: {
-                      chromeMediaSource: 'tab',
-                      chromeMediaSourceId: response.payload.streamId,
-                    },
-                  },
-                  video: {
-                    mandatory: {
-                      chromeMediaSource: 'tab',
-                      chromeMediaSourceId: response.payload.streamId,
-                    },
-                  },
-                } as MediaStreamConstraints)
-                .then(resolve)
-                .catch(reject);
-              break;
-
-            case 'capture.tab.error':
-              reject(response.payload.error);
-              break;
-
-            default:
-              reject({ message: 'Unhandled message: ' + response.type });
-              break;
-          }
-        }
-      );
-    });
-  }
-
   startScreenCapture() {
     this.status = 'pending';
-    this.timeout = setTimeout(() => {
-      const promise = [this.__createStream(), microphone.createStream()] as const;
-      Promise.all(promise).then(this.__captureStreamSuccess).catch(this.__captureStreamError);
-    }, RECORD_TIMEOUT * 1000);
+    this.timeout = setTimeout(() => {}, RECORD_TIMEOUT * 1000);
   }
 
   stopScreenCapture() {
-    if (!this.recorder || this.recorder.state === 'inactive') {
-      this.status = 'idle';
-      this.__stopTimer(true);
-    } else {
-      this.recorder.stop();
-      this.status = 'saving';
-    }
-
-    if (this.stream) {
-      this.stream.getTracks().forEach((track) => track.stop());
-      this.stream = null;
-    }
+    this.status = 'saving';
+    chrome.runtime.sendMessage({ type: StreamConfig.StopCapture });
   }
 
   cancelScreenCapture() {

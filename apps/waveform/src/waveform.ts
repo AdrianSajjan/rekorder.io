@@ -1,3 +1,5 @@
+import { theme } from '@rekorder.io/constants';
+
 class AudioWaveform {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
@@ -38,7 +40,7 @@ class AudioWaveform {
     this.animationFrame = requestAnimationFrame(this.__drawWaveform.bind(this));
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.lineWidth = 4;
-    this.context.strokeStyle = '#4f46e5';
+    this.context.strokeStyle = theme.colors.primary.main;
 
     if (!this.draw) {
       this.context.beginPath();
