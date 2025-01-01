@@ -1,7 +1,8 @@
-import { clone } from '@rekorder.io/utils';
-import { EventConfig } from '@rekorder.io/constants';
-import { Autocomplete } from '@rekorder.io/types';
 import { makeAutoObservable } from 'mobx';
+import { clone } from '@rekorder.io/utils';
+import { Autocomplete } from '@rekorder.io/types';
+import { AudioConfig, EventConfig } from '@rekorder.io/constants';
+import { checkPushToTalkActive, checkPushToTalkInactive } from '@rekorder.io/utils';
 
 class Microphone {
   enabled: boolean;
@@ -10,6 +11,8 @@ class Microphone {
   device: Autocomplete<'n/a'>;
   stream: MediaStream | null;
   status: 'idle' | 'pending' | 'initialized' | 'error';
+
+  private _pushToTalkActive = false;
 
   constructor() {
     this.device = 'n/a';
@@ -24,6 +27,11 @@ class Microphone {
     return new Microphone();
   }
 
+  private get _waveform() {
+    const iframe = document.getElementById('rekorder-waveform-iframe') as HTMLIFrameElement | null;
+    return iframe?.contentWindow ?? window;
+  }
+
   private __setupEvents() {
     document.addEventListener('keydown', this.__handleKeyDown);
     document.addEventListener('keyup', this.__handleKeyUp);
@@ -35,11 +43,19 @@ class Microphone {
   }
 
   private __handleKeyDown(event: KeyboardEvent) {
-    if (event.altKey && event.shiftKey && event.code === 'KeyU') this.__enableAudioTracks();
+    if (checkPushToTalkActive(event) && !this._pushToTalkActive) {
+      this.__enableAudioTracks();
+      this._waveform.postMessage(clone({ type: EventConfig.AudioPushToTalkActive }), '*');
+      this._pushToTalkActive = true;
+    }
   }
 
   private __handleKeyUp(event: KeyboardEvent) {
-    if (event.altKey || event.shiftKey || event.code === 'KeyU') this.__disableAudioTracks();
+    if (checkPushToTalkInactive(event) && this._pushToTalkActive) {
+      this.__disableAudioTracks();
+      this._waveform.postMessage(clone({ type: EventConfig.AudioPushToTalkInactive }), '*');
+      this._pushToTalkActive = false;
+    }
   }
 
   private __enableAudioTracks() {
@@ -62,12 +78,16 @@ class Microphone {
 
   changeDevice(value: Autocomplete<'n/a'>) {
     this.device = value;
-    window.postMessage(clone({ type: EventConfig.AudioDevice, payload: { device: value } }), '*');
+
+    chrome.storage.local.set({ [AudioConfig.DeviceId]: value });
+    this._waveform.postMessage(clone({ type: EventConfig.AudioDevice, payload: { device: value } }), '*');
   }
 
   updatePushToTalk(value: boolean) {
     this.pushToTalk = value;
-    window.postMessage(clone({ type: EventConfig.AudioPushToTalk, payload: { pushToTalk: value } }), '*');
+
+    chrome.storage.local.set({ [AudioConfig.PushToTalk]: value });
+    this._waveform.postMessage(clone({ type: EventConfig.AudioPushToTalk, payload: { pushToTalk: value } }), '*');
 
     if (this.enabled) {
       if (this.pushToTalk) {

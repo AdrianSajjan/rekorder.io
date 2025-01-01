@@ -34,6 +34,13 @@ const AudioPluginCSS = css.resolve`
     flex: 1;
   }
 
+  .select-value-label {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
   .select-badge {
     margin-left: auto;
   }
@@ -81,7 +88,9 @@ const AudioPlugin = observer(() => {
           <Select.Input className={clsx(AudioPluginCSS.className, 'select-input')}>
             <div className={clsx(AudioPluginCSS.className, 'select-value')}>
               {microphone.device === 'n/a' ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
-              {microphone.device === 'n/a' ? 'No Microphone' : microphones.find((m) => m.deviceId === microphone.device)?.label}
+              <span className={clsx(AudioPluginCSS.className, 'select-value-label')}>
+                {microphone.device === 'n/a' ? 'No Microphone' : microphones.find((m) => m.deviceId === microphone.device)?.label}
+              </span>
               {microphone.device === 'n/a' ? (
                 <StatusBadge variant="error" className={clsx(AudioPluginCSS.className, 'select-badge')}>
                   Off
@@ -108,9 +117,10 @@ const AudioPlugin = observer(() => {
         {microphone.device !== 'n/a' ? (
           <iframe
             title="Waveform"
+            id="rekorder-waveform-iframe"
             src={chrome.runtime.getURL('/build/waveform.html')}
             className={clsx(AudioPluginCSS.className, 'waveform')}
-            allow="microphone:*"
+            allow="microphone *"
           />
         ) : null}
       </div>

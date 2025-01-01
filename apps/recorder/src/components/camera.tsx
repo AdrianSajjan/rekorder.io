@@ -127,6 +127,7 @@ const CameraPreview = observer(() => {
             <iframe
               allow="camera"
               title="Camera Preview"
+              id="rekorder-camera-preview-iframe"
               src={chrome.runtime.getURL('build/camera.html')}
               className={clsx(CameraPreviewCSS.className, 'rekorder-camera-iframe')}
               data-flip={String(camera.flip)}

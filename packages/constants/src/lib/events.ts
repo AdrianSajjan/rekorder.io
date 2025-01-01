@@ -8,4 +8,6 @@ export const EventConfig = {
   AudioPermission: 'audio:permission',
   AudioDevice: 'audio:device',
   AudioPushToTalk: 'audio:push-to-talk',
-};
+  AudioPushToTalkActive: 'audio:push-to-talk:active',
+  AudioPushToTalkInactive: 'audio:push-to-talk:inactive',
+} as const;

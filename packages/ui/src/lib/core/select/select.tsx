@@ -110,27 +110,21 @@ const SelectInputCSS = css.resolve`
   }
 `;
 
-const SelectInput = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
-  ({ className, children, placeholder, ...props }, ref) => {
-    const { size } = useSelectContext();
+const SelectInput = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(({ className, children, placeholder, ...props }, ref) => {
+  const { size } = useSelectContext();
 
-    return (
-      <React.Fragment>
-        {SelectInputCSS.styles}
-        <SelectPrimitive.Trigger
-          ref={ref}
-          className={clsx(SelectInputCSS.className, 'trigger', size, className)}
-          {...props}
-        >
-          {children ?? <SelectPrimitive.Value placeholder={placeholder} />}
-          <SelectPrimitive.Icon className={clsx(SelectInputCSS.className, 'icon')}>
-            <CaretDown size={14} weight="bold" />
-          </SelectPrimitive.Icon>
-        </SelectPrimitive.Trigger>
-      </React.Fragment>
-    );
-  }
-);
+  return (
+    <React.Fragment>
+      {SelectInputCSS.styles}
+      <SelectPrimitive.Trigger ref={ref} className={clsx(SelectInputCSS.className, 'trigger', size, className)} {...props}>
+        {children ?? <SelectPrimitive.Value placeholder={placeholder} />}
+        <SelectPrimitive.Icon className={clsx(SelectInputCSS.className, 'icon')}>
+          <CaretDown size={14} weight="bold" />
+        </SelectPrimitive.Icon>
+      </SelectPrimitive.Trigger>
+    </React.Fragment>
+  );
+});
 
 interface ISelectGroup {
   title: string;
@@ -270,9 +264,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
             {...props}
           >
             <SelectPrimitive.ScrollUpButton />
-            <SelectPrimitive.Viewport ref={viewport}>
-              {options ? options.map(renderOption) : children}
-            </SelectPrimitive.Viewport>
+            <SelectPrimitive.Viewport ref={viewport}>{options ? options.map(renderOption) : children}</SelectPrimitive.Viewport>
             <SelectPrimitive.ScrollDownButton />
           </SelectPrimitive.Content>
         </SelectPrimitive.Portal>
@@ -281,48 +273,28 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
   }
 );
 
-const SelectGroup = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectGroupProps>(
-  ({ className, ...props }, ref) => {
-    return (
-      <SelectPrimitive.Group className={clsx(SelectContentCSS.className, 'group', className)} ref={ref} {...props} />
-    );
-  }
-);
+const SelectGroup = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectGroupProps>(({ className, ...props }, ref) => {
+  return <SelectPrimitive.Group className={clsx(SelectContentCSS.className, 'group', className)} ref={ref} {...props} />;
+});
 
-const SelectSeparator = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectSeparatorProps>(
-  ({ className, ...props }, ref) => {
-    return (
-      <SelectPrimitive.Separator
-        ref={ref}
-        className={clsx(SelectContentCSS.className, 'separator', className)}
-        {...props}
-      />
-    );
-  }
-);
+const SelectSeparator = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectSeparatorProps>(({ className, ...props }, ref) => {
+  return <SelectPrimitive.Separator ref={ref} className={clsx(SelectContentCSS.className, 'separator', className)} {...props} />;
+});
 
-const SelectLabel = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectLabelProps>(
-  ({ className, ...props }, ref) => {
-    return (
-      <SelectPrimitive.Label ref={ref} className={clsx(SelectContentCSS.className, 'label', className)} {...props} />
-    );
-  }
-);
+const SelectLabel = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectLabelProps>(({ className, ...props }, ref) => {
+  return <SelectPrimitive.Label ref={ref} className={clsx(SelectContentCSS.className, 'label', className)} {...props} />;
+});
 
-const SelectItem = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectItemProps>(
-  ({ children, className, ...props }, ref) => {
-    return (
-      <SelectPrimitive.Item className={clsx(SelectContentCSS.className, 'item', className)} ref={ref} {...props}>
-        <SelectPrimitive.ItemText className={clsx(SelectContentCSS.className, 'text')}>
-          {children}
-        </SelectPrimitive.ItemText>
-        <SelectPrimitive.ItemIndicator className={clsx(SelectContentCSS.className, 'indicator')}>
-          <Check size={16} weight="bold" color={theme.colors.accent.dark} />
-        </SelectPrimitive.ItemIndicator>
-      </SelectPrimitive.Item>
-    );
-  }
-);
+const SelectItem = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectItemProps>(({ children, className, ...props }, ref) => {
+  return (
+    <SelectPrimitive.Item className={clsx(SelectContentCSS.className, 'item', className)} ref={ref} {...props}>
+      <SelectPrimitive.ItemText className={clsx(SelectContentCSS.className, 'text')}>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemIndicator className={clsx(SelectContentCSS.className, 'indicator')}>
+        <Check size={16} weight="bold" color={theme.colors.accent.dark} />
+      </SelectPrimitive.ItemIndicator>
+    </SelectPrimitive.Item>
+  );
+});
 
 SelectRoot.Input = SelectInput;
 SelectRoot.Content = SelectContent;

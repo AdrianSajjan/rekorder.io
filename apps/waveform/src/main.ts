@@ -1,6 +1,6 @@
 import { RuntimeMessage } from '@rekorder.io/types';
-import { AudioWaveform } from './waveform';
 import { AudioConfig, EventConfig } from '@rekorder.io/constants';
+import { AudioWaveform } from './waveform';
 
 const canvas = document.getElementById('waveform') as HTMLCanvasElement;
 const waveform = AudioWaveform.createInstance(canvas);
@@ -16,8 +16,6 @@ chrome.storage.local.get([AudioConfig.DeviceId, AudioConfig.PushToTalk], (result
 });
 
 window.addEventListener('message', (event: MessageEvent<RuntimeMessage>) => {
-  console.log('Waveform', event.data);
-
   switch (event.data.type) {
     case EventConfig.AudioDevice: {
       const deviceId = event.data.payload.device ?? 'n/a';
@@ -31,6 +29,16 @@ window.addEventListener('message', (event: MessageEvent<RuntimeMessage>) => {
     case EventConfig.AudioPushToTalk: {
       const pushToTalk = event.data.payload.pushToTalk ?? false;
       waveform.update(pushToTalk);
+      break;
+    }
+
+    case EventConfig.AudioPushToTalkActive: {
+      waveform.enableAudioTracks();
+      break;
+    }
+
+    case EventConfig.AudioPushToTalkInactive: {
+      waveform.disableAudioTracks();
       break;
     }
   }

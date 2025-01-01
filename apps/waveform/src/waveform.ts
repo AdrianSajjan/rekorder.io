@@ -1,9 +1,6 @@
-import { theme } from '@rekorder.io/ui';
-
 class AudioWaveform {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D | null;
-  private controller: AbortController | null;
 
   private audioContext: AudioContext | null;
   private analyserNode: AnalyserNode | null;
@@ -22,7 +19,6 @@ class AudioWaveform {
     this.pushToTalk = false;
     this.draw = false;
 
-    this.controller = null;
     this.dataArray = null;
     this.bufferLength = null;
     this.stream = null;
@@ -42,7 +38,7 @@ class AudioWaveform {
     this.animationFrame = requestAnimationFrame(this.__drawWaveform.bind(this));
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.context.lineWidth = 4;
-    this.context.strokeStyle = theme.colors.primary.main;
+    this.context.strokeStyle = '#4f46e5';
 
     if (!this.draw) {
       this.context.beginPath();
@@ -91,31 +87,12 @@ class AudioWaveform {
     this.__startDrawing();
   }
 
-  private __handleKeyDown(event: KeyboardEvent) {
-    if (event.altKey && event.shiftKey && event.code === 'KeyU') this.__enableAudioTracks();
-  }
-
-  private __handleKeyUp(event: KeyboardEvent) {
-    if (event.altKey || event.shiftKey || event.code === 'KeyU') this.__disableAudioTracks();
-  }
-
-  private __setupEvents() {
-    this.controller = new AbortController();
-    document.addEventListener('keydown', this.__handleKeyDown.bind(this), { signal: this.controller.signal });
-    document.addEventListener('keyup', this.__handleKeyUp.bind(this), { signal: this.controller.signal });
-  }
-
-  private __removeEvents() {
-    this.controller?.abort();
-    this.controller = null;
-  }
-
-  private __enableAudioTracks() {
+  enableAudioTracks() {
     this.draw = true;
     this.stream?.getAudioTracks().forEach((track) => (track.enabled = true));
   }
 
-  private __disableAudioTracks() {
+  disableAudioTracks() {
     this.draw = false;
     this.stream?.getAudioTracks().forEach((track) => (track.enabled = false));
   }
@@ -123,11 +100,9 @@ class AudioWaveform {
   update(value: boolean) {
     this.pushToTalk = value;
     if (this.pushToTalk) {
-      this.__disableAudioTracks();
-      this.__setupEvents();
+      this.disableAudioTracks();
     } else {
-      this.__removeEvents();
-      this.__enableAudioTracks();
+      this.enableAudioTracks();
     }
   }
 
