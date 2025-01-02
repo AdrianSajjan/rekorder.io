@@ -12,9 +12,9 @@ class Camera {
   stream: MediaStream | null;
   status: 'idle' | 'pending' | 'initialized' | 'error';
 
-  private video: HTMLVideoElement;
-  private canvas: HTMLCanvasElement;
-  private preview: HTMLCanvasElement;
+  private video: HTMLVideoElement = null!;
+  private canvas: HTMLCanvasElement = null!;
+  private preview: HTMLCanvasElement = null!;
 
   private tick: number | null = null;
   private segmenter: BodySegmentation.BodySegmenter | null = null;
@@ -24,10 +24,6 @@ class Camera {
     this.device = 'n/a';
     this.effect = 'none';
     this.status = 'idle';
-
-    this.video = document.createElement('video');
-    this.canvas = document.createElement('canvas');
-    this.preview = document.createElement('canvas');
 
     this.__setupStore();
     this.__setupEvents();
@@ -162,18 +158,28 @@ class Camera {
 
     this.tick = null;
     this.stream = null;
-    this.video.srcObject = null;
+
+    this.video = null!;
+    this.canvas = null!;
+    this.preview = null!;
   }
 
   initialize(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
     this.video = video;
     this.canvas = canvas;
+    this.preview = document.createElement('canvas');
   }
 
   start() {
     if (this.device !== 'n/a') {
       this.status = 'pending';
-      const options: MediaStreamConstraints = { video: { deviceId: this.device }, audio: false };
+      const options: MediaStreamConstraints = {
+        video: {
+          deviceId: this.device,
+          frameRate: { ideal: 30, max: 30, min: 24 },
+        },
+        audio: false,
+      };
       navigator.mediaDevices.getUserMedia(options).then(this.__createStreamSuccess).catch(this.__createSteamError);
     }
   }
