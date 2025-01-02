@@ -1,13 +1,13 @@
 import { RuntimeMessage } from '@rekorder.io/types';
-import { AudioConfig, EventConfig } from '@rekorder.io/constants';
+import { StorageConfig, EventConfig } from '@rekorder.io/constants';
 import { AudioWaveform } from './waveform';
 
 const canvas = document.getElementById('waveform') as HTMLCanvasElement;
 const waveform = AudioWaveform.createInstance(canvas);
 
-chrome.storage.local.get([AudioConfig.DeviceId, AudioConfig.PushToTalk], (result) => {
-  const deviceId = result[AudioConfig.DeviceId];
-  const pushToTalk = result[AudioConfig.PushToTalk] ?? false;
+chrome.storage.local.get([StorageConfig.AudioDeviceId, StorageConfig.AudioPushToTalk], (result) => {
+  const deviceId = result[StorageConfig.AudioDeviceId];
+  const pushToTalk = result[StorageConfig.AudioPushToTalk] ?? false;
 
   if (!deviceId || deviceId === 'n/a') return;
 
@@ -17,7 +17,7 @@ chrome.storage.local.get([AudioConfig.DeviceId, AudioConfig.PushToTalk], (result
 
 window.addEventListener('message', (event: MessageEvent<RuntimeMessage>) => {
   switch (event.data.type) {
-    case EventConfig.AudioDevice: {
+    case EventConfig.ChangeAudioDevice: {
       const deviceId = event.data.payload.device ?? 'n/a';
       waveform.stop();
 
@@ -26,19 +26,18 @@ window.addEventListener('message', (event: MessageEvent<RuntimeMessage>) => {
       break;
     }
 
-    case EventConfig.AudioPushToTalk: {
-      const pushToTalk = event.data.payload.pushToTalk ?? false;
+    case EventConfig.ChangeAudioPushToTalk: {
+      const pushToTalk = event.data.payload.active ?? false;
       waveform.update(pushToTalk);
       break;
     }
 
-    case EventConfig.AudioPushToTalkActive: {
-      waveform.enableAudioTracks();
-      break;
-    }
-
-    case EventConfig.AudioPushToTalkInactive: {
-      waveform.disableAudioTracks();
+    case EventConfig.ChangeAudioPushToTalkActivity: {
+      if (event.data.payload.active) {
+        waveform.enableAudioTracks();
+      } else {
+        waveform.disableAudioTracks();
+      }
       break;
     }
   }

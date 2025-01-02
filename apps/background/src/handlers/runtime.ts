@@ -3,36 +3,57 @@ import { RuntimeMessage } from '@rekorder.io/types';
 import { checkBrowserName } from '@rekorder.io/utils';
 import { offscreen } from '../libs/offscreen';
 
-export function handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
+export function handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender) {
   switch (message.type) {
-    case EventConfig.TabCapture: {
+    /**
+     * Get the media stream id for the current tab and start capturing the stream in the offscreen document
+     */
+    case EventConfig.StartStreamCapture: {
       chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, async (streamId) => {
         try {
           await offscreen.setup('build/offscreen.html');
-          respond({ type: EventConfig.TabCaptureSuccess, payload: { streamId } });
-          chrome.runtime.sendMessage({ type: EventConfig.StreamStartCapture, payload: { streamId } });
+          chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture, payload: { streamId } });
         } catch (error) {
-          respond({ type: EventConfig.TabCaptureError, payload: { error } });
+          if (sender.tab?.id) {
+            chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
+          }
         }
       });
-      return true;
+      return false;
     }
 
-    case EventConfig.StreamCaptureSuccess: {
+    /**
+     * Successfully started capturing stream in the offscreen document, forward the message to the content script
+     */
+    case EventConfig.StartStreamCaptureSuccess: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
       });
       return false;
     }
 
-    case EventConfig.StreamCaptureError: {
+    /**
+     * Failed to start capturing stream in the offscreen document, forward the message to the content script
+     */
+    case EventConfig.StartStreamCaptureError: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
       });
       return false;
     }
 
-    case EventConfig.StreamSaveSuccess: {
+    /**
+     * Ask the offscreen document to save the captured stream from the content script
+     */
+    case EventConfig.SaveCapturedStream: {
+      chrome.runtime.sendMessage({ ...message });
+      return false;
+    }
+
+    /**
+     * Successfully saved the captured stream in the offscreen document, open the file in the browser
+     */
+    case EventConfig.SaveCapturedStreamSuccess: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         chrome.tabs.create({ url: message.payload.url });
         if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
@@ -40,28 +61,43 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
       return false;
     }
 
-    case EventConfig.StreamSaveError: {
+    /**
+     * Failed to save the captured stream in the offscreen document, forward the message to the content script
+     */
+    case EventConfig.SaveCapturedStreamError: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
       });
       return false;
     }
 
-    case EventConfig.StreamPauseCapture: {
+    /**
+     * Ask the offscreen document to pause the captured stream from the content script
+     */
+    case EventConfig.PauseStreamCapture: {
       chrome.runtime.sendMessage({ ...message });
       return false;
     }
 
-    case EventConfig.StreamResumeCapture: {
+    /**
+     * Ask the offscreen document to resume the captured stream from the content script
+     */
+    case EventConfig.ResumeStreamCapture: {
       chrome.runtime.sendMessage({ ...message });
       return false;
     }
 
-    case EventConfig.StreamStopCapture: {
+    /**
+     * Ask the offscreen document to cancel the captured stream from the content script
+     */
+    case EventConfig.CancelStreamCapture: {
       chrome.runtime.sendMessage({ ...message });
       return false;
     }
 
+    /**
+     * Open the permission settings page in the browser
+     */
     case EventConfig.OpenPermissionSettings: {
       const name = checkBrowserName();
       if (name === 'unknown') return false;

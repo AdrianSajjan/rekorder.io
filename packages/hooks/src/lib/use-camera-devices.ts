@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { UserMediaDevice } from '@rekorder.io/types';
-import { CameraConfig, EventConfig } from '@rekorder.io/constants';
+import { StorageConfig, EventConfig } from '@rekorder.io/constants';
 import { clone, serialize } from '@rekorder.io/utils';
 
 export function useRequestCameraDevices() {
@@ -9,14 +9,14 @@ export function useRequestCameraDevices() {
 
   const handleChangeCameraPermission = useCallback((permission: PermissionState) => {
     setPermission(permission);
-    chrome.storage.local.set({ [CameraConfig.Permission]: permission });
-    window.parent.postMessage(clone({ type: EventConfig.CameraPermission, payload: { permission } }), '*');
+    chrome.storage.local.set({ [StorageConfig.CameraPermission]: permission });
+    window.parent.postMessage(clone({ type: EventConfig.ChangeCameraPermission, payload: { permission } }), '*');
   }, []);
 
   const handleChangeCameraDevices = useCallback((devices: UserMediaDevice[]) => {
     setCameras(devices);
-    chrome.storage.local.set({ [CameraConfig.Devices]: serialize(devices) });
-    window.parent.postMessage(clone({ type: EventConfig.CameraDevices, payload: { devices } }), '*');
+    chrome.storage.local.set({ [StorageConfig.CameraDevices]: serialize(devices) });
+    window.parent.postMessage(clone({ type: EventConfig.ChangeCameraDevices, payload: { devices } }), '*');
   }, []);
 
   const handleQueryDevices = useCallback(async () => {

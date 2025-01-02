@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { UserMediaDevice } from '@rekorder.io/types';
-import { AudioConfig, EventConfig } from '@rekorder.io/constants';
+import { StorageConfig, EventConfig } from '@rekorder.io/constants';
 import { clone, serialize } from '@rekorder.io/utils';
 
 export function useRequestAudioDevices() {
@@ -9,14 +9,14 @@ export function useRequestAudioDevices() {
 
   const handleChangeAudioPermission = useCallback((permission: PermissionState) => {
     setPermission(permission);
-    chrome.storage.local.set({ [AudioConfig.Permission]: permission });
-    window.parent.postMessage(clone({ type: EventConfig.AudioPermission, payload: { permission } }), '*');
+    chrome.storage.local.set({ [StorageConfig.AudioPermission]: permission });
+    window.parent.postMessage(clone({ type: EventConfig.ChangeAudioPermission, payload: { permission } }), '*');
   }, []);
 
   const handleChangeAudioDevices = useCallback((devices: UserMediaDevice[]) => {
     setMicrophones(devices);
-    chrome.storage.local.set({ [AudioConfig.Devices]: serialize(devices) });
-    window.parent.postMessage(clone({ type: EventConfig.AudioDevices, payload: { devices } }), '*');
+    chrome.storage.local.set({ [StorageConfig.AudioDevices]: serialize(devices) });
+    window.parent.postMessage(clone({ type: EventConfig.ChangeAudioDevice, payload: { devices } }), '*');
   }, []);
 
   const handleQueryDevices = useCallback(async () => {

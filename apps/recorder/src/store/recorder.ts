@@ -22,6 +22,7 @@ class Recorder {
     this.interval = null;
     this.timeout = null;
 
+    this.__setupEvents();
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -51,29 +52,29 @@ class Recorder {
 
   private __runtimeEvents(message: RuntimeMessage) {
     switch (message.type) {
-      case EventConfig.StreamCaptureError: {
+      case EventConfig.StartStreamCaptureSuccess: {
+        this.status = 'active';
+        this.__startTimer();
+        break;
+      }
+
+      case EventConfig.StartStreamCaptureError: {
         this.__stopTimer();
         this.status = 'error';
-        toast.error(unwrapError(message.payload.error, 'Something went wrong while capturing your screen.'));
+        toast.error(unwrapError(message.payload.error, 'Something went wrong while starting your recording.'));
         break;
       }
 
-      case EventConfig.StreamSaveSuccess: {
+      case EventConfig.SaveCapturedStreamSuccess: {
         this.status = 'idle';
-        window.open(message.payload.url, '_blank');
-        this.__removeEvents();
+        console.log(message.payload.url);
         break;
       }
 
-      case EventConfig.StreamSaveError: {
+      case EventConfig.SaveCapturedStreamError: {
         this.status = 'error';
         toast.error(unwrapError(message.payload.error, 'Something went wrong while saving your recording.'));
-        this.__removeEvents();
         break;
-      }
-
-      default: {
-        console.warn('Unhandled message type:', message.type);
       }
     }
   }
@@ -86,50 +87,28 @@ class Recorder {
     chrome.runtime.onMessage.removeListener(this.__runtimeEvents);
   }
 
-  private __streamCaptureCallback(response: RuntimeMessage) {
-    switch (response.type) {
-      case EventConfig.TabCaptureSuccess: {
-        this.status = 'active';
-        this.__startTimer();
-        this.__setupEvents();
-        break;
-      }
-
-      case EventConfig.TabCaptureError: {
-        this.status = 'error';
-        this.__removeEvents();
-        break;
-      }
-
-      default: {
-        console.warn('Unhandled message type:', response.type);
-        break;
-      }
-    }
-  }
-
   startScreenCapture() {
     this.status = 'pending';
     this.timeout = setTimeout(() => {
-      chrome.runtime.sendMessage({ type: EventConfig.TabCapture }, this.__streamCaptureCallback);
+      chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture });
     }, RECORD_TIMEOUT * 1000);
   }
 
   stopScreenCapture() {
     this.status = 'saving';
-    chrome.runtime.sendMessage({ type: EventConfig.StreamStopCapture, payload: { timestamp: this.timestamp } });
+    chrome.runtime.sendMessage({ type: EventConfig.CancelStreamCapture, payload: { timestamp: this.timestamp } });
   }
 
   cancelScreenCapture() {
     if (this.timeout) clearTimeout(this.timeout);
     this.status = 'idle';
-    chrome.runtime.sendMessage({ type: EventConfig.StreamStopCapture, payload: { timestamp: this.timestamp } });
+    chrome.runtime.sendMessage({ type: EventConfig.CancelStreamCapture, payload: { timestamp: this.timestamp } });
   }
 
   pauseScreenCapture() {
     if (this.status === 'active') {
       this.status = 'paused';
-      chrome.runtime.sendMessage({ type: EventConfig.StreamPauseCapture });
+      chrome.runtime.sendMessage({ type: EventConfig.PauseStreamCapture });
       this.__stopTimer();
     }
   }
@@ -137,9 +116,13 @@ class Recorder {
   resumeScreenCapture() {
     if (this.status === 'paused') {
       this.status = 'active';
-      chrome.runtime.sendMessage({ type: EventConfig.StreamResumeCapture });
+      chrome.runtime.sendMessage({ type: EventConfig.ResumeStreamCapture });
       this.__startTimer();
     }
+  }
+
+  dispose() {
+    this.__removeEvents();
   }
 }
 

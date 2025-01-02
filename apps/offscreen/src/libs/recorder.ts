@@ -38,7 +38,7 @@ class OffscreenRecorder {
 
   private __exportWebmBlob(blob: Blob) {
     const url = URL.createObjectURL(blob);
-    chrome.runtime.sendMessage({ type: EventConfig.StreamSaveSuccess, payload: { url } });
+    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { url } });
   }
 
   private __recorderDataSaved() {
@@ -57,7 +57,7 @@ class OffscreenRecorder {
     if (!this.video) return;
 
     this.__preventTabSilence(this.video);
-    chrome.runtime.sendMessage({ type: EventConfig.StreamCaptureSuccess, payload: null });
+    chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureSuccess, payload: null });
 
     const combined = [...this.video.getVideoTracks()];
     if (this.audio) combined.push(...this.audio.getAudioTracks());
@@ -72,10 +72,10 @@ class OffscreenRecorder {
   }
 
   private __captureStreamError(error: unknown) {
-    chrome.runtime.sendMessage({ type: EventConfig.StreamCaptureError, payload: { error } });
+    chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureError, payload: { error } });
   }
 
-  async start(sourceId: string, microphoneId: string) {
+  async start(sourceId: string, microphoneId?: string) {
     try {
       this.video = await navigator.mediaDevices.getUserMedia({
         audio: {

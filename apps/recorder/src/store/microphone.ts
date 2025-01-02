@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 import { clone } from '@rekorder.io/utils';
 import { Autocomplete } from '@rekorder.io/types';
-import { AudioConfig, EventConfig } from '@rekorder.io/constants';
+import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { checkPushToTalkActive, checkPushToTalkInactive } from '@rekorder.io/utils';
 
 class Microphone {
@@ -42,22 +42,22 @@ class Microphone {
 
   private __handleKeyDown(event: KeyboardEvent) {
     if (checkPushToTalkActive(event) && !this._pushToTalkActive) {
-      this._waveform.postMessage(clone({ type: EventConfig.AudioPushToTalkActive }), '*');
+      this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalkActivity, payload: { active: true } }), '*');
       this._pushToTalkActive = true;
     }
   }
 
   private __handleKeyUp(event: KeyboardEvent) {
     if (checkPushToTalkInactive(event) && this._pushToTalkActive) {
-      this._waveform.postMessage(clone({ type: EventConfig.AudioPushToTalkInactive }), '*');
+      this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalkActivity, payload: { active: false } }), '*');
       this._pushToTalkActive = false;
     }
   }
 
   changeDevice(value: Autocomplete<'n/a'>) {
     this.device = value;
-    chrome.storage.local.set({ [AudioConfig.DeviceId]: value });
-    this._waveform.postMessage(clone({ type: EventConfig.AudioDevice, payload: { device: value } }), '*');
+    chrome.storage.local.set({ [StorageConfig.AudioDeviceId]: value });
+    this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioDevice, payload: { device: value } }), '*');
   }
 
   updateEnabled(value: boolean | 'toggle') {
@@ -66,8 +66,8 @@ class Microphone {
 
   updatePushToTalk(value: boolean) {
     this.pushToTalk = value;
-    chrome.storage.local.set({ [AudioConfig.PushToTalk]: value });
-    this._waveform.postMessage(clone({ type: EventConfig.AudioPushToTalk, payload: { pushToTalk: value } }), '*');
+    chrome.storage.local.set({ [StorageConfig.AudioPushToTalk]: value });
+    this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalk, payload: { pushToTalk: value } }), '*');
 
     if (!this.enabled) return;
 

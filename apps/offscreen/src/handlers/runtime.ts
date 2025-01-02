@@ -4,23 +4,43 @@ import { recorder } from '../libs/recorder';
 
 export function handleRuntimeMessageListener(message: RuntimeMessage) {
   switch (message.type) {
-    case EventConfig.StreamStartCapture: {
+    /**
+     * Message received from the content script relayed by background worker to start capturing the stream
+     */
+    case EventConfig.StartStreamCapture: {
       recorder.start(message.payload.streamId, message.payload.microphoneId);
       return false;
     }
 
-    case EventConfig.StreamStopCapture: {
+    /**
+     * Message received from the content script relayed by background worker to save the captured stream
+     */
+    case EventConfig.SaveCapturedStream: {
       recorder.stop(message.payload.timestamp);
       return false;
     }
 
-    case EventConfig.StreamPauseCapture: {
+    /**
+     * Message received from the content script relayed by background worker to pause the captured stream
+     */
+    case EventConfig.PauseStreamCapture: {
       recorder.pause();
       return false;
     }
 
-    case EventConfig.StreamResumeCapture: {
+    /**
+     * Message received from the content script relayed by background worker to resume the captured stream
+     */
+    case EventConfig.ResumeStreamCapture: {
       recorder.resume();
+      return false;
+    }
+
+    /**
+     * Message received from the content script relayed by background worker to cancel the captured stream
+     */
+    case EventConfig.CancelStreamCapture: {
+      // TODO: Implement this
       return false;
     }
 
