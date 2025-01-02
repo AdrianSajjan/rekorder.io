@@ -124,11 +124,8 @@ class OffscreenRecorder {
   private async __captureDisplayVideoStream() {
     this.video = await navigator.mediaDevices.getUserMedia({
       audio: this.captureDeviceAudio ? { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId } } : false,
-      video: {
-        mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId, maxFrameRate: 30 },
-        frameRate: { ideal: 30, max: 30, min: 24 },
-      },
-    } as unknown as MediaStreamConstraints);
+      video: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId, maxFrameRate: 30 } },
+    } as MediaStreamConstraints);
   }
 
   private async __captureUserMicrophoneAudio() {
