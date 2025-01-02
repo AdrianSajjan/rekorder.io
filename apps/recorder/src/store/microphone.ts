@@ -5,19 +5,16 @@ import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { checkPushToTalkActive, checkPushToTalkInactive } from '@rekorder.io/utils';
 
 class Microphone {
+  muted: boolean;
   enabled: boolean;
   pushToTalk: boolean;
   device: Autocomplete<'n/a'>;
-  status: 'idle' | 'pending' | 'initialized' | 'error';
-
-  private _pushToTalkActive = false;
 
   constructor() {
+    this.muted = false;
     this.device = 'n/a';
-    this.status = 'idle';
     this.enabled = true;
     this.pushToTalk = false;
-
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -41,16 +38,22 @@ class Microphone {
   }
 
   private __handleKeyDown(event: KeyboardEvent) {
-    if (checkPushToTalkActive(event) && !this._pushToTalkActive) {
+    if (!this.muted || !this.enabled) return;
+
+    if (checkPushToTalkActive(event)) {
       this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalkActivity, payload: { active: true } }), '*');
-      this._pushToTalkActive = true;
+      chrome.runtime.sendMessage({ type: EventConfig.ChangeAudioPushToTalkActivity, payload: { active: true } });
+      this.muted = false;
     }
   }
 
   private __handleKeyUp(event: KeyboardEvent) {
-    if (checkPushToTalkInactive(event) && this._pushToTalkActive) {
+    if (this.muted || !this.enabled) return;
+
+    if (checkPushToTalkInactive(event)) {
       this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalkActivity, payload: { active: false } }), '*');
-      this._pushToTalkActive = false;
+      chrome.runtime.sendMessage({ type: EventConfig.ChangeAudioPushToTalkActivity, payload: { active: false } });
+      this.muted = true;
     }
   }
 
@@ -62,19 +65,22 @@ class Microphone {
 
   updateEnabled(value: boolean | 'toggle') {
     this.enabled = value === 'toggle' ? !this.enabled : value;
+    chrome.runtime.sendMessage({ type: EventConfig.ChangeAudioMutedState, payload: { muted: this.enabled } });
   }
 
   updatePushToTalk(value: boolean) {
     this.pushToTalk = value;
+
     chrome.storage.local.set({ [StorageConfig.AudioPushToTalk]: value });
     this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalk, payload: { pushToTalk: value } }), '*');
+    chrome.runtime.sendMessage({ type: EventConfig.ChangeAudioPushToTalk, payload: { pushToTalk: value } });
 
-    if (!this.enabled) return;
-
-    if (this.pushToTalk) {
-      this.__setupEvents();
-    } else {
-      this.__removeEvents();
+    if (this.enabled) {
+      if (this.pushToTalk) {
+        this.__setupEvents();
+      } else {
+        this.__removeEvents();
+      }
     }
   }
 }
