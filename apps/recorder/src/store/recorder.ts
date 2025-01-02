@@ -50,10 +50,8 @@ class Recorder {
   }
 
   private __runtimeEvents(message: RuntimeMessage) {
-    console.log('Runtime message', message);
     switch (message.type) {
       case EventConfig.StreamCaptureError: {
-        console.log('Capture error', message.payload);
         this.__stopTimer();
         this.status = 'error';
         toast.error(unwrapError(message.payload.error, 'Something went wrong while capturing your screen.'));
@@ -61,7 +59,6 @@ class Recorder {
       }
 
       case EventConfig.StreamSaveSuccess: {
-        console.log('Save success', message.payload);
         this.status = 'idle';
         window.open(message.payload.url, '_blank');
         this.__removeEvents();
@@ -69,7 +66,6 @@ class Recorder {
       }
 
       case EventConfig.StreamSaveError: {
-        console.log('Save error', message.payload);
         this.status = 'error';
         toast.error(unwrapError(message.payload.error, 'Something went wrong while saving your recording.'));
         this.__removeEvents();
@@ -115,7 +111,6 @@ class Recorder {
   startScreenCapture() {
     this.status = 'pending';
     this.timeout = setTimeout(() => {
-      console.log(EventConfig.TabCapture);
       chrome.runtime.sendMessage({ type: EventConfig.TabCapture }, this.__streamCaptureCallback);
     }, RECORD_TIMEOUT * 1000);
   }

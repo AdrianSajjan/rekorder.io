@@ -37,14 +37,11 @@ class OffscreenRecorder {
   }
 
   private __exportWebmBlob(blob: Blob) {
-    console.log('Exporting webm blob');
     const url = URL.createObjectURL(blob);
-    console.log('Sending url', url);
     chrome.runtime.sendMessage({ type: EventConfig.StreamSaveSuccess, payload: { url } });
   }
 
   private __recorderDataSaved() {
-    console.log('Recorder data saved');
     const blob = new Blob(this.chunks, { type: 'video/webm' });
     exportWebmBlob(blob, this.timestamp, this.__exportWebmBlob.bind(this), { logger: false });
     this.chunks = [];
@@ -80,7 +77,6 @@ class OffscreenRecorder {
 
   async start(sourceId: string, microphoneId: string) {
     try {
-      console.log('Starting video capture', sourceId, microphoneId, navigator.mediaDevices);
       this.video = await navigator.mediaDevices.getUserMedia({
         audio: {
           mandatory: {
@@ -95,29 +91,22 @@ class OffscreenRecorder {
           },
         },
       } as MediaStreamConstraints);
-      console.log('Video capture success');
 
       if (!!microphoneId && microphoneId !== 'n/a') {
-        console.log('Starting audio capture', microphoneId);
         this.audio = await navigator.mediaDevices.getUserMedia({
           audio: {
             deviceId: microphoneId,
           },
         });
-        console.log('Audio capture success');
       }
 
-      console.log('Capture stream success');
       this.__captureStreamSuccess();
     } catch (error) {
-      console.log('Capture stream error', error);
       this.__captureStreamError(error);
     }
   }
 
   stop(timestamp?: number) {
-    console.log('Stop recorder', timestamp, this.recorder?.state);
-
     if (timestamp) this.timestamp = timestamp;
     this.recorder?.stop();
 

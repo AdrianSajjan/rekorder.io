@@ -26,6 +26,12 @@
     "src/**/*.js",
     "src/**/*.jsx",
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "../../packages/utils/src/**/*",
+    "../../packages/constants/src/**/*",
+    "../../packages/ui/src/**/*",
+    "../../packages/canvas/src/**/*",
+    "../../packages/hooks/src/**/*",
+    "../../packages/types/src/**/*"
   ]
 }

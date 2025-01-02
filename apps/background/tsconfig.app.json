@@ -22,5 +22,13 @@
     "src/**/*.test.jsx",
     "src/**/*.spec.jsx"
   ],
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "../../packages/utils/src/**/*",
+    "../../packages/constants/src/**/*",
+    "../../packages/ui/src/**/*",
+    "../../packages/canvas/src/**/*",
+    "../../packages/hooks/src/**/*",
+    "../../packages/types/src/**/*"
+  ]
 }
