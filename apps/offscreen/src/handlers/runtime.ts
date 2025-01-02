@@ -8,7 +8,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
      * Message received from the content script relayed by background worker to start capturing the stream
      */
     case EventConfig.StartStreamCapture: {
-      recorder.start(message.payload.streamId, message.payload.microphoneId);
+      recorder.start(message.payload.streamId, message.payload.microphoneId, message.payload.captureDeviceAudio, message.payload.pushToTalk);
       return false;
     }
 

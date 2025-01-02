@@ -1,10 +1,12 @@
+import { toast } from 'sonner';
 import { makeAutoObservable, runInAction } from 'mobx';
 
 import { EventConfig } from '@rekorder.io/constants';
-import { RECORD_TIMEOUT } from '../constants/recorder';
 import { RuntimeMessage } from '@rekorder.io/types';
-import { toast } from 'sonner';
 import { unwrapError } from '@rekorder.io/utils';
+
+import { RECORD_TIMEOUT } from '../constants/recorder';
+import { microphone } from './microphone';
 
 class Recorder {
   audio: boolean;
@@ -93,13 +95,25 @@ class Recorder {
   startScreenCapture() {
     this.status = 'pending';
     this._timeout = setTimeout(() => {
-      chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture });
+      chrome.runtime.sendMessage({
+        type: EventConfig.StartStreamCapture,
+        payload: {
+          microphoneId: microphone.device,
+          captureDeviceAudio: this.audio,
+          pushToTalk: microphone.pushToTalk,
+        },
+      });
     }, RECORD_TIMEOUT * 1000);
   }
 
   saveScreenCapture() {
     this.status = 'saving';
-    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStream, payload: { timestamp: this.timestamp } });
+    chrome.runtime.sendMessage({
+      type: EventConfig.SaveCapturedStream,
+      payload: {
+        timestamp: this.timestamp,
+      },
+    });
   }
 
   cancelScreenCapture() {

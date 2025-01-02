@@ -147,9 +147,14 @@ class OffscreenRecorder {
         deviceId: this.microphoneId,
       },
     });
+
+    if (this.muted) {
+      this.audio.getAudioTracks().forEach((track) => (track.enabled = false));
+    }
   }
 
-  start(sourceId: string, microphoneId = 'n/a', captureDeviceAudio = false) {
+  start(sourceId: string, microphoneId = 'n/a', captureDeviceAudio = false, pushToTalk = false) {
+    this.muted = pushToTalk;
     this.sourceId = sourceId;
     this.microphoneId = microphoneId;
     this.captureDeviceAudio = captureDeviceAudio;

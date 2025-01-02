@@ -12,7 +12,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
       chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, async (streamId) => {
         try {
           await offscreen.setup('build/offscreen.html');
-          chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture, payload: { streamId } });
+          chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture, payload: Object.assign({ streamId }, message.payload) });
         } catch (error) {
           if (sender.tab?.id) {
             chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });

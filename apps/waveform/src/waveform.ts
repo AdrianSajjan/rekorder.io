@@ -19,7 +19,7 @@ class AudioWaveform {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
     this.pushToTalk = false;
-    this.draw = false;
+    this.draw = true;
 
     this.dataArray = null;
     this.bufferLength = null;
@@ -80,11 +80,13 @@ class AudioWaveform {
 
   async start(constraints?: MediaStreamConstraints): Promise<void> {
     this.stream = await navigator.mediaDevices.getUserMedia(constraints || { audio: true });
+    if (this.pushToTalk) this.stream.getAudioTracks().forEach((track) => (track.enabled = this.draw));
+
     this.audioContext = new AudioContext();
     const source = this.audioContext.createMediaStreamSource(this.stream);
-
     this.analyserNode = this.audioContext.createAnalyser();
     this.analyserNode.fftSize = 2048;
+
     source.connect(this.analyserNode);
     this.__startDrawing();
   }
@@ -101,6 +103,7 @@ class AudioWaveform {
 
   update(value: boolean) {
     this.pushToTalk = value;
+
     if (this.pushToTalk) {
       this.disableAudioTracks();
     } else {

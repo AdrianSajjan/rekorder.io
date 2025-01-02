@@ -70,10 +70,11 @@ class Microphone {
 
   updatePushToTalk(value: boolean) {
     this.pushToTalk = value;
+    this.muted = this.pushToTalk;
 
     chrome.storage.local.set({ [StorageConfig.AudioPushToTalk]: value });
-    this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalk, payload: { pushToTalk: value } }), '*');
-    chrome.runtime.sendMessage({ type: EventConfig.ChangeAudioPushToTalk, payload: { pushToTalk: value } });
+    this._waveform.postMessage(clone({ type: EventConfig.ChangeAudioPushToTalk, payload: { active: value } }), '*');
+    chrome.runtime.sendMessage({ type: EventConfig.ChangeAudioPushToTalk, payload: { active: value } });
 
     if (this.enabled) {
       if (this.pushToTalk) {
