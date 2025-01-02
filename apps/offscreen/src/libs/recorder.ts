@@ -1,5 +1,6 @@
 import exportWebmBlob from 'fix-webm-duration';
 import { EventConfig } from '@rekorder.io/constants';
+import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';
 
 class OffscreenRecorder {
   chunks: Blob[];
@@ -108,9 +109,10 @@ class OffscreenRecorder {
 
     this.__preventTabSilence(this.video);
     const combined = [...this.video.getTracks(), ...(this.audio ? this.audio.getTracks() : [])];
+    const mimeType = MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type)) ?? DEFAULT_MIME_TYPE;
 
     this.stream = new MediaStream(combined);
-    this.recorder = new MediaRecorder(this.stream, { mimeType: 'video/webm; codecs=vp8,opus', videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000 });
+    this.recorder = new MediaRecorder(this.stream, { mimeType, videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000 });
 
     this.recorder.addEventListener('stop', this.__recorderStopEvent.bind(this));
     this.recorder.addEventListener('error', this.__captureStreamError.bind(this));
@@ -118,6 +120,7 @@ class OffscreenRecorder {
     this.recorder.addEventListener('pause', this.__recorderPauseEvent.bind(this));
     this.recorder.addEventListener('resume', this.__recorderResumeEvent.bind(this));
     this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable.bind(this));
+
     this.recorder.start(100);
   }
 
