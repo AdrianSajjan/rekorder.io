@@ -40,7 +40,23 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
      * Message received from the content script relayed by background worker to cancel the captured stream
      */
     case EventConfig.DiscardStreamCapture: {
-      // TODO: Implement this
+      recorder.cancel();
+      return false;
+    }
+
+    /**
+     * Message received from the content script relayed by background worker to toggle the microphone mute state
+     */
+    case EventConfig.ChangeAudioMutedState: {
+      recorder.mute(message.payload.muted);
+      return false;
+    }
+
+    /**
+     * Message received from the content script relayed by background worker to toggle the push to talk activity
+     */
+    case EventConfig.ChangeAudioPushToTalkActivity: {
+      recorder.mute(!message.payload.active);
       return false;
     }
 

@@ -27,7 +27,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      */
     case EventConfig.StartStreamCaptureSuccess: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-        if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
+        if (tab.id) chrome.tabs.sendMessage(tab.id, message);
       });
       return false;
     }
@@ -37,7 +37,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      */
     case EventConfig.StartStreamCaptureError: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-        if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
+        if (tab.id) chrome.tabs.sendMessage(tab.id, message);
       });
       return false;
     }
@@ -46,7 +46,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      * Ask the offscreen document to save the captured stream from the content script
      */
     case EventConfig.SaveCapturedStream: {
-      chrome.runtime.sendMessage({ ...message });
+      chrome.runtime.sendMessage(message);
       return false;
     }
 
@@ -56,7 +56,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
     case EventConfig.SaveCapturedStreamSuccess: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         chrome.tabs.create({ url: message.payload.url });
-        if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
+        if (tab.id) chrome.tabs.sendMessage(tab.id, message);
       });
       return false;
     }
@@ -66,7 +66,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      */
     case EventConfig.SaveCapturedStreamError: {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-        if (tab.id) chrome.tabs.sendMessage(tab.id, { ...message });
+        if (tab.id) chrome.tabs.sendMessage(tab.id, message);
       });
       return false;
     }
@@ -75,7 +75,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      * Ask the offscreen document to pause the captured stream from the content script
      */
     case EventConfig.PauseStreamCapture: {
-      chrome.runtime.sendMessage({ ...message });
+      chrome.runtime.sendMessage(message);
       return false;
     }
 
@@ -83,7 +83,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      * Ask the offscreen document to resume the captured stream from the content script
      */
     case EventConfig.ResumeStreamCapture: {
-      chrome.runtime.sendMessage({ ...message });
+      chrome.runtime.sendMessage(message);
       return false;
     }
 
@@ -91,7 +91,23 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      * Ask the offscreen document to cancel the captured stream from the content script
      */
     case EventConfig.DiscardStreamCapture: {
-      chrome.runtime.sendMessage({ ...message });
+      chrome.runtime.sendMessage(message);
+      return false;
+    }
+
+    /**
+     * Message received from the content script relayed by background worker to toggle the push to talk activity
+     */
+    case EventConfig.ChangeAudioPushToTalkActivity: {
+      chrome.runtime.sendMessage(message);
+      return false;
+    }
+
+    /**
+     * Message received from the content script relayed by background worker to toggle the audio muted state
+     */
+    case EventConfig.ChangeAudioMutedState: {
+      chrome.runtime.sendMessage(message);
       return false;
     }
 
@@ -100,9 +116,10 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
      */
     case EventConfig.OpenPermissionSettings: {
       const name = checkBrowserName();
-      if (name === 'unknown') return false;
-      const url = name + '://settings/content/siteDetails?site=chrome-extension://' + encodeURIComponent(chrome.runtime.id);
-      chrome.tabs.create({ url });
+      if (name !== 'unknown') {
+        const url = name + '://settings/content/siteDetails?site=chrome-extension://' + encodeURIComponent(chrome.runtime.id);
+        chrome.tabs.create({ url });
+      }
       return false;
     }
 

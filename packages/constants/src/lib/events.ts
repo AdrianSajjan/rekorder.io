@@ -9,6 +9,7 @@ export const EventConfig = {
   ChangeAudioPermission: 'change.audio.permission',
   ChangeAudioPushToTalk: 'change.audio.push-to-talk',
   ChangeAudioPushToTalkActivity: 'change.audio.push-to-talk.activity',
+  ChangeAudioMutedState: 'change.audio.muted.state',
 
   StartStreamCapture: 'start.stream.capture',
   StartStreamCaptureSuccess: 'start.stream.capture.success',
@@ -29,6 +30,5 @@ export const EventConfig = {
   SaveCapturedStream: 'save.captured.stream',
   SaveCapturedStreamError: 'save.captured.stream.error',
   SaveCapturedStreamSuccess: 'save.captured.stream.success',
-
   OpenPermissionSettings: 'open.permissions.settings',
 } as const;
