@@ -11,16 +11,17 @@ class Recorder {
   timestamp: number;
   status: 'idle' | 'active' | 'pending' | 'saving' | 'paused' | 'error';
 
-  private interval: NodeJS.Timer | null;
-  private timeout: NodeJS.Timeout | null;
+  private _interval: NodeJS.Timer | null;
+  private _timeout: NodeJS.Timeout | null;
+  private _runtimeEvents = this.__runtimeEvents.bind(this);
 
   constructor() {
     this.status = 'idle';
     this.timestamp = 0;
     this.audio = false;
 
-    this.interval = null;
-    this.timeout = null;
+    this._interval = null;
+    this._timeout = null;
 
     this.__setupEvents();
     makeAutoObservable(this, {}, { autoBind: true });
@@ -37,42 +38,44 @@ class Recorder {
   }
 
   private __startTimer() {
-    if (!this.interval) {
-      this.interval = setInterval(() => {
+    if (!this._interval) {
+      this._interval = setInterval(() => {
         runInAction(() => (this.timestamp += 1));
       }, 1000);
     }
   }
 
   private __stopTimer(reset?: boolean) {
-    if (this.interval) clearInterval(this.interval);
-    if (reset) this.timestamp = 0;
-    this.interval = null;
+    if (this._interval) clearInterval(this._interval);
+    runInAction(() => {
+      if (reset) this.timestamp = 0;
+      this._interval = null;
+    });
   }
 
   private __runtimeEvents(message: RuntimeMessage) {
     switch (message.type) {
       case EventConfig.StartStreamCaptureSuccess: {
-        this.status = 'active';
+        runInAction(() => (this.status = 'active'));
         this.__startTimer();
         break;
       }
 
       case EventConfig.StartStreamCaptureError: {
         this.__stopTimer();
-        this.status = 'error';
+        runInAction(() => (this.status = 'error'));
         toast.error(unwrapError(message.payload.error, 'Something went wrong while starting your recording.'));
         break;
       }
 
       case EventConfig.SaveCapturedStreamSuccess: {
-        this.status = 'idle';
+        runInAction(() => (this.status = 'idle'));
         console.log(message.payload.url);
         break;
       }
 
       case EventConfig.SaveCapturedStreamError: {
-        this.status = 'error';
+        runInAction(() => (this.status = 'error'));
         toast.error(unwrapError(message.payload.error, 'Something went wrong while saving your recording.'));
         break;
       }
@@ -80,29 +83,34 @@ class Recorder {
   }
 
   private __setupEvents() {
-    chrome.runtime.onMessage.addListener(this.__runtimeEvents);
+    chrome.runtime.onMessage.addListener(this._runtimeEvents);
   }
 
   private __removeEvents() {
-    chrome.runtime.onMessage.removeListener(this.__runtimeEvents);
+    chrome.runtime.onMessage.removeListener(this._runtimeEvents);
   }
 
   startScreenCapture() {
     this.status = 'pending';
-    this.timeout = setTimeout(() => {
+    this._timeout = setTimeout(() => {
       chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture });
     }, RECORD_TIMEOUT * 1000);
   }
 
-  stopScreenCapture() {
+  saveScreenCapture() {
     this.status = 'saving';
-    chrome.runtime.sendMessage({ type: EventConfig.CancelStreamCapture, payload: { timestamp: this.timestamp } });
+    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStream, payload: { timestamp: this.timestamp } });
   }
 
   cancelScreenCapture() {
-    if (this.timeout) clearTimeout(this.timeout);
+    if (this._timeout) clearTimeout(this._timeout);
     this.status = 'idle';
-    chrome.runtime.sendMessage({ type: EventConfig.CancelStreamCapture, payload: { timestamp: this.timestamp } });
+  }
+
+  discardScreenCapture() {
+    this.status = 'idle';
+    chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCapture });
+    this.__stopTimer();
   }
 
   pauseScreenCapture() {

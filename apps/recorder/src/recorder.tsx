@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { Toaster } from 'sonner';
-import { AnimationsProvider, theme } from '@rekorder.io/ui';
+import { AnimationsProvider, theme, animations } from '@rekorder.io/ui';
 
 import { CameraPreview } from './components/camera';
 import { PluginCard } from './components/plugin/plugin';
@@ -20,11 +20,18 @@ const RecorderCSS = css.resolve`
     padding: 0;
   }
 
+  .rekorder-area {
+    opacity: 0;
+    position: fixed;
+    z-index: ${theme.zIndex(1)};
+    animation: ${animations['fade-in']} 300ms ease-out forwards;
+  }
+
   .rekorder-container {
     inset: 0;
+    z-index: 3;
     position: fixed;
     pointer-events: none;
-    z-index: ${theme.zIndex(2)};
   }
 `;
 
@@ -32,16 +39,18 @@ export function Recorder() {
   return (
     <AnimationsProvider>
       {RecorderCSS.styles}
-      <Overlay />
-      <EditorArea />
-      <section className={clsx(RecorderCSS.className, 'rekorder-container')}>
-        <PluginCard />
-        <PluginToolbar />
-        <CameraPreview />
-        <TimerCountdown />
+      <section className={clsx(RecorderCSS.className, 'rekorder-area')}>
+        <Overlay />
+        <EditorArea />
+        <div className={clsx(RecorderCSS.className, 'rekorder-container')}>
+          <PluginCard />
+          <PluginToolbar />
+          <CameraPreview />
+          <TimerCountdown />
+        </div>
+        <Permission />
+        <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
       </section>
-      <Permission />
-      <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
     </AnimationsProvider>
   );
 }

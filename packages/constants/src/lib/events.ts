@@ -22,9 +22,9 @@ export const EventConfig = {
   ResumeStreamCaptureSuccess: 'resume.stream.capture.success',
   ResumeStreamCaptureError: 'resume.stream.capture.error',
 
-  CancelStreamCapture: 'cancel.stream.capture',
-  CancelStreamCaptureSuccess: 'cancel.stream.capture.success',
-  CancelStreamCaptureError: 'cancel.stream.capture.error',
+  DiscardStreamCapture: 'discard.stream.capture',
+  DiscardStreamCaptureSuccess: 'discard.stream.capture.success',
+  DiscardStreamCaptureError: 'discard.stream.capture.error',
 
   SaveCapturedStream: 'save.captured.stream',
   SaveCapturedStreamError: 'save.captured.stream.error',

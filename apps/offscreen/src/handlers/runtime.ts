@@ -39,7 +39,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
     /**
      * Message received from the content script relayed by background worker to cancel the captured stream
      */
-    case EventConfig.CancelStreamCapture: {
+    case EventConfig.DiscardStreamCapture: {
       // TODO: Implement this
       return false;
     }

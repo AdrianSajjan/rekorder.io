@@ -3,7 +3,7 @@ import * as BodySegmentation from '@tensorflow-models/body-segmentation';
 
 import { makeAutoObservable } from 'mobx';
 import { Autocomplete, CameraEffects, RuntimeMessage } from '@rekorder.io/types';
-import { CameraConfig, EventConfig } from '@rekorder.io/constants';
+import { StorageConfig, EventConfig } from '@rekorder.io/constants';
 
 class Camera {
   effect: CameraEffects;
@@ -40,9 +40,9 @@ class Camera {
   }
 
   private __setupStore() {
-    chrome.storage.local.get([CameraConfig.DeviceId, CameraConfig.Effect], (result) => {
-      this.device = result[CameraConfig.DeviceId] || 'n/a';
-      this.effect = result[CameraConfig.Effect] || 'none';
+    chrome.storage.local.get([StorageConfig.CameraDeviceId, StorageConfig.CameraEffect], (result) => {
+      this.device = result[StorageConfig.CameraDeviceId] || 'n/a';
+      this.effect = result[StorageConfig.CameraEffect] || 'none';
     });
   }
 
@@ -62,10 +62,10 @@ class Camera {
 
   private __windowMessageHandler(event: MessageEvent<RuntimeMessage>) {
     switch (event.data.type) {
-      case EventConfig.CameraDevice:
+      case EventConfig.ChangeCameraDevice:
         this.device = event.data.payload.device;
         break;
-      case EventConfig.CameraEffect:
+      case EventConfig.ChangeCameraEffect:
         this.effect = event.data.payload.effect;
         break;
     }

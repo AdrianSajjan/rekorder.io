@@ -21,8 +21,8 @@ const TimerCSS = css.resolve`
     pointer-events: none;
     transform: translate(-50%, -50%);
 
+    z-index: 250;
     font-family: ${theme.fonts.default};
-    z-index: ${theme.zIndex(250)};
     animation: ${animations['fade-in']} 200ms ease-out forwards;
   }
 

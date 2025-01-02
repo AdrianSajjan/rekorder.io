@@ -5,9 +5,7 @@ import css from 'styled-jsx/css';
 
 import { useCallback, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
-
 import { FabricJSCanvas } from '@rekorder.io/canvas';
-import { theme } from '@rekorder.io/ui';
 
 import { toolbar } from '../store/toolbar';
 import { editor } from '../store/editor';
@@ -16,7 +14,7 @@ const EditorAreaCSS = css.resolve`
   .rekorder-editor-area {
     inset: 0;
     position: fixed;
-    z-index: ${theme.zIndex(1)};
+    z-index: 2;
   }
 
   .rekorder-editor-area[data-state='enabled'] {

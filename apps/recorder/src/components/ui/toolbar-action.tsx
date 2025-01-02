@@ -65,7 +65,7 @@ const ToolbarActionCSS = css.resolve`
     border-radius: 80px 80px 0% 0%;
 
     position: absolute;
-    z-index: -${theme.zIndex(1)};
+    z-index: -1;
     top: -${theme.space(3)};
 
     border-right: ${theme.space(1)} solid ${theme.colors.core.white};

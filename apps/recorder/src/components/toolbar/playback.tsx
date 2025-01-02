@@ -9,7 +9,7 @@ const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivEl
   return (
     <div {...props}>
       <ToolbarAction tooltip="Download recording">
-        <Record size={16} weight="fill" onClick={recorder.stopScreenCapture} />
+        <Record size={16} weight="fill" onClick={recorder.saveScreenCapture} />
       </ToolbarAction>
       <ToolbarRecorderPlayPause />
       <ToolbarAction tooltip="Restart recording">

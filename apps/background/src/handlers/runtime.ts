@@ -90,7 +90,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
     /**
      * Ask the offscreen document to cancel the captured stream from the content script
      */
-    case EventConfig.CancelStreamCapture: {
+    case EventConfig.DiscardStreamCapture: {
       chrome.runtime.sendMessage({ ...message });
       return false;
     }
@@ -101,7 +101,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage, sender: ch
     case EventConfig.OpenPermissionSettings: {
       const name = checkBrowserName();
       if (name === 'unknown') return false;
-      const url = name + '://settings/content/siteDetails?site=' + encodeURIComponent(sender.tab?.url || '');
+      const url = name + '://settings/content/siteDetails?site=chrome-extension://' + encodeURIComponent(chrome.runtime.id);
       chrome.tabs.create({ url });
       return false;
     }
