@@ -43,6 +43,11 @@ const ToolbarActionCSS = css.resolve`
     background-color: ${theme.colors.background.main};
   }
 
+  .toolbar-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   .toolbar-action:focus-visible {
     outline: none;
     box-shadow: ${theme.ring({ ring: { width: 2, color: theme.alpha(theme.colors.primary.main, 0.4) } })};
