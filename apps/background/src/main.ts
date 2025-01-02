@@ -1,5 +1,5 @@
-import { handleActionClickListener } from './handlers/action';
-import { handleRuntimeMessageListener } from './handlers/runtime';
+import { thread } from './libs/thread';
 
-chrome.action.onClicked.addListener(handleActionClickListener);
-chrome.runtime.onMessage.addListener(handleRuntimeMessageListener);
+chrome.action.onClicked.addListener(thread.handleActionClickListener);
+chrome.runtime.onMessage.addListener(thread.handleRuntimeMessageListener);
+chrome.tabs.onUpdated.addListener(thread.handleTabChangeListener);

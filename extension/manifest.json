@@ -22,10 +22,11 @@
     ],
     "permissions": [
         "tabs",
-        "scripting",
         "storage",
+        "offscreen",
+        "scripting",
         "activeTab",
         "tabCapture",
-        "offscreen"
+        "webNavigation"
     ]
 }
