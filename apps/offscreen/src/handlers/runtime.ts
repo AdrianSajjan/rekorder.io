@@ -61,7 +61,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
     }
 
     default: {
-      console.warn('Unhandled message type:', message.type);
+      console.log('Unhandled message type:', message.type);
       return false;
     }
   }

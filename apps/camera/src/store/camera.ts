@@ -72,10 +72,14 @@ class Camera {
   }
 
   private __resizeCanvas() {
-    this.canvas.width = this.video.videoWidth;
-    this.canvas.height = this.video.videoHeight;
-    this.preview.width = this.canvas.width;
-    this.preview.height = this.canvas.height;
+    if (this.video.videoWidth !== this.canvas.width || this.video.videoHeight !== this.canvas.height) {
+      this.canvas.width = this.video.videoWidth;
+      this.canvas.height = this.video.videoHeight;
+    }
+    if (this.video.videoWidth !== this.preview.width || this.video.videoHeight !== this.preview.height) {
+      this.preview.width = this.video.videoWidth;
+      this.preview.height = this.video.videoHeight;
+    }
   }
 
   private __drawCanvas(source: CanvasImageSource) {
@@ -86,23 +90,24 @@ class Camera {
   private async __renderWithoutEffects() {
     this.__resizeCanvas();
     this.__drawCanvas(this.video);
-    this.tick = requestAnimationFrame(this.__renderWithoutEffects);
+    this.tick = this.video.requestVideoFrameCallback(this.__renderWithoutEffects);
   }
 
   private async __renderBlurBackground() {
     const segmenter = await this.__createSelfieSegmentationModel();
     const segmentation = await segmenter.segmentPeople(this.video);
-    this.__resizeCanvas();
 
+    this.__resizeCanvas();
     await BodySegmentation.drawBokehEffect(this.preview, this.video, segmentation, 0.5, 5, 15, false);
     this.__drawCanvas(this.preview);
-    this.tick = requestAnimationFrame(this.__renderBlurBackground);
+
+    this.tick = this.video.requestVideoFrameCallback(this.__renderBlurBackground);
   }
 
   private async __renderImageBackground() {
     this.__resizeCanvas();
     this.__drawCanvas(this.video);
-    this.tick = requestAnimationFrame(this.__renderImageBackground);
+    this.tick = this.video.requestVideoFrameCallback(this.__renderImageBackground);
   }
 
   private async __createSelfieSegmentationModel() {
@@ -116,20 +121,20 @@ class Camera {
     return this.segmenter;
   }
 
-  private __videoMetadataLoaded() {
+  private __videoLoadedEvent() {
     this.video.play();
     this.status = 'initialized';
     this.__renderStream();
   }
 
-  private __videoMetadataError() {
+  private __videoErrorEvent() {
     this.status = 'error';
   }
 
   private __createStreamSuccess(stream: MediaStream) {
-    this.video.addEventListener('loadedmetadata', this.__videoMetadataLoaded, { once: true });
-    this.video.addEventListener('error', this.__videoMetadataError, { once: true });
     this.stream = stream;
+    this.video.addEventListener('loadeddata', this.__videoLoadedEvent, { once: true });
+    this.video.addEventListener('error', this.__videoErrorEvent, { once: true });
     this.video.srcObject = stream;
   }
 
@@ -140,32 +145,19 @@ class Camera {
   private __renderStream() {
     switch (this.effect) {
       case 'none':
-        this.__renderWithoutEffects();
+        this.tick = this.video.requestVideoFrameCallback(this.__renderWithoutEffects);
         break;
       case 'blur':
-        this.__renderBlurBackground();
+        this.tick = this.video.requestVideoFrameCallback(this.__renderBlurBackground);
         break;
       case 'image':
-        this.__renderImageBackground();
+        this.tick = this.video.requestVideoFrameCallback(this.__renderImageBackground);
         break;
     }
   }
 
-  initializeElements(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
-    this.video = video;
-    this.canvas = canvas;
-  }
-
-  createStream() {
-    if (this.device !== 'n/a') {
-      this.status = 'pending';
-      const options = { video: { deviceId: this.device }, audio: false };
-      navigator.mediaDevices.getUserMedia(options).then(this.__createStreamSuccess).catch(this.__createSteamError);
-    }
-  }
-
-  cancelStream() {
-    if (this.tick) cancelAnimationFrame(this.tick);
+  private __cancelStream() {
+    if (this.tick) this.video.cancelVideoFrameCallback(this.tick);
     if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
 
     this.tick = null;
@@ -173,8 +165,21 @@ class Camera {
     this.video.srcObject = null;
   }
 
+  initialize(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
+    this.video = video;
+    this.canvas = canvas;
+  }
+
+  start() {
+    if (this.device !== 'n/a') {
+      this.status = 'pending';
+      const options: MediaStreamConstraints = { video: { deviceId: this.device }, audio: false };
+      navigator.mediaDevices.getUserMedia(options).then(this.__createStreamSuccess).catch(this.__createSteamError);
+    }
+  }
+
   dispose() {
-    this.cancelStream();
+    this.__cancelStream();
     this.__disposeEvents();
   }
 }

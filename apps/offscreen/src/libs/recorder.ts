@@ -58,9 +58,11 @@ class OffscreenRecorder {
   }
 
   private __preventTabSilence(media: MediaStream) {
-    this.helperAudioContext = new AudioContext();
-    const source = this.helperAudioContext.createMediaStreamSource(media);
-    source.connect(this.helperAudioContext.destination);
+    if (this.captureDeviceAudio) {
+      this.helperAudioContext = new AudioContext();
+      const source = this.helperAudioContext.createMediaStreamSource(media);
+      source.connect(this.helperAudioContext.destination);
+    }
   }
 
   private __exportWebmBlob(blob: Blob) {
@@ -105,13 +107,10 @@ class OffscreenRecorder {
     if (!this.video) return;
 
     this.__preventTabSilence(this.video);
-    const combined = [...this.video.getVideoTracks()];
-
-    if (this.audio) combined.push(...this.audio.getAudioTracks());
-    if (this.captureDeviceAudio) combined.push(...this.video.getAudioTracks());
+    const combined = [...this.video.getTracks(), ...(this.audio ? this.audio.getTracks() : [])];
 
     this.stream = new MediaStream(combined);
-    this.recorder = new MediaRecorder(this.stream, { mimeType: 'video/webm; codecs=vp9,opus' });
+    this.recorder = new MediaRecorder(this.stream, { mimeType: 'video/webm; codecs=vp8,opus', videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000 });
 
     this.recorder.addEventListener('stop', this.__recorderStopEvent.bind(this));
     this.recorder.addEventListener('error', this.__captureStreamError.bind(this));
@@ -119,17 +118,19 @@ class OffscreenRecorder {
     this.recorder.addEventListener('pause', this.__recorderPauseEvent.bind(this));
     this.recorder.addEventListener('resume', this.__recorderResumeEvent.bind(this));
     this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable.bind(this));
-    this.recorder.start();
+    this.recorder.start(100);
   }
 
   private async __captureDisplayVideoStream() {
     this.video = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
-          chromeMediaSource: 'tab',
-          chromeMediaSourceId: this.sourceId,
-        },
-      },
+      audio: this.captureDeviceAudio
+        ? {
+            mandatory: {
+              chromeMediaSource: 'tab',
+              chromeMediaSourceId: this.sourceId,
+            },
+          }
+        : false,
       video: {
         mandatory: {
           chromeMediaSource: 'tab',

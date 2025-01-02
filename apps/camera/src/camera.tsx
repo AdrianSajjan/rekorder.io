@@ -31,8 +31,11 @@ const CameraPreview = observer(() => {
 
   useEffect(() => {
     if (!video$.current || !canvas$.current) return;
-    camera.initializeElements(video$.current, canvas$.current);
-    camera.createStream();
+
+    camera.initialize(video$.current, canvas$.current);
+    camera.start();
+
+    return () => camera.dispose();
   }, []);
 
   useEffect(() => {
@@ -42,8 +45,8 @@ const CameraPreview = observer(() => {
     const handleResize = () => setDimensions({ width: video.videoWidth, height: video.videoHeight });
     handleResize();
 
-    video.addEventListener('loadeddata', handleResize);
-    return () => video.removeEventListener('loadeddata', handleResize);
+    video.addEventListener('loadedmetadata', handleResize);
+    return () => video.removeEventListener('loadedmetadata', handleResize);
   }, []);
 
   const style = {
