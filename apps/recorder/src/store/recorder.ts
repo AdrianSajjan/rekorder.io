@@ -1,7 +1,7 @@
 import { toast } from 'sonner';
 import { makeAutoObservable, runInAction } from 'mobx';
 
-import { EventConfig } from '@rekorder.io/constants';
+import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { unwrapError } from '@rekorder.io/utils';
 
@@ -11,6 +11,7 @@ import { microphone } from './microphone';
 class Recorder {
   audio: boolean;
   timestamp: number;
+  initialized: boolean;
   status: 'idle' | 'active' | 'pending' | 'saving' | 'paused' | 'error';
 
   private _interval: NodeJS.Timer | null;
@@ -18,6 +19,7 @@ class Recorder {
   private _runtimeEvents = this.__runtimeEvents.bind(this);
 
   constructor() {
+    this.initialized = false;
     this.status = 'idle';
     this.timestamp = 0;
     this.audio = false;
@@ -25,7 +27,9 @@ class Recorder {
     this._interval = null;
     this._timeout = null;
 
+    this.__setupState();
     this.__setupEvents();
+
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -37,6 +41,24 @@ class Recorder {
     const minutes = Math.floor(this.timestamp / 60);
     const seconds = this.timestamp % 60;
     return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+  }
+
+  private async __setupState() {
+    try {
+      const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
+      const state = result[StorageConfig.RecorderStatus] as RecordingState;
+      runInAction(() => {
+        this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
+        this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
+      });
+      if (this.status === 'active') this.__startTimer();
+    } catch (error) {
+      console.log('Error setting up state from storage', error);
+    } finally {
+      runInAction(() => {
+        this.initialized = true;
+      });
+    }
   }
 
   private __startTimer() {
@@ -64,8 +86,8 @@ class Recorder {
       }
 
       case EventConfig.StartStreamCaptureError: {
-        this.__stopTimer();
         runInAction(() => (this.status = 'error'));
+        this.__stopTimer(true);
         toast.error(unwrapError(message.payload.error, 'Something went wrong while starting your recording.'));
         break;
       }
@@ -97,23 +119,15 @@ class Recorder {
     this._timeout = setTimeout(() => {
       chrome.runtime.sendMessage({
         type: EventConfig.StartStreamCapture,
-        payload: {
-          microphoneId: microphone.device,
-          captureDeviceAudio: this.audio,
-          pushToTalk: microphone.pushToTalk,
-        },
+        payload: { microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
       });
     }, RECORD_TIMEOUT * 1000);
   }
 
   saveScreenCapture() {
     this.status = 'saving';
-    chrome.runtime.sendMessage({
-      type: EventConfig.SaveCapturedStream,
-      payload: {
-        timestamp: this.timestamp,
-      },
-    });
+    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStream });
+    this.__stopTimer(true);
   }
 
   cancelScreenCapture() {
@@ -125,7 +139,7 @@ class Recorder {
   discardScreenCapture() {
     this.status = 'idle';
     chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCapture });
-    this.__stopTimer();
+    this.__stopTimer(true);
   }
 
   pauseScreenCapture() {
@@ -142,10 +156,6 @@ class Recorder {
       chrome.runtime.sendMessage({ type: EventConfig.ResumeStreamCapture });
       this.__startTimer();
     }
-  }
-
-  dispose() {
-    this.__removeEvents();
   }
 }
 

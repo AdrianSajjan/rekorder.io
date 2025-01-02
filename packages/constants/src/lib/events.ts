@@ -30,5 +30,14 @@ export const EventConfig = {
   SaveCapturedStream: 'save.captured.stream',
   SaveCapturedStreamError: 'save.captured.stream.error',
   SaveCapturedStreamSuccess: 'save.captured.stream.success',
+
   OpenPermissionSettings: 'open.permissions.settings',
+
+  SetSessionStorage: 'set.session.storage',
+  SetSessionStorageSuccess: 'set.session.storage.success',
+  SetSessionStorageError: 'set.session.storage.error',
+
+  GetSessionStorage: 'get.session.storage',
+  GetSessionStorageSuccess: 'get.session.storage.success',
+  GetSessionStorageError: 'get.session.storage.error',
 } as const;

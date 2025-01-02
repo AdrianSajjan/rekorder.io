@@ -71,7 +71,7 @@ class Thread {
     this.__injectContentScript();
   }
 
-  private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender) {
+  private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
     switch (message.type) {
       /**
        * Get the media stream id for the current tab and start capturing the stream in the offscreen document
@@ -177,6 +177,34 @@ class Thread {
       case EventConfig.ChangeAudioMutedState: {
         chrome.runtime.sendMessage(message);
         return false;
+      }
+
+      /**
+       * Set the session storage, can be requested by the content script or the offscreen document
+       */
+      case EventConfig.SetSessionStorage: {
+        chrome.storage.session.set(message.payload, () => {
+          if (chrome.runtime.lastError) {
+            respond({ type: EventConfig.SetSessionStorageError, payload: { error: chrome.runtime.lastError } });
+          } else {
+            respond({ type: EventConfig.SetSessionStorageSuccess, payload: message.payload });
+          }
+        });
+        return true;
+      }
+
+      /**
+       * Get the session storage, can be requested by the content script or the offscreen document
+       */
+      case EventConfig.GetSessionStorage: {
+        chrome.storage.session.get(message.payload, (result) => {
+          if (chrome.runtime.lastError) {
+            respond({ type: EventConfig.GetSessionStorageError, payload: { error: chrome.runtime.lastError } });
+          } else {
+            respond({ type: EventConfig.GetSessionStorageSuccess, payload: result });
+          }
+        });
+        return true;
       }
 
       /**

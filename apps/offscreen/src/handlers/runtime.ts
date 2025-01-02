@@ -16,7 +16,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
      * Message received from the content script relayed by background worker to save the captured stream
      */
     case EventConfig.SaveCapturedStream: {
-      recorder.stop(message.payload.timestamp);
+      recorder.stop();
       return false;
     }
 
