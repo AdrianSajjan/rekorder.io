@@ -5,8 +5,9 @@ import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { unwrapError } from '@rekorder.io/utils';
 
-import { RECORD_TIMEOUT } from '../constants/recorder';
 import { microphone } from './microphone';
+import { RECORDER_ROOT } from '../constants/layout';
+import { RECORD_TIMEOUT } from '../constants/recorder';
 
 class Recorder {
   audio: boolean;
@@ -82,6 +83,12 @@ class Recorder {
       case EventConfig.StartStreamCaptureSuccess: {
         runInAction(() => (this.status = 'active'));
         this.__startTimer();
+        break;
+      }
+
+      case EventConfig.CloseExtension: {
+        const node = document.getElementById(RECORDER_ROOT);
+        if (node) node.remove();
         break;
       }
 

@@ -7,15 +7,16 @@ import { Fragment } from 'react';
 
 import { SquaresFour, VideoCamera } from '@phosphor-icons/react';
 import { AnimateHeight, Button, HorizontalTabs, SegmentedControl, theme } from '@rekorder.io/ui';
+import { EventConfig } from '@rekorder.io/constants';
 
 import { recorder } from '../../store/recorder';
 import { useDragControls } from '../../hooks/use-drag-controls';
+import { RECORDER_ROOT } from '../../constants/layout';
 
 import { AudioPlugin } from './audio';
 import { CameraPlugin } from './camera';
 import { ScreenPlugin } from './screen';
 import { ToolbarPlugin } from './toolbar';
-import { EventConfig } from '@rekorder.io/constants';
 
 const PluginCardCSS = css.resolve`
   .rekorder-plugin-container {
@@ -105,7 +106,8 @@ const PluginCard = observer(() => {
 
   const handleCloseExtension = () => {
     chrome.runtime.sendMessage({ type: EventConfig.CloseExtension });
-    document.getElementById('rekorder-ui')?.remove();
+    const node = document.getElementById(RECORDER_ROOT);
+    if (node) node.remove();
   };
 
   return (

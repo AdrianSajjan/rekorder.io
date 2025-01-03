@@ -26,16 +26,25 @@ class Thread {
   }
 
   private async __handleCloseExtension() {
+    try {
+      const url = chrome.runtime.getURL(OFFSCREEN_PATH);
+      const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
+      if (contents.length > 0) chrome.offscreen.closeDocument(() => console.log('Offscreen document closed'));
+    } catch (error) {
+      console.warn('Error in background while closing offscreen document', error);
+    }
+
+    this.enabled = false;
     this.tab = undefined;
     this.url = undefined;
     this.offscreen = null;
 
-    this.enabled = false;
-    this.injected.clear();
-
-    const url = chrome.runtime.getURL(OFFSCREEN_PATH);
-    const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
-    if (contents.length > 0) chrome.offscreen.closeDocument(() => console.log('Offscreen document closed'));
+    if (this.injected.size > 0) {
+      this.injected.forEach((tab) => {
+        chrome.tabs.sendMessage(tab, { type: EventConfig.CloseExtension });
+      });
+      this.injected.clear();
+    }
   }
 
   private async __handleSetupOffscreenDocument() {
@@ -58,7 +67,7 @@ class Thread {
   }
 
   private __injectContentScript() {
-    if (!this.tab || !this.enabled || !this.url?.includes('chrome-extension://')) return;
+    if (!this.tab || !this.enabled || this.url?.includes('chrome-extension://')) return;
 
     chrome.scripting.executeScript(
       {
@@ -76,14 +85,21 @@ class Thread {
   }
 
   private __handleActionClickListener(tab: chrome.tabs.Tab) {
-    if (!tab.id) return;
-
-    this.tab = tab.id;
-    this.url = tab.url;
-    this.enabled = true;
-
-    this.injected.add(tab.id);
-    this.__injectContentScript();
+    if (!this.enabled) {
+      this.__handleCloseExtension();
+    } else if (tab.url?.includes('chrome-extension://')) {
+      // TODO: Tab is in the extension, we need to handle this case
+      console.log('Tab is in the extension, we need to handle this case');
+    } else if (!tab.id) {
+      // TODO: Tab id is not present, we need to handle this case
+      console.log('Tab id is not present, we need to handle this case');
+    } else {
+      this.tab = tab.id;
+      this.url = tab.url;
+      this.enabled = true;
+      this.injected.add(tab.id);
+      this.__injectContentScript();
+    }
   }
 
   private __handleTabChangeListener(tab: number, change: chrome.tabs.TabChangeInfo, data: chrome.tabs.Tab) {
