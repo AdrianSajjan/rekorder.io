@@ -2,15 +2,16 @@ import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { checkBrowserName } from '@rekorder.io/utils';
 
+const OFFSCREEN_PATH = 'build/offscreen.html';
+
 class Thread {
-  path?: string;
-  enabled?: boolean;
-  tab?: number | null;
+  tab?: number;
+  url?: string;
+  enabled: boolean;
 
   injected: Set<number>;
   offscreen?: Promise<void> | null;
 
-  handleTabReloadListener = this.__handleTabReloadListener.bind(this);
   handleTabChangeListener = this.__handleTabChangeListener.bind(this);
   handleActionClickListener = this.__handleActionClickListener.bind(this);
   handleRuntimeMessageListener = this.__handleRuntimeMessageListener.bind(this);
@@ -20,34 +21,34 @@ class Thread {
   }
 
   constructor() {
+    this.enabled = false;
     this.injected = new Set();
   }
 
   private async __handleCloseExtension() {
-    this.tab = null;
+    this.tab = undefined;
+    this.url = undefined;
     this.offscreen = null;
 
     this.enabled = false;
     this.injected.clear();
 
-    if (this.path) {
-      const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [this.path] });
-      if (contents.length > 0) chrome.offscreen.closeDocument(() => console.log('Offscreen document closed'));
-    }
+    const url = chrome.runtime.getURL(OFFSCREEN_PATH);
+    const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
+    if (contents.length > 0) chrome.offscreen.closeDocument(() => console.log('Offscreen document closed'));
   }
 
-  private async __handleSetupOffscreenDocument(path: string) {
-    this.path = path;
-    const url = chrome.runtime.getURL(this.path);
-
+  private async __handleSetupOffscreenDocument() {
+    const url = chrome.runtime.getURL(OFFSCREEN_PATH);
     const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
+
     if (contents.length > 0) return;
 
     if (this.offscreen) {
       await this.offscreen;
     } else {
       this.offscreen = chrome.offscreen.createDocument({
-        url: path,
+        url: OFFSCREEN_PATH,
         reasons: [chrome.offscreen.Reason.USER_MEDIA, chrome.offscreen.Reason.DISPLAY_MEDIA, chrome.offscreen.Reason.AUDIO_PLAYBACK],
         justification: 'Record users desktop screen and audio and microphone audio',
       });
@@ -57,40 +58,40 @@ class Thread {
   }
 
   private __injectContentScript() {
-    if (this.tab) {
-      chrome.scripting.executeScript(
-        {
-          target: { tabId: this.tab },
-          files: ['build/content-script.js'],
-        },
-        () => {
-          if (chrome.runtime.lastError) {
-            console.warn('Failed to inject content script:', chrome.runtime.lastError.message);
-          } else {
-            console.log('Content script injected into tab:', this.tab);
-          }
+    if (!this.tab || !this.enabled || !this.url?.includes('chrome-extension://')) return;
+
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: this.tab },
+        files: ['build/content-script.js'],
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.warn('Failed to inject content script:', chrome.runtime.lastError.message);
+        } else {
+          console.log('Content script injected into tab:', this.tab);
         }
-      );
-    }
+      }
+    );
   }
 
   private __handleActionClickListener(tab: chrome.tabs.Tab) {
-    if (tab.id) {
-      this.tab = tab.id;
-      this.enabled = true;
-      this.injected.add(tab.id);
-      this.__injectContentScript();
-    }
-  }
+    if (!tab.id) return;
 
-  private __handleTabReloadListener(details: chrome.webNavigation.WebNavigationTransitionCallbackDetails) {
-    if (details.tabId !== this.tab || !this.enabled) return;
+    this.tab = tab.id;
+    this.url = tab.url;
+    this.enabled = true;
+
+    this.injected.add(tab.id);
     this.__injectContentScript();
   }
 
   private __handleTabChangeListener(tab: number, change: chrome.tabs.TabChangeInfo, data: chrome.tabs.Tab) {
-    if (this.tab === tab || change.status !== 'complete' || data.url?.includes('chrome-extension://') || !this.enabled) return;
+    if (change.status !== 'complete') return;
+
     this.tab = tab;
+    this.url = data.url;
+
     this.injected.add(tab);
     this.__injectContentScript();
   }
@@ -110,12 +111,20 @@ class Thread {
        */
       case EventConfig.StartStreamCapture: {
         chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, async (streamId) => {
-          try {
-            await this.__handleSetupOffscreenDocument('build/offscreen.html');
-            chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture, payload: Object.assign({ streamId }, message.payload) });
-          } catch (error) {
+          if (chrome.runtime.lastError) {
+            console.warn('Error in background while getting media stream id', chrome.runtime.lastError);
             if (sender.tab?.id) {
-              chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
+              chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error: chrome.runtime.lastError } });
+            }
+          } else {
+            try {
+              await this.__handleSetupOffscreenDocument();
+              chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture, payload: Object.assign({ streamId }, message.payload) });
+            } catch (error) {
+              console.warn('Error in background while starting stream', error);
+              if (sender.tab?.id) {
+                chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
+              }
             }
           }
         });
