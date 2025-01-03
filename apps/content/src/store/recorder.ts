@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 import { makeAutoObservable, runInAction } from 'mobx';
+import { isUndefined } from 'lodash';
 
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
@@ -13,7 +14,7 @@ class Recorder {
   audio: boolean;
   timestamp: number;
   initialized: boolean;
-  status: 'idle' | 'active' | 'pending' | 'saving' | 'paused' | 'error';
+  status: 'idle' | 'countdown' | 'pending' | 'active' | 'paused' | 'saving' | 'error';
 
   private _interval: NodeJS.Timer | null;
   private _timeout: NodeJS.Timeout | null;
@@ -124,12 +125,19 @@ class Recorder {
   }
 
   startScreenCapture() {
-    this.status = 'pending';
+    this.status = 'countdown';
+
     this._timeout = setTimeout(() => {
-      chrome.runtime.sendMessage({
-        type: EventConfig.StartTabStreamCapture,
-        payload: { microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
+      runInAction(() => {
+        this.status = 'pending';
       });
+
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          type: EventConfig.StartDisplayStreamCapture,
+          payload: { microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
+        });
+      }, 0);
     }, RECORD_TIMEOUT * 1000);
   }
 
@@ -165,6 +173,10 @@ class Recorder {
       chrome.runtime.sendMessage({ type: EventConfig.ResumeStreamCapture });
       this.__startTimer();
     }
+  }
+
+  changeDesktopAudio(audio?: boolean) {
+    this.audio = isUndefined(audio) ? !this.audio : audio;
   }
 }
 

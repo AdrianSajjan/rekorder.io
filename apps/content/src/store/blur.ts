@@ -70,7 +70,6 @@ class ElementBlur {
       element.style.outline = style.outline ?? 'none';
       if (!style.blurred) this._styles.delete(element);
     }
-    console.log(this._styles.entries());
   }
 
   private __setupEvents() {

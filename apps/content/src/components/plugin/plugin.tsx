@@ -21,8 +21,7 @@ import { ToolbarPlugin } from './toolbar';
 const PluginCardCSS = css.resolve`
   .rekorder-plugin-container {
     position: absolute;
-    width: 100%;
-    max-width: ${theme.screens.xs}px;
+    width: fit-content;
     pointer-events: all;
   }
 
@@ -82,7 +81,7 @@ const PluginCardCSS = css.resolve`
 `;
 
 const PluginCardHOC = observer(() => {
-  if (recorder.status === 'idle' || recorder.status === 'pending' || recorder.status === 'error') {
+  if (recorder.status === 'idle' || recorder.status === 'countdown' || recorder.status === 'error') {
     return <PluginCard />;
   } else {
     return null;
@@ -94,7 +93,7 @@ const PluginCard = observer(() => {
 
   const handleScreenCapture = () => {
     switch (recorder.status) {
-      case 'pending':
+      case 'countdown':
         recorder.cancelScreenCapture();
         break;
       case 'idle':
@@ -137,7 +136,9 @@ const PluginCard = observer(() => {
                     <HorizontalTabs.Trigger value="screen">Screen</HorizontalTabs.Trigger>
                     <HorizontalTabs.Trigger value="camera">Camera</HorizontalTabs.Trigger>
                     <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
-                    <HorizontalTabs.Trigger value="toolbar">Toolbar</HorizontalTabs.Trigger>
+                    <HorizontalTabs.Trigger disabled value="toolbar">
+                      Toolbar
+                    </HorizontalTabs.Trigger>
                   </HorizontalTabs.List>
                   <AnimateHeight className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel')}>
                     <div className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel-content')}>

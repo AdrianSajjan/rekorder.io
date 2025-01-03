@@ -28,7 +28,7 @@ const RecorderCSS = css.resolve`
     opacity: 0;
     position: fixed;
     z-index: ${theme.zIndex(1)};
-    animation: ${animations['fade-in']} 300ms ease-out forwards;
+    animation: ${animations['fade-in']} cubic-bezier(0.2, 0.5, 0.1, 0.8) 150ms forwards;
   }
 
   .rekorder-container {

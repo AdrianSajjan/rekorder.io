@@ -25,11 +25,11 @@ const HorizontalTabsCSS = css.resolve`
     all: unset;
   }
 
-  .control {
+  .rekorder-horizontal-tabs-control {
     font-family: ${theme.fonts.default};
   }
 
-  .list {
+  .rekorder-horizontal-tabs-list {
     display: grid;
     gap: ${theme.space(6)};
     grid-auto-columns: 1fr;
@@ -47,11 +47,11 @@ const HorizontalTabsCSS = css.resolve`
     scrollbar-width: none;
   }
 
-  .list::-webkit-scrollbar {
+  .rekorder-horizontal-tabs-list::-webkit-scrollbar {
     display: none;
   }
 
-  .list .trigger {
+  .rekorder-horizontal-tabs-list .rekorder-horizontal-tabs-trigger {
     width: 100%;
     position: relative;
 
@@ -60,7 +60,12 @@ const HorizontalTabsCSS = css.resolve`
     justify-content: center;
   }
 
-  .content {
+  .rekorder-horizontal-tabs-trigger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .rekorder-horizontal-tabs-trigger-content {
     position: relative;
     color: ${theme.colors.accent.dark};
     padding: ${theme.space(3)};
@@ -73,20 +78,20 @@ const HorizontalTabsCSS = css.resolve`
     justify-content: center;
   }
 
-  .trigger[data-state='active'] .content {
+  .rekorder-horizontal-tabs-trigger[data-state='active'] .rekorder-horizontal-tabs-trigger-content {
     color: ${theme.colors.background.text};
   }
 
-  .icon {
+  .rekorder-horizontal-tabs-trigger-icon {
     display: flex;
     color: ${theme.colors.accent.dark};
   }
 
-  .trigger[data-state='active'] .icon {
+  .rekorder-horizontal-tabs-trigger[data-state='active'] .rekorder-horizontal-tabs-trigger-icon {
     color: ${theme.colors.primary.main};
   }
 
-  .indicator {
+  .rekorder-horizontal-tabs-indicator {
     position: absolute;
     background-color: ${theme.colors.primary.main};
     border-radius: ${theme.space(0.5)};
@@ -112,7 +117,7 @@ const HorizontalTabsRoot = React.forwardRef<HTMLDivElement, HorizontalTabsRootPr
   return (
     <React.Fragment>
       {HorizontalTabsCSS.styles}
-      <Tabs.Root ref={ref} className={clsx(HorizontalTabsCSS.className, 'control', size, className)} {...props} />
+      <Tabs.Root ref={ref} className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-control', size, className)} {...props} />
     </React.Fragment>
   );
 }) as SegmenedControl;
@@ -121,7 +126,7 @@ const HorizontalTabsList = React.forwardRef<HTMLDivElement, Tabs.TabsListProps>(
   const id = React.useId();
   return (
     <LayoutGroup id={id}>
-      <Tabs.List {...props} ref={ref} className={clsx(HorizontalTabsCSS.className, 'list', className)} />
+      <Tabs.List {...props} ref={ref} className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-list', className)} />
     </LayoutGroup>
   );
 });
@@ -150,19 +155,21 @@ const HorizontalTabsTrigger = React.forwardRef<HTMLButtonElement, Tabs.TabsTrigg
   });
 
   return (
-    <Tabs.Trigger ref={handleAssignRefs} className={clsx(HorizontalTabsCSS.className, 'trigger', className)} {...props}>
-      <div className={clsx(HorizontalTabsCSS.className, 'content')}>{children}</div>
-      {state === 'active' ? <motion.div layoutId="rekorder-segmented-controls-indictor" className={clsx(HorizontalTabsCSS.className, 'indicator')} /> : null}
+    <Tabs.Trigger ref={handleAssignRefs} className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-trigger', className)} {...props}>
+      <div className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-trigger-content')}>{children}</div>
+      {state === 'active' ? (
+        <motion.div layoutId="rekorder-segmented-controls-indicator" className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-indicator')} />
+      ) : null}
     </Tabs.Trigger>
   );
 });
 
 const HorizontalTabsTriggerIcon = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(({ className, ...props }, ref) => {
-  return <span className={clsx(HorizontalTabsCSS.className, 'icon', className)} ref={ref} {...props} />;
+  return <span className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-trigger-icon', className)} ref={ref} {...props} />;
 });
 
 const HorizontalTabsPanel = React.forwardRef<HTMLDivElement, Tabs.TabsContentProps>(({ className, ...props }, ref) => {
-  return <Tabs.Content {...props} ref={ref} className={clsx(HorizontalTabsCSS.className, 'panel', className)} />;
+  return <Tabs.Content {...props} ref={ref} className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-panel', className)} />;
 });
 
 HorizontalTabsRoot.List = HorizontalTabsList;

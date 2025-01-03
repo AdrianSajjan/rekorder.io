@@ -38,6 +38,7 @@ class Toolbar {
   updateActionbarState(actionbarState: string) {
     const previousState = this.actionbarState;
     this.actionbarState = actionbarState;
+
     this.__updateActionbarState(previousState);
     this.__updateActionbarState(actionbarState);
   }

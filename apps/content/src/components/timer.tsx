@@ -66,7 +66,7 @@ const TimerCSS = css.resolve`
 `;
 
 const TimerCountdownHOC = observer(() => {
-  if (recorder.status === 'pending') {
+  if (recorder.status === 'countdown') {
     return <TimerCountdown />;
   } else {
     return null;

@@ -122,6 +122,19 @@ class Thread {
     this.__injectContentScript();
   }
 
+  private __sendMessageToContentScript(message: RuntimeMessage, success?: () => void, error?: () => void) {
+    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      const id = tab?.id || this.currentTab?.id;
+      if (id) {
+        chrome.tabs.sendMessage(id, message);
+        success?.();
+      } else {
+        error?.();
+        console.warn('No active tab found, message not sent', message);
+      }
+    });
+  }
+
   private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
     switch (message.type) {
       /**
@@ -133,24 +146,22 @@ class Thread {
       }
 
       /**
-       * Get the media stream id for the current tab and start capturing the stream in the offscreen document
+       * Get the media stream id for the current tab and start capturing the stream in the offscreen document, sent from the content script
+       * Sender Tab ID is the tab that the content script is injected into
        */
       case EventConfig.StartTabStreamCapture: {
         chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, async (streamId) => {
           if (chrome.runtime.lastError) {
-            console.warn('Error in background while getting media stream id', chrome.runtime.lastError);
-            if (sender.tab?.id) {
-              chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error: chrome.runtime.lastError } });
-            }
+            const error = chrome.runtime.lastError;
+            if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
+            console.warn('Error in background while getting media stream id', error);
           } else {
             try {
               await this.__handleSetupOffscreenDocument();
               chrome.runtime.sendMessage({ type: EventConfig.StartTabStreamCapture, payload: Object.assign({ streamId }, message.payload) });
             } catch (error) {
+              if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
               console.warn('Error in background while starting tab stream capture', error);
-              if (sender.tab?.id) {
-                chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
-              }
             }
           }
         });
@@ -158,18 +169,18 @@ class Thread {
       }
 
       /**
-       * Start capturing the display stream in the offscreen document, this will show a dialog to the user to select the display to capture
+       * Start capturing the display stream in the offscreen document, this will show a dialog to the user to select the display to capture, sent from the content script
+       * Sender Tab ID is the tab that the content script is injected into
        */
       case EventConfig.StartDisplayStreamCapture: {
         this.__handleSetupOffscreenDocument().then(
           () => {
             chrome.runtime.sendMessage({ type: EventConfig.StartDisplayStreamCapture, payload: message.payload });
+            console.log('Offscreen document created, starting display stream capture');
           },
           (error) => {
+            if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
             console.warn('Error in background while starting display stream capture', error);
-            if (sender.tab?.id) {
-              chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
-            }
           }
         );
         return false;
@@ -179,9 +190,7 @@ class Thread {
        * Successfully started capturing stream in the offscreen document, forward the message to the content script
        */
       case EventConfig.StartStreamCaptureSuccess: {
-        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-          if (tab.id) chrome.tabs.sendMessage(tab.id, message);
-        });
+        this.__sendMessageToContentScript(message);
         return false;
       }
 
@@ -189,14 +198,12 @@ class Thread {
        * Failed to start capturing stream in the offscreen document, forward the message to the content script
        */
       case EventConfig.StartStreamCaptureError: {
-        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-          if (tab.id) chrome.tabs.sendMessage(tab.id, message);
-        });
+        this.__sendMessageToContentScript(message);
         return false;
       }
 
       /**
-       * Ask the offscreen document to save the captured stream from the content script
+       * Ask the offscreen document to save the captured stream, sent from the content script
        */
       case EventConfig.SaveCapturedStream: {
         chrome.runtime.sendMessage(message);
@@ -204,28 +211,26 @@ class Thread {
       }
 
       /**
-       * Successfully saved the captured stream in the offscreen document, open the file in the browser
+       * Successfully saved the captured stream in the offscreen document, open the file in the browser, sent from the offscreen document
        */
       case EventConfig.SaveCapturedStreamSuccess: {
-        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+        this.__sendMessageToContentScript(message, () => {
           chrome.tabs.create({ url: message.payload.url });
-          if (tab.id) chrome.tabs.sendMessage(tab.id, message);
+          this.__handleCloseExtension();
         });
         return false;
       }
 
       /**
-       * Failed to save the captured stream in the offscreen document, forward the message to the content script
+       * Failed to save the captured stream in the offscreen document, forward the message to the content script, sent from the offscreen document
        */
       case EventConfig.SaveCapturedStreamError: {
-        chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-          if (tab.id) chrome.tabs.sendMessage(tab.id, message);
-        });
+        this.__sendMessageToContentScript(message);
         return false;
       }
 
       /**
-       * Ask the offscreen document to pause the captured stream from the content script
+       * Ask the offscreen document to pause the captured stream, sent from the content script
        */
       case EventConfig.PauseStreamCapture: {
         chrome.runtime.sendMessage(message);
@@ -233,7 +238,7 @@ class Thread {
       }
 
       /**
-       * Ask the offscreen document to resume the captured stream from the content script
+       * Ask the offscreen document to resume the captured stream, sent from the content script
        */
       case EventConfig.ResumeStreamCapture: {
         chrome.runtime.sendMessage(message);
@@ -241,7 +246,7 @@ class Thread {
       }
 
       /**
-       * Ask the offscreen document to cancel the captured stream from the content script
+       * Ask the offscreen document to cancel the captured stream, sent from the content script
        */
       case EventConfig.DiscardStreamCapture: {
         chrome.runtime.sendMessage(message);

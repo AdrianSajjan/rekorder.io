@@ -4,7 +4,7 @@ import { Pause, Play, Record, Trash } from '@phosphor-icons/react';
 import { recorder } from '../../store/recorder';
 import { ToolbarAction } from '../ui/toolbar-action';
 
-const disabled = ['idle', 'saving', 'pending', 'error'];
+const disabled = ['idle', 'saving', 'countdown', 'pending', 'error'];
 
 const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivElement>) => {
   return (

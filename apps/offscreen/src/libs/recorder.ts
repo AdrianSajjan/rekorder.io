@@ -106,11 +106,11 @@ class OffscreenRecorder {
   }
 
   private __preventTabSilence(media: MediaStream) {
-    if (this.captureDeviceAudio) {
-      this.helperAudioContext = new AudioContext();
-      const source = this.helperAudioContext.createMediaStreamSource(media);
-      source.connect(this.helperAudioContext.destination);
-    }
+    if (!this.captureDeviceAudio || !media.getAudioTracks().length) return;
+
+    this.helperAudioContext = new AudioContext();
+    const source = this.helperAudioContext.createMediaStreamSource(media);
+    source.connect(this.helperAudioContext.destination);
   }
 
   private __exportWebmBlob(blob: Blob) {
@@ -200,6 +200,14 @@ class OffscreenRecorder {
         audio: this.captureDeviceAudio,
       });
     }
+
+    if (!this.video.getVideoTracks().length) {
+      throw new Error(`No video tracks found in the created display media stream: ${this.sourceId}`);
+    }
+
+    if (this.captureDeviceAudio && !this.video.getAudioTracks().length) {
+      throw new Error(`No audio tracks found in the created display media stream: ${this.sourceId}`);
+    }
   }
 
   private async __captureUserMicrophoneAudio() {
@@ -208,6 +216,10 @@ class OffscreenRecorder {
     this.audio = await navigator.mediaDevices.getUserMedia({
       audio: { deviceId: this.microphoneId },
     });
+
+    if (this.audio.getAudioTracks().length === 0) {
+      throw new Error(`No audio tracks found in the created audio media stream: ${this.microphoneId}`);
+    }
 
     if (this.muted) {
       this.audio.getAudioTracks().forEach((track) => (track.enabled = false));

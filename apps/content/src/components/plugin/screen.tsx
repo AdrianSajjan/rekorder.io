@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 import { animations, Switch, theme } from '@rekorder.io/ui';
+import { recorder } from '../../store/recorder';
 
 const ScreenPluginCSS = css.resolve`
   .rekorder-screen-container {
@@ -39,13 +40,13 @@ const ScreenPlugin = observer(() => {
           <label htmlFor="capture-device-audio" className={clsx(ScreenPluginCSS.className, 'toggle-control-label')}>
             Capture Device Audio
           </label>
-          <Switch id="capture-device-audio" />
+          <Switch id="capture-device-audio" checked={recorder.audio} onCheckedChange={recorder.changeDesktopAudio} />
         </div>
         <div className={clsx('toggle-control', ScreenPluginCSS.className)}>
           <label htmlFor="zoom-on-click" className={clsx(ScreenPluginCSS.className, 'toggle-control-label')}>
             Zoom on Click
           </label>
-          <Switch id="zoom-on-click" />
+          <Switch id="zoom-on-click" disabled />
         </div>
       </div>
     </Fragment>

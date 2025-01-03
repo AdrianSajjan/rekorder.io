@@ -25,11 +25,11 @@ const SegmentedControlCSS = css.resolve`
     all: unset;
   }
 
-  .control {
+  .rekorder-segmented-control {
     font-family: ${theme.fonts.default};
   }
 
-  .list {
+  .rekorder-segmented-control-list {
     display: grid;
     grid-auto-columns: 1fr;
     overflow: hidden;
@@ -42,24 +42,24 @@ const SegmentedControlCSS = css.resolve`
     border-radius: ${theme.space(3)};
   }
 
-  .control.small .list {
+  .rekorder-segmented-control.small .rekorder-segmented-control-list {
     font-size: 14px;
   }
-  .control.medium .list {
+  .rekorder-segmented-control.medium .rekorder-segmented-control-list {
     font-size: 14px;
   }
-  .control.large .list {
+  .rekorder-segmented-control.large .rekorder-segmented-control-list {
     font-size: 15px;
   }
 
-  .control.horizontal .list {
+  .rekorder-segmented-control.horizontal .rekorder-segmented-control-list {
     grid-auto-flow: column;
   }
-  .control.vertical .list {
+  .rekorder-segmented-control.vertical .rekorder-segmented-control-list {
     grid-auto-flow: row;
   }
 
-  .trigger {
+  .rekorder-segmented-control-trigger {
     width: 100%;
     position: relative;
 
@@ -68,27 +68,27 @@ const SegmentedControlCSS = css.resolve`
     justify-content: center;
   }
 
-  .trigger:disabled {
+  .rekorder-segmented-control-trigger:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
 
-  .control.small .trigger {
+  .rekorder-segmented-control.small .rekorder-segmented-control-trigger {
     height: ${theme.space(9)};
     border-radius: ${theme.space(1.5)};
   }
 
-  .control.medium .trigger {
+  .rekorder-segmented-control.medium .rekorder-segmented-control-trigger {
     height: ${theme.space(10)};
     border-radius: ${theme.space(2)};
   }
 
-  .control.large .trigger {
+  .rekorder-segmented-control.large .rekorder-segmented-control-trigger {
     height: ${theme.space(11)};
     border-radius: ${theme.space(2.5)};
   }
 
-  .content {
+  .rekorder-segmented-control-trigger-content {
     position: relative;
     color: ${theme.colors.text.muted};
     transition: color 300ms ease;
@@ -100,19 +100,19 @@ const SegmentedControlCSS = css.resolve`
     justify-content: center;
   }
 
-  .trigger[data-state='active'] .content {
+  .rekorder-segmented-control-trigger[data-state='active'] .rekorder-segmented-control-trigger-content {
     color: ${theme.colors.background.text};
   }
 
-  .icon {
+  .rekorder-segmented-control-trigger-icon {
     display: flex;
     color: ${theme.colors.accent.dark};
   }
-  .trigger[data-state='active'] .icon {
+  .rekorder-segmented-control-trigger[data-state='active'] .rekorder-segmented-control-trigger-icon {
     color: ${theme.colors.primary.main};
   }
 
-  .indicator {
+  .rekorder-segmented-control-indicator {
     position: absolute;
     box-shadow: ${theme.shadow().sm};
     background-color: ${theme.colors.core.white};
@@ -137,7 +137,12 @@ const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRo
     return (
       <React.Fragment>
         {SegmentedControlCSS.styles}
-        <Tabs.Root ref={ref} orientation={orientation} className={clsx(SegmentedControlCSS.className, 'control', orientation, size, className)} {...props} />
+        <Tabs.Root
+          ref={ref}
+          orientation={orientation}
+          className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control', orientation, size, className)}
+          {...props}
+        />
       </React.Fragment>
     );
   }
@@ -147,7 +152,7 @@ const SegmentedControlList = React.forwardRef<HTMLDivElement, Tabs.TabsListProps
   const id = React.useId();
   return (
     <LayoutGroup id={id}>
-      <Tabs.List {...props} ref={ref} className={clsx(SegmentedControlCSS.className, 'list', className)} />
+      <Tabs.List {...props} ref={ref} className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-list', className)} />
     </LayoutGroup>
   );
 });
@@ -176,19 +181,21 @@ const SegmentedControlTrigger = React.forwardRef<HTMLButtonElement, Tabs.TabsTri
   });
 
   return (
-    <Tabs.Trigger ref={handleAssignRefs} className={clsx(SegmentedControlCSS.className, 'trigger', className)} {...props}>
-      <div className={clsx(SegmentedControlCSS.className, 'content')}>{children}</div>
-      {state === 'active' ? <motion.div layoutId="rekorder-segmented-controls-indictor" className={clsx(SegmentedControlCSS.className, 'indicator')} /> : null}
+    <Tabs.Trigger ref={handleAssignRefs} className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-trigger', className)} {...props}>
+      <div className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-trigger-content')}>{children}</div>
+      {state === 'active' ? (
+        <motion.div layoutId="rekorder-segmented-controls-indicator" className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-indicator')} />
+      ) : null}
     </Tabs.Trigger>
   );
 });
 
 const SegmentedControlTriggerIcon = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(({ className, ...props }, ref) => {
-  return <span className={clsx(SegmentedControlCSS.className, 'icon', className)} ref={ref} {...props} />;
+  return <span className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-trigger-icon', className)} ref={ref} {...props} />;
 });
 
 const SegmentedControlPanel = React.forwardRef<HTMLDivElement, Tabs.TabsContentProps>(({ className, ...props }, ref) => {
-  return <Tabs.Content {...props} ref={ref} className={clsx(SegmentedControlCSS.className, 'panel', className)} />;
+  return <Tabs.Content {...props} ref={ref} className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-panel', className)} />;
 });
 
 SegmentedControlRoot.List = SegmentedControlList;

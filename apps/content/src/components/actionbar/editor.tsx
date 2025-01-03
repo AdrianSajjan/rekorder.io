@@ -90,8 +90,6 @@ const DrawingActionbarCSS = css.resolve`
   }
 `;
 
-const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
-
 const ShapeComponents = {
   rectangle: <Rectangle size={16} weight="bold" />,
   triangle: <Triangle size={16} weight="bold" />,
@@ -99,6 +97,8 @@ const ShapeComponents = {
 };
 
 const EditorActionbar = observer(() => {
+  const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
+
   const handleValueChange = (value: string) => {
     editor.toggleDrawingMode(value as EditorMode);
   };

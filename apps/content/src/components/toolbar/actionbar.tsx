@@ -14,8 +14,6 @@ import { CursorClickIcon } from '../icons/cursor-click';
 import { CursorHighlightIcon } from '../icons/cursor-highlight';
 import { CursorSpotlightIcon } from '../icons/cursor-spotlight';
 
-const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
-
 const cursors = {
   'default-cursor': <Cursor size={16} weight="bold" />,
   'highlight-click': <CursorClickIcon height={16} width={16} />,
@@ -24,6 +22,8 @@ const cursors = {
 };
 
 const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, 'className'>) => {
+  const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
+
   return (
     <ToggleGroup value={toolbar.actionbarState} onValueChange={toolbar.updateActionbarState} type="single" {...props}>
       <Actionbar open={toolbar.actionbarState === 'draw'} container={toolbarContainer} content={<EditorActionbar />}>
@@ -43,7 +43,7 @@ const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, '
           <CornersIn size={16} weight="bold" />
         </ToggleGroupItem>
       </ToolbarAction>
-      <Actionbar open={toolbar.actionbarState === 'click'} content={<CursorActionbar />}>
+      <Actionbar open={toolbar.actionbarState === 'click'} container={toolbarContainer} content={<CursorActionbar />}>
         <ToolbarAction actionbarIndicator asChild tooltip="Toggle click mode">
           <ToggleGroupItem value="click">{cursors[cursor.mode]}</ToggleGroupItem>
         </ToolbarAction>
