@@ -3,10 +3,12 @@ import { RuntimeMessage } from '@rekorder.io/types';
 import { checkBrowserName } from '@rekorder.io/utils';
 
 class Thread {
-  tab?: number;
+  path?: string;
   enabled?: boolean;
+  tab?: number | null;
+
   injected: Set<number>;
-  offscreen?: Promise<void>;
+  offscreen?: Promise<void> | null;
 
   handleTabReloadListener = this.__handleTabReloadListener.bind(this);
   handleTabChangeListener = this.__handleTabChangeListener.bind(this);
@@ -21,10 +23,24 @@ class Thread {
     this.injected = new Set();
   }
 
-  private async __handleSetupOffscreenDocument(path: string) {
-    const url = chrome.runtime.getURL(path);
-    const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
+  private async __handleCloseExtension() {
+    this.tab = null;
+    this.offscreen = null;
 
+    this.enabled = false;
+    this.injected.clear();
+
+    if (this.path) {
+      const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [this.path] });
+      if (contents.length > 0) chrome.offscreen.closeDocument(() => console.log('Offscreen document closed'));
+    }
+  }
+
+  private async __handleSetupOffscreenDocument(path: string) {
+    this.path = path;
+    const url = chrome.runtime.getURL(this.path);
+
+    const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
     if (contents.length > 0) return;
 
     if (this.offscreen) {
@@ -81,6 +97,14 @@ class Thread {
 
   private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
     switch (message.type) {
+      /**
+       * Close the extension
+       */
+      case EventConfig.CloseExtension: {
+        this.__handleCloseExtension();
+        return false;
+      }
+
       /**
        * Get the media stream id for the current tab and start capturing the stream in the offscreen document
        */

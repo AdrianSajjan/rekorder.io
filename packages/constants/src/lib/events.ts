@@ -32,6 +32,7 @@ export const EventConfig = {
   SaveCapturedStreamSuccess: 'save.captured.stream.success',
 
   OpenPermissionSettings: 'open.permissions.settings',
+  CloseExtension: 'close.extension',
 
   SetSessionStorage: 'set.session.storage',
   SetSessionStorageSuccess: 'set.session.storage.success',

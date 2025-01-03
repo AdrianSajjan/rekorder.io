@@ -38,7 +38,7 @@ const RecorderCSS = css.resolve`
   }
 `;
 
-const Recorder = observer(() => {
+const Content = observer(() => {
   return recorder.initialized ? (
     <AnimationsProvider>
       {RecorderCSS.styles}
@@ -58,4 +58,4 @@ const Recorder = observer(() => {
   ) : null;
 });
 
-export { Recorder };
+export { Content };

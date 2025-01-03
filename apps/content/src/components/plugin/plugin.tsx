@@ -15,6 +15,7 @@ import { AudioPlugin } from './audio';
 import { CameraPlugin } from './camera';
 import { ScreenPlugin } from './screen';
 import { ToolbarPlugin } from './toolbar';
+import { EventConfig } from '@rekorder.io/constants';
 
 const PluginCardCSS = css.resolve`
   .rekorder-plugin-container {
@@ -24,7 +25,7 @@ const PluginCardCSS = css.resolve`
     pointer-events: all;
   }
 
-  .card {
+  .rekorder-plugin-card {
     width: 100%;
     padding-top: ${theme.space(8)};
     padding-bottom: ${theme.space(6)};
@@ -35,36 +36,40 @@ const PluginCardCSS = css.resolve`
     box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.light, 0.1)).xl};
   }
 
-  .segmented-list {
+  .rekorder-segmented-list {
     margin: 0 auto;
     width: ${theme.space(70)} !important;
   }
 
-  .segmented-panel {
+  .rekorder-segmented-panel {
     margin-top: ${theme.space(5)};
   }
 
-  .horizontal-panel {
+  .rekorder-horizontal-panel {
     background-color: ${theme.colors.background.light};
   }
 
-  .horizontal-panel-content {
+  .rekorder-horizontal-panel-content {
     padding: ${theme.space(6)};
     max-height: ${theme.space(60)};
     overflow-y: auto;
   }
 
-  .footer {
+  .rekorder-footer {
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.space(3)};
     border-top: 1px solid ${theme.colors.borders.input};
     padding: ${theme.space(6)} ${theme.space(6)} 0;
   }
 
-  .record-button {
+  .rekorder-record-button,
+  .rekorder-close-button {
     width: 100%;
     position: relative;
   }
 
-  .record-button-command {
+  .rekorder-record-button-command {
     top: 50%;
     position: absolute;
     right: ${theme.space(4)};
@@ -98,14 +103,19 @@ const PluginCard = observer(() => {
     }
   };
 
+  const handleCloseExtension = () => {
+    chrome.runtime.sendMessage({ type: EventConfig.CloseExtension });
+    document.getElementById('rekorder-ui')?.remove();
+  };
+
   return (
     <Fragment>
       {PluginCardCSS.styles}
       <Draggable nodeRef={drag.ref} position={drag.position} onStop={drag.onChangePosition} bounds={drag.bounds}>
         <div ref={drag.ref} className={clsx(PluginCardCSS.className, 'rekorder-plugin-container')}>
-          <article className={clsx(PluginCardCSS.className, 'card')}>
-            <SegmentedControl size="small" className={clsx(PluginCardCSS.className, 'segmented-controls')} defaultValue="record">
-              <SegmentedControl.List className={clsx(PluginCardCSS.className, 'segmented-list')}>
+          <article className={clsx(PluginCardCSS.className, 'rekorder-plugin-card')}>
+            <SegmentedControl size="small" className={clsx(PluginCardCSS.className, 'rekorder-segmented-controls')} defaultValue="record">
+              <SegmentedControl.List className={clsx(PluginCardCSS.className, 'rekorder-segmented-list')}>
                 <SegmentedControl.Trigger value="record">
                   <SegmentedControl.TriggerIcon>
                     <VideoCamera weight="fill" size={20} />
@@ -119,7 +129,7 @@ const PluginCard = observer(() => {
                   <span>Videos</span>
                 </SegmentedControl.Trigger>
               </SegmentedControl.List>
-              <SegmentedControl.Panel value="record" className={clsx(PluginCardCSS.className, 'segmented-panel')}>
+              <SegmentedControl.Panel value="record" className={clsx(PluginCardCSS.className, 'rekorder-segmented-panel')}>
                 <HorizontalTabs defaultValue="screen">
                   <HorizontalTabs.List>
                     <HorizontalTabs.Trigger value="screen">Screen</HorizontalTabs.Trigger>
@@ -127,8 +137,8 @@ const PluginCard = observer(() => {
                     <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
                     <HorizontalTabs.Trigger value="toolbar">Toolbar</HorizontalTabs.Trigger>
                   </HorizontalTabs.List>
-                  <AnimateHeight className={clsx(PluginCardCSS.className, 'horizontal-panel')}>
-                    <div className={clsx(PluginCardCSS.className, 'horizontal-panel-content')}>
+                  <AnimateHeight className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel')}>
+                    <div className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel-content')}>
                       <HorizontalTabs.Panel value="screen">
                         <ScreenPlugin />
                       </HorizontalTabs.Panel>
@@ -144,10 +154,13 @@ const PluginCard = observer(() => {
                     </div>
                   </AnimateHeight>
                 </HorizontalTabs>
-                <div className={clsx(PluginCardCSS.className, 'footer')}>
-                  <Button variant="fancy" onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'record-button')}>
+                <div className={clsx(PluginCardCSS.className, 'rekorder-footer')}>
+                  <Button variant="fancy" onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'rekorder-record-button')}>
                     <span>{recorder.status === 'pending' ? 'Cancel Recording' : 'Start Recording'}</span>
-                    <span className={clsx(PluginCardCSS.className, 'record-button-command')}>⌥⇧D</span>
+                    <span className={clsx(PluginCardCSS.className, 'rekorder-record-button-command')}>⌥⇧D</span>
+                  </Button>
+                  <Button variant="outline" color="accent" onClick={handleCloseExtension} className={clsx(PluginCardCSS.className, 'rekorder-close-button')}>
+                    Close Extension
                   </Button>
                 </div>
               </SegmentedControl.Panel>

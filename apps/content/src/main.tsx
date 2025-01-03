@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Recorder } from './recorder';
+import { Content } from './content';
 
 const id = 'rekorder-ui';
 const node = document.getElementById(id);
@@ -12,6 +12,6 @@ document.body.appendChild(root);
 
 createRoot(root).render(
   <StrictMode>
-    <Recorder />
+    <Content />
   </StrictMode>
 );
