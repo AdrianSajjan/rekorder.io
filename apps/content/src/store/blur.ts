@@ -66,10 +66,10 @@ class ElementBlur {
   }
 
   private __flushStyles() {
-    this._styles.forEach((style, element) => {
-      element.style.outline = style.outline;
-    });
-    this._styles.clear();
+    for (const [element, style] of this._styles.entries()) {
+      element.style.outline = style.outline ?? 'none';
+      if (!style.blurred) this._styles.delete(element);
+    }
   }
 
   private __setupEvents() {
@@ -84,9 +84,16 @@ class ElementBlur {
     document.removeEventListener('mouseout', this.__handleMouseOut);
   }
 
+  updateBlurAmount(amount: number) {
+    this.blurAmount = amount;
+  }
+
   toggle() {
-    if (this.enabled) this.dispose();
-    else this.initialize();
+    if (this.enabled) {
+      this.dispose();
+    } else {
+      this.initialize();
+    }
   }
 
   initialize() {
