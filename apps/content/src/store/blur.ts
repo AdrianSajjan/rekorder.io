@@ -44,7 +44,7 @@ class ElementBlur {
     const style = this._styles.get(element);
 
     if (element.style.outline !== style?.outline) element.style.outline = style?.outline ?? 'none';
-    if (!style?.blured) this._styles.delete(element);
+    if (!style?.blurred) this._styles.delete(element);
   }
 
   private __handleMouseDown(event: MouseEvent) {
@@ -56,8 +56,8 @@ class ElementBlur {
     const element = event.target as HTMLElement;
     const style = this._styles.get(element);
 
-    if (!style?.blured) {
-      this._styles.set(element, { ...style, filter: element.style.filter, blured: true });
+    if (!style?.blurred) {
+      this._styles.set(element, { ...style, filter: element.style.filter, blurred: true });
       element.style.filter = `blur(${this.blurAmount}px)`;
     } else {
       element.style.filter = style.filter ?? 'none';
@@ -70,6 +70,7 @@ class ElementBlur {
       element.style.outline = style.outline ?? 'none';
       if (!style.blurred) this._styles.delete(element);
     }
+    console.log(this._styles.entries());
   }
 
   private __setupEvents() {
