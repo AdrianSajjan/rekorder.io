@@ -208,20 +208,10 @@ class Thread {
       }
 
       /**
-       * Successfully saved the captured stream in the offscreen document, open the file in the browser, sent from the offscreen document
+       * Successfully saved the captured stream in the offscreen document,do something with the blob / url, sent from the offscreen document
        */
       case EventConfig.SaveCapturedStreamSuccess: {
-        chrome.downloads.download(
-          {
-            url: message.payload.url,
-            saveAs: true,
-            filename: Date.now() + '.webm',
-          },
-          (id) => {
-            this.__handleCloseExtension();
-            console.log('Downloaded saved stream file with id:', id);
-          }
-        );
+        this.__handleCloseExtension();
         return false;
       }
 

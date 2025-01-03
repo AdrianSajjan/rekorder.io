@@ -113,10 +113,13 @@ class OffscreenRecorder {
     source.connect(this.helperAudioContext.destination);
   }
 
+  /**
+   * Export the blob to the content script / Upload the blob to the server and send the url back to the content script
+   * URL.createObjectURL(blob) is placeholder for the actual url
+   */
   private __exportWebmBlob(blob: Blob) {
     this.__resetState();
-    const url = URL.createObjectURL(blob);
-    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { url } });
+    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { blob, url: URL.createObjectURL(blob) } });
   }
 
   private __recorderStopEvent() {
