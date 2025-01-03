@@ -49,7 +49,7 @@ const SelectInputCSS = css.resolve`
     font: inherit;
   }
 
-  .trigger {
+  .rekorder-trigger {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -66,21 +66,21 @@ const SelectInputCSS = css.resolve`
     transition: background-color 200ms ease-in-out, border-color 200ms ease-in-out;
   }
 
-  .trigger[data-placeholder] {
+  .rekorder-trigger[data-placeholder] {
     color: ${theme.colors.accent.dark};
   }
 
-  .trigger:hover {
+  .rekorder-trigger:hover {
     background-color: ${theme.colors.background.light};
   }
 
-  .trigger:focus {
+  .rekorder-trigger:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.primary.main, 0.25) } })};
   }
 
-  .trigger.large {
+  .rekorder-trigger.rekorder-large {
     height: ${theme.space(11)};
     padding-left: ${theme.space(3.5)};
     padding-right: ${theme.space(3.5)};
@@ -88,7 +88,7 @@ const SelectInputCSS = css.resolve`
     font-size: 16px;
   }
 
-  .trigger.medium {
+  .rekorder-trigger.rekorder-medium {
     height: ${theme.space(10)};
     padding-left: ${theme.space(3.5)};
     padding-right: ${theme.space(3.5)};
@@ -96,7 +96,7 @@ const SelectInputCSS = css.resolve`
     font-size: 14px;
   }
 
-  .trigger.small {
+  .rekorder-trigger.rekorder-small {
     height: ${theme.space(9)};
     padding-left: ${theme.space(3.5)};
     padding-right: ${theme.space(3.5)};
@@ -104,7 +104,7 @@ const SelectInputCSS = css.resolve`
     font-size: 14px;
   }
 
-  .trigger .icon {
+  .rekorder-trigger .rekorder-icon {
     display: inline-flex;
     color: ${theme.colors.accent.main};
   }
@@ -116,9 +116,9 @@ const SelectInput = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(({ c
   return (
     <React.Fragment>
       {SelectInputCSS.styles}
-      <SelectPrimitive.Trigger ref={ref} className={clsx(SelectInputCSS.className, 'trigger', size, className)} {...props}>
+      <SelectPrimitive.Trigger ref={ref} className={clsx(SelectInputCSS.className, 'rekorder-trigger', theme.createClassName(size), className)} {...props}>
         {children ?? <SelectPrimitive.Value placeholder={placeholder} />}
-        <SelectPrimitive.Icon className={clsx(SelectInputCSS.className, 'icon')}>
+        <SelectPrimitive.Icon className={clsx(SelectInputCSS.className, 'rekorder-icon')}>
           <CaretDown size={14} weight="bold" />
         </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
@@ -159,7 +159,7 @@ const SelectContentCSS = css.resolve`
     margin: 0;
   }
 
-  .content {
+  .rekorder-content {
     box-shadow: ${theme.shadow().md};
     min-width: var(--radix-select-trigger-width);
     background-color: ${theme.colors.core.white};
@@ -170,30 +170,31 @@ const SelectContentCSS = css.resolve`
     z-index: ${theme.zIndex(100)};
   }
 
-  .content[data-state='open'] {
+  .rekorder-content[data-state='open'] {
     animation-name: ${animations['slide-down-fade-in']};
     animation-duration: 250ms;
   }
 
-  .content.large {
+  .rekorder-content.rekorder-large {
     border-radius: ${theme.space(3)};
   }
 
-  .content.medium {
+  .rekorder-content.rekorder-medium {
     border-radius: ${theme.space(2.5)};
   }
 
-  .content.small {
+  .rekorder-content.rekorder-small {
     border-radius: ${theme.space(2)};
   }
 
-  .content .item {
+  .rekorder-content .rekorder-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: ${theme.space(3)};
 
     padding: ${theme.space(2.5)} ${theme.space(3.5)};
+    color: ${theme.colors.background.text};
     border-radius: ${theme.space(1.5)};
     font-size: 14px;
 
@@ -201,24 +202,24 @@ const SelectContentCSS = css.resolve`
     cursor: pointer;
   }
 
-  .content .item:focus {
+  .rekorder-content .rekorder-item:focus {
     outline: none;
     background-color: ${theme.colors.background.main};
   }
 
-  .content .item:hover {
+  .rekorder-content .rekorder-item:hover {
     outline: none;
     background-color: ${theme.colors.background.main};
   }
 
-  .content .label {
+  .rekorder-content .rekorder-label {
     font-size: 12px;
     font-weight: 600;
     padding: ${theme.space(2)} ${theme.space(3)};
     color: ${theme.colors.primary.dark};
   }
 
-  .content .separator {
+  .rekorder-content .rekorder-separator {
     height: 1px;
     background-color: ${theme.colors.borders.input};
     margin: ${theme.space(1.5)} 0;
@@ -257,7 +258,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
         {SelectContentCSS.styles}
         <SelectPrimitive.Portal>
           <SelectPrimitive.Content
-            className={clsx(SelectContentCSS.className, 'content', size)}
+            className={clsx(SelectContentCSS.className, 'rekorder-content', theme.createClassName(size))}
             position={position}
             sideOffset={sideOffset}
             ref={ref}
@@ -274,22 +275,22 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
 );
 
 const SelectGroup = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectGroupProps>(({ className, ...props }, ref) => {
-  return <SelectPrimitive.Group className={clsx(SelectContentCSS.className, 'group', className)} ref={ref} {...props} />;
+  return <SelectPrimitive.Group className={clsx(SelectContentCSS.className, 'rekorder-group', className)} ref={ref} {...props} />;
 });
 
 const SelectSeparator = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectSeparatorProps>(({ className, ...props }, ref) => {
-  return <SelectPrimitive.Separator ref={ref} className={clsx(SelectContentCSS.className, 'separator', className)} {...props} />;
+  return <SelectPrimitive.Separator ref={ref} className={clsx(SelectContentCSS.className, 'rekorder-separator', className)} {...props} />;
 });
 
 const SelectLabel = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectLabelProps>(({ className, ...props }, ref) => {
-  return <SelectPrimitive.Label ref={ref} className={clsx(SelectContentCSS.className, 'label', className)} {...props} />;
+  return <SelectPrimitive.Label ref={ref} className={clsx(SelectContentCSS.className, 'rekorder-label', className)} {...props} />;
 });
 
 const SelectItem = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectItemProps>(({ children, className, ...props }, ref) => {
   return (
-    <SelectPrimitive.Item className={clsx(SelectContentCSS.className, 'item', className)} ref={ref} {...props}>
-      <SelectPrimitive.ItemText className={clsx(SelectContentCSS.className, 'text')}>{children}</SelectPrimitive.ItemText>
-      <SelectPrimitive.ItemIndicator className={clsx(SelectContentCSS.className, 'indicator')}>
+    <SelectPrimitive.Item className={clsx(SelectContentCSS.className, 'rekorder-item', className)} ref={ref} {...props}>
+      <SelectPrimitive.ItemText className={clsx(SelectContentCSS.className, 'rekorder-text')}>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemIndicator className={clsx(SelectContentCSS.className, 'rekorder-indicator')}>
         <Check size={16} weight="bold" color={theme.colors.accent.dark} />
       </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>

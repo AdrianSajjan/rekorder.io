@@ -20,7 +20,7 @@ const AlertDialogCSS = css.resolve`
     all: unset;
   }
 
-  .alert-dialog-overlay {
+  .rekorder-alert-dialog-overlay {
     inset: 0;
     position: fixed;
 
@@ -28,15 +28,15 @@ const AlertDialogCSS = css.resolve`
     background-color: ${theme.alpha(theme.colors.core.black, 0.8)};
   }
 
-  .alert-dialog-overlay[data-state='open'] {
+  .rekorder-alert-dialog-overlay[data-state='open'] {
     animation: ${animations['fade-in']} cubic-bezier(0.2, 0.5, 0.1, 0.8) 150ms;
   }
 
-  .alert-dialog-overlay[data-state='closed'] {
+  .rekorder-alert-dialog-overlay[data-state='closed'] {
     animation: ${animations['fade-out']} ease-out 100ms;
   }
 
-  .alert-dialog-content {
+  .rekorder-alert-dialog-content {
     top: 50%;
     left: 50%;
     position: fixed;
@@ -52,15 +52,15 @@ const AlertDialogCSS = css.resolve`
     background-color: ${theme.colors.core.white};
   }
 
-  .alert-dialog-content[data-state='open'] {
+  .rekorder-alert-dialog-content[data-state='open'] {
     animation: alert-entry cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards;
   }
 
-  .alert-dialog-content[data-state='closed'] {
+  .rekorder-alert-dialog-content[data-state='closed'] {
     animation: alert-exit ease-out 100ms;
   }
 
-  .alert-dialog-header {
+  .rekorder-alert-dialog-header {
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -69,7 +69,7 @@ const AlertDialogCSS = css.resolve`
     padding: ${theme.space(6)};
   }
 
-  .alert-dialog-footer {
+  .rekorder-alert-dialog-footer {
     display: flex;
     align-items: center;
     flex-direction: row-reverse;
@@ -79,22 +79,23 @@ const AlertDialogCSS = css.resolve`
     border-top: 1px solid ${theme.colors.borders.input};
   }
 
-  .alert-dialog-title {
+  .rekorder-alert-dialog-title {
     font-size: 16px;
     font-weight: 500;
+    color: ${theme.colors.background.text};
   }
 
-  .alert-dialog-description {
+  .rekorder-alert-dialog-description {
     font-size: 14px;
     line-height: 1.3;
     color: ${theme.colors.accent.dark};
   }
 
-  .alert-dialog-action {
+  .rekorder-alert-dialog-action {
     flex: 1;
   }
 
-  .alert-dialog-cancel {
+  .rekorder-alert-dialog-cancel {
     flex: 1;
   }
 
@@ -133,7 +134,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Overlay className={clsx(AlertDialogCSS.className, 'alert-dialog-overlay', className)} {...props} ref={ref} />
+    <AlertDialogPrimitive.Overlay className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-overlay', className)} {...props} ref={ref} />
   </React.Fragment>
 ));
 
@@ -143,21 +144,21 @@ const AlertDialogContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Content className={clsx(AlertDialogCSS.className, 'alert-dialog-content', className)} {...props} ref={ref} />
+    <AlertDialogPrimitive.Content className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-content', className)} {...props} ref={ref} />
   </React.Fragment>
 ));
 
 const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <div className={clsx(AlertDialogCSS.className, 'alert-dialog-header', className)} {...props} />
+    <div className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-header', className)} {...props} />
   </React.Fragment>
 );
 
 const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <div className={clsx(AlertDialogCSS.className, 'alert-dialog-footer', className)} {...props} />
+    <div className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-footer', className)} {...props} />
   </React.Fragment>
 );
 
@@ -167,7 +168,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Title ref={ref} className={clsx(AlertDialogCSS.className, 'alert-dialog-title', className)} {...props} />
+    <AlertDialogPrimitive.Title ref={ref} className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-title', className)} {...props} />
   </React.Fragment>
 ));
 
@@ -177,7 +178,7 @@ const AlertDialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <React.Fragment>
     {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Description ref={ref} className={clsx(AlertDialogCSS.className, 'alert-dialog-description', className)} {...props} />
+    <AlertDialogPrimitive.Description ref={ref} className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-description', className)} {...props} />
   </React.Fragment>
 ));
 
@@ -185,7 +186,7 @@ const AlertDialogAction = React.forwardRef<React.ElementRef<typeof AlertDialogPr
   <React.Fragment>
     {AlertDialogCSS.styles}
     <AlertDialogPrimitive.Action asChild>
-      <Button className={clsx(AlertDialogCSS.className, 'alert-dialog-action', className)} ref={ref} {...props} />
+      <Button className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-action', className)} ref={ref} {...props} />
     </AlertDialogPrimitive.Action>
   </React.Fragment>
 ));
@@ -195,7 +196,7 @@ const AlertDialogCancel = React.forwardRef<React.ElementRef<typeof AlertDialogPr
     <React.Fragment>
       {AlertDialogCSS.styles}
       <AlertDialogPrimitive.Cancel asChild>
-        <Button className={clsx(AlertDialogCSS.className, 'alert-dialog-cancel', className)} variant={variant} color={color} ref={ref} {...props} />
+        <Button className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-cancel', className)} variant={variant} color={color} ref={ref} {...props} />
       </AlertDialogPrimitive.Cancel>
     </React.Fragment>
   )

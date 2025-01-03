@@ -39,7 +39,7 @@ const ButtonRootCSS = css.resolve`
     border: unset;
   }
 
-  .button {
+  .rekorder-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -50,14 +50,14 @@ const ButtonRootCSS = css.resolve`
     font-family: ${theme.fonts.default};
   }
 
-  .button {
+  .rekorder-button {
     transition: background-color 200ms ease-in-out;
   }
-  .button.ghost,
-  .button.outline {
+  .rekorder-button.rekorder-ghost,
+  .rekorder-button.rekorder-outline {
     background-color: transparent;
   }
-  .button.fancy {
+  .rekorder-button.rekorder-fancy {
     border: 1px solid;
     border-image-source: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 100%);
     background-image: linear-gradient(to bottom, var(--gradient-form), rgba(255, 255, 255, 0));
@@ -65,221 +65,221 @@ const ButtonRootCSS = css.resolve`
     transition: --gradient-form 200ms ease-in-out, box-shadow 200ms ease-in-out;
   }
 
-  .button.solid.primary {
+  .rekorder-button.rekorder-solid.rekorder-primary {
     color: ${theme.colors.primary.text};
     background-color: ${theme.colors.primary.main};
   }
-  .button.solid.error {
+  .rekorder-button.rekorder-solid.rekorder-error {
     color: ${theme.colors.destructive.text};
     background-color: ${theme.colors.destructive.main};
   }
-  .button.solid.accent {
+  .rekorder-button.rekorder-solid.rekorder-accent {
     color: ${theme.colors.accent.text};
     background-color: ${theme.colors.accent.light};
   }
-  .button.solid.success {
+  .rekorder-button.rekorder-solid.rekorder-success {
     color: ${theme.colors.success.text};
     background-color: ${theme.colors.success.main};
   }
-  .button.solid.warning {
+  .rekorder-button.rekorder-solid.rekorder-warning {
     color: ${theme.colors.warning.text};
     background-color: ${theme.colors.warning.main};
   }
-  .button.solid.info {
+  .rekorder-button.rekorder-solid.rekorder-info {
     color: ${theme.colors.info.text};
     background-color: ${theme.colors.info.main};
   }
 
-  .button.solid.primary:hover {
+  .rekorder-button.rekorder-solid.rekorder-primary:hover {
     background-color: ${theme.colors.primary.dark};
   }
-  .button.solid.error:hover {
+  .rekorder-button.rekorder-solid.rekorder-error:hover {
     background-color: ${theme.colors.destructive.dark};
   }
-  .button.solid.accent:hover {
+  .rekorder-button.rekorder-solid.rekorder-accent:hover {
     background-color: ${theme.colors.accent.dark};
   }
-  .button.solid.success:hover {
+  .rekorder-button.rekorder-solid.rekorder-success:hover {
     background-color: ${theme.colors.success.dark};
   }
-  .button.solid.warning:hover {
+  .rekorder-button.rekorder-solid.rekorder-warning:hover {
     background-color: ${theme.colors.warning.dark};
   }
-  .button.solid.info:hover {
+  .rekorder-button.rekorder-solid.rekorder-info:hover {
     background-color: ${theme.colors.info.dark};
   }
 
-  .button.light.primary {
+  .rekorder-button.rekorder-light.rekorder-primary {
     color: ${theme.colors.primary.main};
     background-color: ${theme.alpha(theme.colors.primary.main, 0.1)};
   }
-  .button.light.error {
+  .rekorder-button.rekorder-light.rekorder-error {
     color: ${theme.colors.destructive.main};
     background-color: ${theme.alpha(theme.colors.destructive.main, 0.1)};
   }
-  .button.light.accent {
+  .rekorder-button.rekorder-light.rekorder-accent {
     color: ${theme.colors.accent.text};
     background-color: ${theme.alpha(theme.colors.accent.main, 0.2)};
   }
-  .button.light.success {
+  .rekorder-button.rekorder-light.rekorder-success {
     color: ${theme.colors.success.main};
     background-color: ${theme.alpha(theme.colors.success.main, 0.1)};
   }
-  .button.light.warning {
+  .rekorder-button.rekorder-light.rekorder-warning {
     color: ${theme.colors.warning.main};
     background-color: ${theme.alpha(theme.colors.warning.main, 0.1)};
   }
-  .button.light.info {
+  .rekorder-button.rekorder-light.rekorder-info {
     color: ${theme.colors.info.main};
     background-color: ${theme.alpha(theme.colors.info.main, 0.1)};
   }
 
-  .button.light.primary:hover {
+  .rekorder-button.rekorder-light.rekorder-primary:hover {
     background-color: ${theme.alpha(theme.colors.primary.main, 0.2)};
   }
-  .button.light.error:hover {
+  .rekorder-button.rekorder-light.rekorder-error:hover {
     background-color: ${theme.alpha(theme.colors.destructive.main, 0.2)};
   }
-  .button.light.accent:hover {
+  .rekorder-button.rekorder-light.rekorder-accent:hover {
     background-color: ${theme.alpha(theme.colors.accent.main, 0.3)};
   }
-  .button.light.success:hover {
+  .rekorder-button.rekorder-light.rekorder-success:hover {
     background-color: ${theme.alpha(theme.colors.success.main, 0.2)};
   }
-  .button.light.warning:hover {
+  .rekorder-button.rekorder-light.rekorder-warning:hover {
     background-color: ${theme.alpha(theme.colors.warning.main, 0.2)};
   }
-  .button.light.info:hover {
+  .rekorder-button.rekorder-light.rekorder-info:hover {
     background-color: ${theme.alpha(theme.colors.info.main, 0.2)};
   }
 
-  .button.fancy.primary {
+  .rekorder-button.rekorder-fancy.rekorder-primary {
     color: ${theme.colors.primary.text};
     background-color: ${theme.colors.primary.main};
     --fancy-shadow-color: ${theme.colors.primary.main};
   }
-  .button.fancy.error {
+  .rekorder-button.rekorder-fancy.rekorder-error {
     color: ${theme.colors.destructive.text};
     background-color: ${theme.colors.destructive.main};
     --fancy-shadow-color: ${theme.colors.destructive.main};
   }
-  .button.fancy.accent {
+  .rekorder-button.rekorder-fancy.rekorder-accent {
     color: ${theme.colors.accent.text};
     background-color: ${theme.colors.accent.light};
     --fancy-shadow-color: ${theme.colors.accent.light};
   }
-  .button.fancy.success {
+  .rekorder-button.rekorder-fancy.rekorder-success {
     color: ${theme.colors.success.text};
     background-color: ${theme.colors.success.main};
     --fancy-shadow-color: ${theme.colors.success.main};
   }
-  .button.fancy.warning {
+  .rekorder-button.rekorder-fancy.rekorder-warning {
     color: ${theme.colors.warning.text};
     background-color: ${theme.colors.warning.main};
     --fancy-shadow-color: ${theme.colors.warning.main};
   }
-  .button.fancy.info {
+  .rekorder-button.rekorder-fancy.rekorder-info {
     color: ${theme.colors.info.text};
     background-color: ${theme.colors.info.main};
     --fancy-shadow-color: ${theme.colors.info.main};
   }
-  .button.fancy:hover {
+  .rekorder-button.rekorder-fancy:hover {
     --gradient-form: rgba(255, 255, 255, 0.3);
   }
 
-  .button.outline.primary {
+  .rekorder-button.rekorder-outline.rekorder-primary {
     color: ${theme.colors.primary.main};
     border: 1px solid ${theme.colors.primary.main};
   }
-  .button.outline.error {
+  .rekorder-button.rekorder-outline.rekorder-error {
     color: ${theme.colors.destructive.main};
     border: 1px solid ${theme.colors.destructive.main};
   }
-  .button.outline.accent {
+  .rekorder-button.rekorder-outline.rekorder-accent {
     box-shadow: ${theme.shadow().sm};
     color: ${theme.colors.accent.text};
     border: 1px solid ${theme.colors.borders.input};
   }
-  .button.outline.success {
+  .rekorder-button.rekorder-outline.rekorder-success {
     color: ${theme.colors.success.main};
     border: 1px solid ${theme.colors.success.main};
   }
-  .button.outline.warning {
+  .rekorder-button.rekorder-outline.rekorder-warning {
     color: ${theme.colors.warning.main};
     border: 1px solid ${theme.colors.warning.main};
   }
-  .button.outline.info {
+  .rekorder-button.rekorder-outline.rekorder-info {
     color: ${theme.colors.info.main};
     border: 1px solid ${theme.colors.info.main};
   }
 
-  .button.ghost.primary {
+  .rekorder-button.rekorder-ghost.rekorder-primary {
     color: ${theme.colors.primary.main};
   }
-  .button.ghost.error {
+  .rekorder-button.rekorder-ghost.rekorder-error {
     color: ${theme.colors.destructive.main};
   }
-  .button.ghost.accent {
+  .rekorder-button.rekorder-ghost.rekorder-accent {
     color: ${theme.colors.accent.text};
   }
-  .button.ghost.success {
+  .rekorder-button.rekorder-ghost.rekorder-success {
     color: ${theme.colors.success.main};
   }
-  .button.ghost.warning {
+  .rekorder-button.rekorder-ghost.rekorder-warning {
     color: ${theme.colors.warning.main};
   }
-  .button.ghost.info {
+  .rekorder-button.rekorder-ghost.rekorder-info {
     color: ${theme.colors.info.main};
   }
 
-  .button.outline.primary:hover,
-  .button.ghost.primary:hover {
+  .rekorder-button.rekorder-outline.rekorder-primary:hover,
+  .rekorder-button.rekorder-ghost.rekorder-primary:hover {
     background-color: ${theme.alpha(theme.colors.primary.main, 0.1)};
   }
-  .button.outline.error:hover,
-  .button.ghost.error:hover {
+  .rekorder-button.rekorder-outline.rekorder-error:hover,
+  .rekorder-button.rekorder-ghost.rekorder-error:hover {
     background-color: ${theme.alpha(theme.colors.destructive.main, 0.1)};
   }
-  .button.outline.accent:hover,
-  .button.ghost.accent:hover {
+  .rekorder-button.rekorder-outline.rekorder-accent:hover,
+  .rekorder-button.rekorder-ghost.rekorder-accent:hover {
     background-color: ${theme.alpha(theme.colors.accent.main, 0.1)};
   }
-  .button.outline.success:hover,
-  .button.ghost.success:hover {
+  .rekorder-button.rekorder-outline.rekorder-success:hover,
+  .rekorder-button.rekorder-ghost.rekorder-success:hover {
     background-color: ${theme.alpha(theme.colors.success.main, 0.1)};
   }
-  .button.outline.warning:hover,
-  .button.ghost.warning:hover {
+  .rekorder-button.rekorder-outline.rekorder-warning:hover,
+  .rekorder-button.rekorder-ghost.rekorder-warning:hover {
     background-color: ${theme.alpha(theme.colors.warning.main, 0.1)};
   }
-  .button.outline.info:hover,
-  .button.ghost.info:hover {
+  .rekorder-button.rekorder-outline.rekorder-info:hover,
+  .rekorder-button.rekorder-ghost.rekorder-info:hover {
     background-color: ${theme.alpha(theme.colors.info.main, 0.1)};
   }
 
-  .button:focus {
+  .rekorder-button:focus {
     outline: none;
   }
-  .button.primary:focus {
+  .rekorder-button.rekorder-primary:focus {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.primary.main, 0.5) } })};
   }
-  .button.error:focus {
+  .rekorder-button.rekorder-error:focus {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.destructive.main, 0.5) } })};
   }
-  .button.accent:focus {
+  .rekorder-button.rekorder-accent:focus {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.accent.light, 0.5) } })};
   }
-  .button.success:focus {
+  .rekorder-button.rekorder-success:focus {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.success.main, 0.5) } })};
   }
-  .button.warning:focus {
+  .rekorder-button.rekorder-warning:focus {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.warning.main, 0.5) } })};
   }
-  .button.info:focus {
+  .rekorder-button.rekorder-info:focus {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.info.main, 0.5) } })};
   }
 
-  .button.large {
+  .rekorder-button.rekorder-large {
     padding-left: ${theme.space(5.5)};
     padding-right: ${theme.space(5.5)};
 
@@ -287,7 +287,7 @@ const ButtonRootCSS = css.resolve`
     height: ${theme.space(11)};
     font-size: 15px;
   }
-  .button.medium {
+  .rekorder-button.rekorder-medium {
     padding-left: ${theme.space(5)};
     padding-right: ${theme.space(5)};
 
@@ -295,7 +295,7 @@ const ButtonRootCSS = css.resolve`
     height: ${theme.space(10)};
     font-size: 14px;
   }
-  .button.small {
+  .rekorder-button.rekorder-small {
     padding-left: ${theme.space(4.5)};
     padding-right: ${theme.space(4.5)};
 
@@ -312,7 +312,18 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <React.Fragment>
         {ButtonRootCSS.styles}
-        <Component ref={forwardedRef} className={clsx(ButtonRootCSS.className, 'button', variant, color, size, className)} {...rest}>
+        <Component
+          ref={forwardedRef}
+          className={clsx(
+            ButtonRootCSS.className,
+            'rekorder-button',
+            theme.createClassName(variant),
+            theme.createClassName(color),
+            theme.createClassName(size),
+            className
+          )}
+          {...rest}
+        >
           {children}
         </Component>
       </React.Fragment>
