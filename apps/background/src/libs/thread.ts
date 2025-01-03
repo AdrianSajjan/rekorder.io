@@ -85,7 +85,7 @@ class Thread {
   }
 
   private __handleActionClickListener(tab: chrome.tabs.Tab) {
-    if (!this.enabled) {
+    if (this.enabled) {
       this.__handleCloseExtension();
     } else if (tab.url?.includes('chrome-extension://')) {
       // TODO: Tab is in the extension, we need to handle this case
@@ -97,6 +97,7 @@ class Thread {
       this.tab = tab.id;
       this.url = tab.url;
       this.enabled = true;
+
       this.injected.add(tab.id);
       this.__injectContentScript();
     }

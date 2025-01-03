@@ -1,6 +1,4 @@
 import exportWebmBlob from 'fix-webm-duration';
-
-import { isString } from 'lodash';
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';
 
@@ -157,7 +155,6 @@ class OffscreenRecorder {
   private __captureStreamError(error: unknown) {
     this.__resetState();
     chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureError, payload: { error } });
-    if (isString(error) && error.toLowerCase().includes('abort error')) console.log('Abort Error', error);
     console.warn('Error in recorder while starting stream', error);
   }
 
