@@ -203,14 +203,22 @@ class OffscreenRecorder {
     }
   }
 
-  start(sourceId: string, microphoneId = 'n/a', captureDeviceAudio = false, pushToTalk = false) {
+  async start(sourceId: string, microphoneId = 'n/a', captureDeviceAudio = false, pushToTalk = false) {
     this.muted = pushToTalk;
     this.sourceId = sourceId;
     this.microphoneId = microphoneId;
     this.captureDeviceAudio = captureDeviceAudio;
 
     const promises = [this.__captureDisplayVideoStream(), this.__captureUserMicrophoneAudio()];
-    Promise.all(promises).then(this.__captureStreamSuccess.bind(this)).catch(this.__captureStreamError.bind(this));
+    const results = await Promise.allSettled(promises);
+    const index = results.findIndex((result) => result.status === 'rejected');
+
+    if (index === -1) {
+      this.__captureStreamSuccess();
+    } else {
+      const error = results[index] as unknown as PromiseRejectionEvent;
+      this.__captureStreamError(error.reason);
+    }
   }
 
   stop() {
