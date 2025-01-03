@@ -45,9 +45,7 @@ const EditorArea = observer(() => {
   );
 
   useEffect(() => {
-    return () => {
-      editor.dispose();
-    };
+    return () => editor.dispose();
   }, []);
 
   return (

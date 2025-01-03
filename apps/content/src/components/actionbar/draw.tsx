@@ -112,6 +112,11 @@ const DrawingActionbar = observer(() => {
             </ToggleGroupItem>
           </ToolbarAction>
           <Divider orientation="vertical" className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-divider')} />
+          <ToolbarAction asChild tooltip="Eraser">
+            <ToggleGroupItem value="eraser">
+              <Eraser size={16} weight="bold" />
+            </ToggleGroupItem>
+          </ToolbarAction>
           <ToolbarAction asChild tooltip="Pencil">
             <ToggleGroupItem value="pencil">
               <PencilSimple size={16} weight="bold" />
@@ -122,20 +127,9 @@ const DrawingActionbar = observer(() => {
               <Highlighter size={16} weight="bold" />
             </ToggleGroupItem>
           </ToolbarAction>
-          <ToolbarAction asChild tooltip="Eraser">
-            <ToggleGroupItem value="eraser">
-              <Eraser size={16} weight="bold" />
-            </ToggleGroupItem>
-          </ToolbarAction>
-          <Divider orientation="vertical" className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-divider')} />
           <ToolbarAction asChild tooltip="Rectangle">
             <ToggleGroupItem value="rectangle">
               <Circle size={16} weight="bold" />
-            </ToggleGroupItem>
-          </ToolbarAction>
-          <ToolbarAction asChild tooltip="Rectangle">
-            <ToggleGroupItem value="rectangle">
-              <Rectangle size={16} weight="bold" />
             </ToggleGroupItem>
           </ToolbarAction>
           <ToolbarAction asChild tooltip="Text">
@@ -175,7 +169,7 @@ const DrawingActionbar = observer(() => {
           <ToolbarAction tooltip="Redo">
             <ArrowBendUpRight size={16} weight="bold" />
           </ToolbarAction>
-          <ToolbarAction tooltip="Clear canvas">
+          <ToolbarAction tooltip="Clear canvas" onClick={editor.clearCanvas}>
             <ArrowCounterClockwise size={16} weight="bold" />
           </ToolbarAction>
         </div>

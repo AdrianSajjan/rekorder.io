@@ -133,6 +133,12 @@ class Editor {
     }
   }
 
+  clearCanvas() {
+    if (!this.canvas) return;
+    this.canvas.clear();
+    this.canvas.requestRenderAll();
+  }
+
   toggleDrawingMode(mode?: EditorMode) {
     if (!this.canvas || !this._pencil || !this._eraser) return;
 
