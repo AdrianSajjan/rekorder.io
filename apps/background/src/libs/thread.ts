@@ -135,7 +135,7 @@ class Thread {
       /**
        * Get the media stream id for the current tab and start capturing the stream in the offscreen document
        */
-      case EventConfig.StartStreamCapture: {
+      case EventConfig.StartTabStreamCapture: {
         chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, async (streamId) => {
           if (chrome.runtime.lastError) {
             console.warn('Error in background while getting media stream id', chrome.runtime.lastError);
@@ -145,15 +145,33 @@ class Thread {
           } else {
             try {
               await this.__handleSetupOffscreenDocument();
-              chrome.runtime.sendMessage({ type: EventConfig.StartStreamCapture, payload: Object.assign({ streamId }, message.payload) });
+              chrome.runtime.sendMessage({ type: EventConfig.StartTabStreamCapture, payload: Object.assign({ streamId }, message.payload) });
             } catch (error) {
-              console.warn('Error in background while starting stream', error);
+              console.warn('Error in background while starting tab stream capture', error);
               if (sender.tab?.id) {
                 chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
               }
             }
           }
         });
+        return false;
+      }
+
+      /**
+       * Start capturing the display stream in the offscreen document, this will show a dialog to the user to select the display to capture
+       */
+      case EventConfig.StartDisplayStreamCapture: {
+        this.__handleSetupOffscreenDocument().then(
+          () => {
+            chrome.runtime.sendMessage({ type: EventConfig.StartDisplayStreamCapture, payload: message.payload });
+          },
+          (error) => {
+            console.warn('Error in background while starting display stream capture', error);
+            if (sender.tab?.id) {
+              chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
+            }
+          }
+        );
         return false;
       }
 

@@ -189,10 +189,17 @@ class OffscreenRecorder {
   }
 
   private async __captureDisplayVideoStream() {
-    this.video = await navigator.mediaDevices.getUserMedia({
-      audio: this.captureDeviceAudio ? { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId } } : false,
-      video: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId, maxFrameRate: 30 } },
-    } as MediaStreamConstraints);
+    if (this.sourceId) {
+      this.video = await navigator.mediaDevices.getUserMedia({
+        audio: this.captureDeviceAudio ? { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId } } : false,
+        video: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId, maxFrameRate: 30 } },
+      } as MediaStreamConstraints);
+    } else {
+      this.video = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: this.captureDeviceAudio,
+      });
+    }
   }
 
   private async __captureUserMicrophoneAudio() {

@@ -5,10 +5,20 @@ import { recorder } from '../libs/recorder';
 export function handleRuntimeMessageListener(message: RuntimeMessage) {
   switch (message.type) {
     /**
-     * Message received from the content script relayed by background worker to start capturing the stream
+     * Message received from the content script relayed by background worker to start capturing the tab stream
+     * If stream id is present, the tab stream will be captured without prompting the user to select a display
      */
-    case EventConfig.StartStreamCapture: {
+    case EventConfig.StartTabStreamCapture: {
       recorder.start(message.payload.streamId, message.payload.microphoneId, message.payload.captureDeviceAudio, message.payload.pushToTalk);
+      return false;
+    }
+
+    /**
+     * Message received from the content script relayed by background worker to start capturing the display stream
+     * If streamId is empty, the user will be prompted to select a display to capture
+     */
+    case EventConfig.StartDisplayStreamCapture: {
+      recorder.start('', message.payload.microphoneId, message.payload.captureDeviceAudio, message.payload.pushToTalk);
       return false;
     }
 

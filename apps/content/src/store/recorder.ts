@@ -127,7 +127,7 @@ class Recorder {
     this.status = 'pending';
     this._timeout = setTimeout(() => {
       chrome.runtime.sendMessage({
-        type: EventConfig.StartStreamCapture,
+        type: EventConfig.StartTabStreamCapture,
         payload: { microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
       });
     }, RECORD_TIMEOUT * 1000);
