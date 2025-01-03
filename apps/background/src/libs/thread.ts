@@ -5,12 +5,12 @@ import { checkBrowserName } from '@rekorder.io/utils';
 const OFFSCREEN_PATH = 'build/offscreen.html';
 
 class Thread {
-  tab?: number;
-  url?: string;
   enabled: boolean;
+  offscreen: Promise<void> | null;
 
-  injected: Set<number>;
-  offscreen?: Promise<void> | null;
+  currentTab: chrome.tabs.Tab | null;
+  originalTab: chrome.tabs.Tab | null;
+  injectedTabs: Set<chrome.tabs.Tab>;
 
   handleTabChangeListener = this.__handleTabChangeListener.bind(this);
   handleActionClickListener = this.__handleActionClickListener.bind(this);
@@ -22,7 +22,11 @@ class Thread {
 
   constructor() {
     this.enabled = false;
-    this.injected = new Set();
+    this.offscreen = null;
+
+    this.currentTab = null;
+    this.originalTab = null;
+    this.injectedTabs = new Set();
   }
 
   private async __handleCloseExtension() {
@@ -35,15 +39,18 @@ class Thread {
     }
 
     this.enabled = false;
-    this.tab = undefined;
-    this.url = undefined;
     this.offscreen = null;
+    this.currentTab = null;
+    this.originalTab = null;
 
-    if (this.injected.size > 0) {
-      this.injected.forEach((tab) => {
-        chrome.tabs.sendMessage(tab, { type: EventConfig.CloseExtension });
+    if (this.injectedTabs.size > 0) {
+      this.injectedTabs.forEach((tab) => {
+        if (tab.id) {
+          chrome.tabs.sendMessage(tab.id, { type: EventConfig.CloseExtension });
+          console.log('Sent close extension message to tab:', tab.id, tab.url, tab.title);
+        }
       });
-      this.injected.clear();
+      this.injectedTabs.clear();
     }
   }
 
@@ -62,23 +69,24 @@ class Thread {
         justification: 'Record users desktop screen and audio and microphone audio',
       });
       await this.offscreen;
-      this.offscreen = undefined;
+      this.offscreen = null;
     }
   }
 
   private __injectContentScript() {
-    if (!this.tab || !this.enabled || this.url?.includes('chrome-extension://')) return;
+    if (!this.enabled || !this.currentTab || this.currentTab.id || this.currentTab.url!.includes('chrome-extension://')) return;
 
+    const tab = this.currentTab;
     chrome.scripting.executeScript(
       {
-        target: { tabId: this.tab },
+        target: { tabId: tab.id! },
         files: ['build/content-script.js'],
       },
       () => {
         if (chrome.runtime.lastError) {
-          console.warn('Failed to inject content script:', chrome.runtime.lastError.message);
+          console.warn('Failed to inject content script:', tab.id, tab.url, tab.title, chrome.runtime.lastError.message);
         } else {
-          console.log('Content script injected into tab:', this.tab);
+          console.log('Content script injected into tab:', tab.id, tab.url, tab.title);
         }
       }
     );
@@ -94,22 +102,21 @@ class Thread {
       // TODO: Tab id is not present, we need to handle this case
       console.log('Tab id is not present, we need to handle this case');
     } else {
-      this.tab = tab.id;
-      this.url = tab.url;
-      this.enabled = true;
+      this.currentTab = tab;
+      this.originalTab = tab;
+      this.injectedTabs.add(tab);
 
-      this.injected.add(tab.id);
+      this.enabled = true;
       this.__injectContentScript();
     }
   }
 
-  private __handleTabChangeListener(tab: number, change: chrome.tabs.TabChangeInfo, data: chrome.tabs.Tab) {
+  private __handleTabChangeListener(_: number, change: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
     if (change.status !== 'complete') return;
 
-    this.tab = tab;
-    this.url = data.url;
+    this.currentTab = tab;
+    this.injectedTabs.add(tab);
 
-    this.injected.add(tab);
     this.__injectContentScript();
   }
 
