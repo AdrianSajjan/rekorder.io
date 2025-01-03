@@ -105,7 +105,7 @@ class Recorder {
 
       case EventConfig.SaveCapturedStreamSuccess: {
         runInAction(() => (this.status = 'idle'));
-        console.log(message.payload.url);
+        toast.success('Your recording has been saved to your downloads folder.');
         break;
       }
 

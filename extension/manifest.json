@@ -27,6 +27,7 @@
         "scripting",
         "activeTab",
         "tabCapture",
-        "webNavigation"
+        "webNavigation",
+        "downloads"
     ]
 }
