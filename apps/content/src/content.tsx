@@ -6,12 +6,13 @@ import { observer } from 'mobx-react';
 import { AnimationsProvider, theme, animations } from '@rekorder.io/ui';
 
 import { CameraPreview } from './components/camera';
-import { PluginCard } from './components/plugin/plugin';
-import { PluginToolbar } from './components/toolbar/toolbar';
 import { Permission } from './components/permission';
 import { Overlay } from './components/overlay';
 import { TimerCountdown } from './components/timer';
 import { EditorArea } from './components/editor';
+import { Cursors } from './components/cursor';
+import { PluginCard } from './components/plugin/plugin';
+import { PluginToolbar } from './components/toolbar/toolbar';
 
 import { SAFE_AREA_PADDING } from './constants/layout';
 import { recorder } from './store/recorder';
@@ -45,13 +46,14 @@ const Content = observer(() => {
       <section className={clsx(RecorderCSS.className, 'rekorder-area')}>
         <Overlay />
         <EditorArea />
+        <Cursors />
         <div className={clsx(RecorderCSS.className, 'rekorder-container')}>
           <PluginCard />
           <PluginToolbar />
-          {/* <CameraPreview /> */}
+          <CameraPreview />
           <TimerCountdown />
         </div>
-        {/* <Permission /> */}
+        <Permission />
         <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
       </section>
     </AnimationsProvider>

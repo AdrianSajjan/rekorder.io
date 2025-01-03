@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
+import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 import { Cursor } from '@phosphor-icons/react';
 import { ToggleGroup, ToggleGroupItem } from '@radix-ui/react-toggle-group';
@@ -10,6 +11,7 @@ import { ToolbarAction } from '../ui/toolbar-action';
 import { CursorClickIcon } from '../icons/cursor-click';
 import { CursorHighlightIcon } from '../icons/cursor-highlight';
 import { CursorSpotlightIcon } from '../icons/cursor-spotlight';
+import { cursor, CursorMode } from '../../store/cursor';
 
 const CursorActionbarCSS = css.resolve`
   * {
@@ -38,13 +40,22 @@ const CursorActionbarCSS = css.resolve`
   }
 `;
 
-export function CursorActionbar() {
+const CursorActionbar = observer(() => {
+  const handleChange = (value: string) => {
+    cursor.update(value as CursorMode);
+  };
+
   return (
     <Fragment>
       {CursorActionbarCSS.styles}
-      <ToggleGroup type="single" className={clsx(CursorActionbarCSS.className, 'rekorder-cursor-actionbar-container')}>
+      <ToggleGroup
+        type="single"
+        value={cursor.mode}
+        onValueChange={handleChange}
+        className={clsx(CursorActionbarCSS.className, 'rekorder-cursor-actionbar-container')}
+      >
         <ToolbarAction asChild tooltip="Default cursor">
-          <ToggleGroupItem value="draw">
+          <ToggleGroupItem value="default-cursor">
             <Cursor size={16} weight="bold" />
           </ToggleGroupItem>
         </ToolbarAction>
@@ -67,4 +78,6 @@ export function CursorActionbar() {
       </ToggleGroup>
     </Fragment>
   );
-}
+});
+
+export { CursorActionbar };
