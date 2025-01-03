@@ -125,7 +125,7 @@ class OffscreenRecorder {
     }
   }
 
-  private __recorderDataAvailable(event: BlobEvent) {
+  private __recorderDataAvailableEvent(event: BlobEvent) {
     if (event.data.size > 0) {
       this.chunks.push(event.data);
     }
@@ -152,10 +152,16 @@ class OffscreenRecorder {
     this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState });
   }
 
+  private __recorderErrorEvent(error: unknown) {
+    this.__resetState();
+    chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureError, payload: { error } });
+    console.warn('Error in recorder while recording stream', error);
+  }
+
   private __captureStreamError(error: unknown) {
     this.__resetState();
     chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureError, payload: { error } });
-    console.warn('Error in recorder while starting stream', error);
+    console.warn('Error in recorder while capturing stream', error);
   }
 
   private __captureStreamSuccess() {
@@ -168,11 +174,11 @@ class OffscreenRecorder {
     this.recorder = new MediaRecorder(this.stream, { mimeType, videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000 });
 
     this.recorder.addEventListener('stop', this.__recorderStopEvent.bind(this));
-    this.recorder.addEventListener('error', this.__captureStreamError.bind(this));
+    this.recorder.addEventListener('error', this.__recorderErrorEvent.bind(this));
     this.recorder.addEventListener('start', this.__recorderStartEvent.bind(this));
     this.recorder.addEventListener('pause', this.__recorderPauseEvent.bind(this));
     this.recorder.addEventListener('resume', this.__recorderResumeEvent.bind(this));
-    this.recorder.addEventListener('dataavailable', this.__recorderDataAvailable.bind(this));
+    this.recorder.addEventListener('dataavailable', this.__recorderDataAvailableEvent.bind(this));
 
     this.__preventTabSilence(this.video);
     this.recorder.start(100);
