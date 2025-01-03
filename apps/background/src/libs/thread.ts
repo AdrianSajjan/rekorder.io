@@ -43,15 +43,13 @@ class Thread {
     this.currentTab = null;
     this.originalTab = null;
 
-    if (this.injectedTabs.size > 0) {
-      this.injectedTabs.forEach((tab) => {
-        if (tab.id) {
-          chrome.tabs.sendMessage(tab.id, { type: EventConfig.CloseExtension });
-          console.log('Sent close extension message to tab:', tab.id, tab.url, tab.title);
-        }
-      });
-      this.injectedTabs.clear();
-    }
+    this.injectedTabs.forEach((tab) => {
+      if (tab.id) {
+        chrome.tabs.sendMessage(tab.id, { type: EventConfig.CloseExtension });
+        console.log('Sent close extension message to tab:', tab.id, tab.url, tab.title);
+      }
+    });
+    this.injectedTabs.clear();
   }
 
   private async __handleSetupOffscreenDocument() {
@@ -74,7 +72,7 @@ class Thread {
   }
 
   private __injectContentScript() {
-    if (!this.enabled || !this.currentTab || this.currentTab.id || this.currentTab.url!.includes('chrome-extension://')) return;
+    if (!this.enabled || !this.currentTab || !this.currentTab.id || this.currentTab.url!.includes('chrome-extension://')) return;
 
     const tab = this.currentTab;
     chrome.scripting.executeScript(
