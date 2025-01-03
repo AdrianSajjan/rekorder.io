@@ -20,14 +20,7 @@ class Toolbar {
     return new Toolbar();
   }
 
-  updateEnabled(enabled: boolean | 'toggle') {
-    this.enabled = enabled === 'toggle' ? !this.enabled : enabled;
-  }
-
-  updateActionbarState(actionbarState: string) {
-    const state = actionbarState || this.actionbarState;
-    this.actionbarState = actionbarState;
-
+  private __updateActionbarState(state: string) {
     switch (state) {
       case 'draw':
         editor.toggleDrawingMode();
@@ -36,6 +29,17 @@ class Toolbar {
         blur.toggle();
         break;
     }
+  }
+
+  updateEnabled(enabled: boolean | 'toggle') {
+    this.enabled = enabled === 'toggle' ? !this.enabled : enabled;
+  }
+
+  updateActionbarState(actionbarState: string) {
+    const previousState = this.actionbarState;
+    this.actionbarState = actionbarState;
+    this.__updateActionbarState(previousState);
+    this.__updateActionbarState(actionbarState);
   }
 
   updateVisibilityState(state: Record<string, boolean>) {
