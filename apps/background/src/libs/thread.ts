@@ -72,7 +72,7 @@ class Thread {
   }
 
   private __injectContentScript() {
-    if (!this.enabled || !this.currentTab || !this.currentTab.id || this.currentTab.url!.includes('chrome-extension://')) return;
+    if (!this.enabled || !this.currentTab || !this.currentTab.id || this.currentTab.url!.includes('chrome://')) return;
 
     const tab = this.currentTab;
     chrome.scripting.executeScript(
@@ -93,7 +93,7 @@ class Thread {
   private __handleActionClickListener(tab: chrome.tabs.Tab) {
     if (this.enabled) {
       this.__handleCloseExtension();
-    } else if (tab.url?.includes('chrome-extension://')) {
+    } else if (tab.url?.includes('chrome://')) {
       // TODO: Tab is in the extension, we need to handle this case
       console.log('Tab is in the extension, we need to handle this case');
     } else if (!tab.id) {
