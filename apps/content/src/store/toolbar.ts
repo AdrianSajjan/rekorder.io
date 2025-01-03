@@ -1,5 +1,7 @@
 import { makeAutoObservable } from 'mobx';
+
 import { editor } from './editor';
+import { blur } from './blur';
 
 class Toolbar {
   enabled: boolean;
@@ -10,6 +12,7 @@ class Toolbar {
     this.enabled = false;
     this.actionbarState = '';
     this.visibilityState = {};
+
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -22,8 +25,17 @@ class Toolbar {
   }
 
   updateActionbarState(actionbarState: string) {
-    this.actionbarState = this.actionbarState === actionbarState ? '' : actionbarState;
-    if (this.actionbarState === 'draw') editor.toggleDrawingMode();
+    const state = actionbarState || this.actionbarState;
+    this.actionbarState = actionbarState;
+
+    switch (state) {
+      case 'draw':
+        editor.toggleDrawingMode();
+        break;
+      case 'blur':
+        blur.toggle();
+        break;
+    }
   }
 
   updateVisibilityState(state: Record<string, boolean>) {
