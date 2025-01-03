@@ -31,9 +31,8 @@ class Thread {
 
   private async __handleCloseExtension() {
     try {
-      const url = chrome.runtime.getURL(OFFSCREEN_PATH);
-      const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
-      if (contents.length > 0) chrome.offscreen.closeDocument(() => console.log('Offscreen document closed'));
+      const exists = await chrome.offscreen.hasDocument();
+      if (exists) chrome.offscreen.closeDocument(() => console.log('Offscreen document closed'));
     } catch (error) {
       console.warn('Error in background while closing offscreen document', error);
     }
@@ -53,10 +52,8 @@ class Thread {
   }
 
   private async __handleSetupOffscreenDocument() {
-    const url = chrome.runtime.getURL(OFFSCREEN_PATH);
-    const contents = await chrome.runtime.getContexts({ contextTypes: [chrome.runtime.ContextType.OFFSCREEN_DOCUMENT], documentUrls: [url] });
-
-    if (contents.length > 0) return;
+    const exists = await chrome.offscreen.hasDocument();
+    if (exists) return console.log('Offscreen document already exists, not creating a new one');
 
     if (this.offscreen) {
       await this.offscreen;
@@ -64,7 +61,7 @@ class Thread {
       this.offscreen = chrome.offscreen.createDocument({
         url: OFFSCREEN_PATH,
         reasons: [chrome.offscreen.Reason.USER_MEDIA, chrome.offscreen.Reason.DISPLAY_MEDIA, chrome.offscreen.Reason.AUDIO_PLAYBACK],
-        justification: 'Record users desktop screen and audio and microphone audio',
+        justification: 'Record either tab stream or desktop screen and audio as well as microphone audio',
       });
       await this.offscreen;
       this.offscreen = null;
@@ -176,11 +173,11 @@ class Thread {
         this.__handleSetupOffscreenDocument().then(
           () => {
             chrome.runtime.sendMessage({ type: EventConfig.StartDisplayStreamCapture, payload: message.payload });
-            console.log('Offscreen document created, starting display stream capture');
+            console.log('Offscreen document setup complete, starting display stream capture');
           },
           (error) => {
             if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
-            console.warn('Error in background while starting display stream capture', error);
+            console.warn('Error in background while setting up offscreen document', error);
           }
         );
         return false;
@@ -216,7 +213,6 @@ class Thread {
       case EventConfig.SaveCapturedStreamSuccess: {
         this.__sendMessageToContentScript(message, () => {
           chrome.tabs.create({ url: message.payload.url });
-          this.__handleCloseExtension();
         });
         return false;
       }

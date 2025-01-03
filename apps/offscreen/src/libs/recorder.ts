@@ -217,7 +217,7 @@ class OffscreenRecorder {
       audio: { deviceId: this.microphoneId },
     });
 
-    if (this.audio.getAudioTracks().length === 0) {
+    if (!this.audio.getAudioTracks().length) {
       throw new Error(`No audio tracks found in the created audio media stream: ${this.microphoneId}`);
     }
 
@@ -229,6 +229,7 @@ class OffscreenRecorder {
   async start(sourceId: string, microphoneId = 'n/a', captureDeviceAudio = false, pushToTalk = false) {
     this.muted = pushToTalk;
     this.sourceId = sourceId;
+
     this.microphoneId = microphoneId;
     this.captureDeviceAudio = captureDeviceAudio;
 
