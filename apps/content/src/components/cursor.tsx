@@ -26,10 +26,11 @@ const styles = theme.createStyles({
     width: theme.space(10),
     height: theme.space(10),
     borderRadius: theme.space(10),
+    border: `3px solid ${theme.colors.primary.dark}`,
 
     zIndex: 2,
-    position: 'absolute',
-    border: `3px solid ${theme.colors.primary.dark}`,
+    position: 'fixed',
+    pointerEvents: 'none',
     transition: 'transform 200ms ease-in-out',
   },
 
@@ -40,8 +41,9 @@ const styles = theme.createStyles({
 
     zIndex: 2,
     opacity: 0.4,
-    position: 'absolute',
+    position: 'fixed',
     background: '#facc15',
+    pointerEvents: 'none',
     transform: 'translate(-50%, -50%)',
   },
 
@@ -49,7 +51,8 @@ const styles = theme.createStyles({
     inset: 0,
     zIndex: 2,
     position: 'fixed',
-    background: theme.alpha(theme.colors.core.black, 0.2),
+    pointerEvents: 'none',
+    background: theme.alpha(theme.colors.core.black, 0.5),
   },
 });
 
