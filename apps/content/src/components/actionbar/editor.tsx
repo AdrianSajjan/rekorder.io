@@ -13,14 +13,18 @@ import {
   ArrowUp,
   Circle,
   Cursor,
+  Rectangle,
   Eraser,
   Highlighter,
   PaintBucket,
   PencilSimple,
-  Rectangle,
   TextT,
   TrashSimple,
+  Triangle,
 } from '@phosphor-icons/react';
+
+import { Actionbar } from './actionbar';
+import { ShapesActionbar } from './shapes';
 
 import { ColorPicker } from '../ui/color-picker';
 import { ToolbarAction } from '../ui/toolbar-action';
@@ -86,7 +90,15 @@ const DrawingActionbarCSS = css.resolve`
   }
 `;
 
-const DrawingActionbar = observer(() => {
+const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
+
+const ShapeComponents = {
+  rectangle: <Rectangle size={16} weight="bold" />,
+  triangle: <Triangle size={16} weight="bold" />,
+  circle: <Circle size={16} weight="bold" />,
+};
+
+const EditorActionbar = observer(() => {
   const handleValueChange = (value: string) => {
     editor.toggleDrawingMode(value as EditorMode);
   };
@@ -127,11 +139,11 @@ const DrawingActionbar = observer(() => {
               <Highlighter size={16} weight="bold" />
             </ToggleGroupItem>
           </ToolbarAction>
-          <ToolbarAction asChild tooltip="Rectangle">
-            <ToggleGroupItem value="rectangle">
-              <Circle size={16} weight="bold" />
-            </ToggleGroupItem>
-          </ToolbarAction>
+          <Actionbar indicator="arrow" content={<ShapesActionbar />} container={toolbarContainer}>
+            <ToolbarAction asChild tooltip="Shapes">
+              <ToggleGroupItem value="shapes">{ShapeComponents[editor.shape]}</ToggleGroupItem>
+            </ToolbarAction>
+          </Actionbar>
           <ToolbarAction asChild tooltip="Text">
             <ToggleGroupItem value="text">
               <TextT size={16} weight="bold" />
@@ -178,4 +190,4 @@ const DrawingActionbar = observer(() => {
   );
 });
 
-export { DrawingActionbar };
+export { EditorActionbar };

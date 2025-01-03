@@ -3,15 +3,17 @@ import { CornersIn, Cursor, PencilSimple, Subtract } from '@phosphor-icons/react
 import { observer } from 'mobx-react';
 
 import { toolbar } from '../../store/toolbar';
-import { ToolbarAction } from '../ui/toolbar-action';
 import { Actionbar } from '../actionbar/actionbar';
 import { CursorActionbar } from '../actionbar/cursor';
-import { DrawingActionbar } from '../actionbar/draw';
+import { EditorActionbar } from '../actionbar/editor';
+import { ToolbarAction } from '../ui/toolbar-action';
+
+const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
 
 const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, 'className'>) => {
   return (
     <ToggleGroup value={toolbar.actionbarState} onValueChange={toolbar.updateActionbarState} type="single" {...props}>
-      <Actionbar open={toolbar.actionbarState === 'draw'} content={<DrawingActionbar />}>
+      <Actionbar open={toolbar.actionbarState === 'draw'} container={toolbarContainer} content={<EditorActionbar />}>
         <ToolbarAction actionbarIndicator asChild tooltip="Toggle drawing mode">
           <ToggleGroupItem value="draw">
             <PencilSimple size={16} weight="bold" />

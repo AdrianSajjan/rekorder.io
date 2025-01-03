@@ -7,16 +7,22 @@ import { theme } from '@rekorder.io/ui';
 
 import { measureElement } from '../lib/utils';
 
-type EditorMode = 'pencil' | 'highlighter' | 'eraser' | 'rectangle' | 'circle' | 'line' | 'text' | 'select';
+type EditorMode = 'pencil' | 'highlighter' | 'eraser' | 'shape' | 'line' | 'text' | 'select';
+
+type ShapeMode = 'rectangle' | 'circle' | 'triangle';
+
+type LineMode = 'line' | 'arrow' | 'dashed' | 'dotted';
 
 class Editor {
   canvas: fabric.Canvas | null;
   workspace: HTMLDivElement | null;
+  scrollSync: boolean;
 
   color: string;
   width: number;
   mode: EditorMode;
-  scrollSync: boolean;
+  line: LineMode;
+  shape: ShapeMode;
 
   private _eraser: EraserBrush | null = null;
   private _observer: ResizeObserver | null = null;
@@ -27,11 +33,14 @@ class Editor {
   constructor() {
     this.canvas = null;
     this.workspace = null;
+    this.scrollSync = true;
 
     this.width = 10;
     this.mode = 'pencil';
     this.color = '#000000';
-    this.scrollSync = true;
+
+    this.line = 'arrow';
+    this.shape = 'rectangle';
 
     makeAutoObservable(this, {}, { autoBind: true });
   }
@@ -111,6 +120,14 @@ class Editor {
     this.__setupEvents();
   }
 
+  updateShapeMode(shape: ShapeMode) {
+    this.shape = shape;
+  }
+
+  updateLineMode(line: LineMode) {
+    this.line = line;
+  }
+
   updateColor(color: string) {
     this.color = color;
 
@@ -164,12 +181,8 @@ class Editor {
         this.canvas.freeDrawingBrush.width = this.width;
         break;
 
-      case 'rectangle':
+      case 'shape':
         // TODO: Implement rectangle tool
-        break;
-
-      case 'circle':
-        // TODO: Implement circle tool
         break;
 
       case 'text':
@@ -196,4 +209,4 @@ class Editor {
 
 const editor = Editor.createInstance();
 
-export { editor, Editor, type EditorMode };
+export { editor, Editor, type EditorMode, type ShapeMode, type LineMode };

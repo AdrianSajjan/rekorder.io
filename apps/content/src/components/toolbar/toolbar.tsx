@@ -16,7 +16,7 @@ const PluginToolbarCSS = css.resolve`
     box-sizing: border-box;
   }
 
-  .toolbar {
+  .rekorder-toolbar {
     position: absolute;
     pointer-events: auto;
     font-family: ${theme.fonts.default};
@@ -35,15 +35,15 @@ const PluginToolbarCSS = css.resolve`
     padding-bottom: ${theme.space(2)};
   }
 
-  .toolbar > * {
+  .rekorder-toolbar > * {
     border-right: 1.5px solid ${theme.colors.borders.input};
   }
 
-  .toolbar > *:last-child {
+  .rekorder-toolbar > *:last-child {
     border-right: none;
   }
 
-  .toolbar-controls {
+  .rekorder-toolbar-controls {
     height: 100%;
     display: flex;
     align-items: center;
@@ -54,15 +54,15 @@ const PluginToolbarCSS = css.resolve`
     padding-right: ${theme.space(3)};
   }
 
-  .toolbar-controls.toolbar-handle {
+  .rekorder-toolbar-controls.rekorder-toolbar-handle {
     cursor: grab;
   }
 
-  .toolbar-controls.toolbar-handle:active {
+  .rekorder-toolbar-controls.rekorder-toolbar-handle:active {
     cursor: grabbing;
   }
 
-  .toolbar-controls.toolbar-timer {
+  .rekorder-toolbar-controls.rekorder-toolbar-timer {
     padding-left: ${theme.space(5)};
     padding-right: ${theme.space(5)};
   }
@@ -74,15 +74,15 @@ function PluginToolbar() {
   return (
     <Fragment>
       {PluginToolbarCSS.styles}
-      <Draggable nodeRef={drag.ref} bounds={drag.bounds} handle="#toolbar-handle" position={drag.position} onStop={drag.onChangePosition}>
-        <article ref={drag.ref} className={clsx(PluginToolbarCSS.className, 'toolbar')}>
+      <Draggable nodeRef={drag.ref} bounds={drag.bounds} handle="#rekorder-toolbar-handle" position={drag.position} onStop={drag.onChangePosition}>
+        <article ref={drag.ref} id="rekorder-toolbar" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar')}>
           <Tooltip.Provider disableHoverableContent delayDuration={500}>
-            <div id="toolbar-handle" className={clsx(PluginToolbarCSS.className, 'toolbar-controls toolbar-handle')}>
+            <div id="rekorder-toolbar-handle" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls rekorder-toolbar-handle')}>
               <DotsSixVertical weight="bold" size={20} color={theme.colors.accent.main} />
             </div>
-            <ToolbarRecordTimer className={clsx(PluginToolbarCSS.className, 'toolbar-controls toolbar-timer')} />
-            <ToolbarRecordingControls className={clsx(PluginToolbarCSS.className, 'toolbar-controls')} />
-            <ToolbarActionbarControls className={clsx(PluginToolbarCSS.className, 'toolbar-controls')} />
+            <ToolbarRecordTimer className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls rekorder-toolbar-timer')} />
+            <ToolbarRecordingControls className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')} />
+            <ToolbarActionbarControls className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')} />
           </Tooltip.Provider>
         </article>
       </Draggable>

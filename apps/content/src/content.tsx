@@ -48,10 +48,10 @@ const Content = observer(() => {
         <div className={clsx(RecorderCSS.className, 'rekorder-container')}>
           <PluginCard />
           <PluginToolbar />
-          <CameraPreview />
+          {/* <CameraPreview /> */}
           <TimerCountdown />
         </div>
-        <Permission />
+        {/* <Permission /> */}
         <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
       </section>
     </AnimationsProvider>
