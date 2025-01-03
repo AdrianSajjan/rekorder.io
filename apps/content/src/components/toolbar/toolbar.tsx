@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
 
+import { observer } from 'mobx-react';
 import { Fragment } from 'react';
 import { DotsSixVertical } from '@phosphor-icons/react';
 import { theme, Tooltip } from '@rekorder.io/ui';
@@ -68,7 +69,7 @@ const PluginToolbarCSS = css.resolve`
   }
 `;
 
-function PluginToolbar() {
+const PluginToolbar = observer(() => {
   const drag = useDragControls<HTMLDivElement>({ position: 'bottom-left', dimension: { height: 40, width: 200 } });
 
   return (
@@ -88,6 +89,6 @@ function PluginToolbar() {
       </Draggable>
     </Fragment>
   );
-}
+});
 
 export { PluginToolbar };

@@ -6,10 +6,13 @@ type Styles = Record<string, any>;
 
 class ElementBlur {
   enabled: boolean;
+  blurAmount: number;
+
   private _styles: Map<HTMLElement, Styles>;
 
   constructor() {
     this.enabled = false;
+    this.blurAmount = 5;
     this._styles = new Map();
     makeAutoObservable(this, {}, { autoBind: true });
   }
@@ -47,12 +50,15 @@ class ElementBlur {
   private __handleMouseDown(event: MouseEvent) {
     if (!this.enabled || this.__isRecorderRoot(event)) return;
 
+    event.preventDefault();
+    event.stopPropagation();
+
     const element = event.target as HTMLElement;
     const style = this._styles.get(element);
 
     if (!style?.blured) {
       this._styles.set(element, { ...style, filter: element.style.filter, blured: true });
-      element.style.filter = 'blur(10px)';
+      element.style.filter = `blur(${this.blurAmount}px)`;
     } else {
       element.style.filter = style.filter ?? 'none';
       this._styles.delete(element);
@@ -67,15 +73,15 @@ class ElementBlur {
   }
 
   private __setupEvents() {
+    document.addEventListener('click', this.__handleMouseDown);
     document.addEventListener('mouseover', this.__handleMouseOver);
     document.addEventListener('mouseout', this.__handleMouseOut);
-    document.addEventListener('mousedown', this.__handleMouseDown);
   }
 
   private __resetEvents() {
+    document.removeEventListener('click', this.__handleMouseDown);
     document.removeEventListener('mouseover', this.__handleMouseOver);
     document.removeEventListener('mouseout', this.__handleMouseOut);
-    document.removeEventListener('mousedown', this.__handleMouseDown);
   }
 
   toggle() {

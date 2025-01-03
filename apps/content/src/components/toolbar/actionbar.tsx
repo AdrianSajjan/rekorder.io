@@ -33,12 +33,12 @@ const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, '
           </ToggleGroupItem>
         </ToolbarAction>
       </Actionbar>
-      <ToolbarAction actionbarIndicator asChild tooltip="Toggle blur mode">
+      <ToolbarAction asChild tooltip="Toggle blur mode">
         <ToggleGroupItem value="blur">
           <Subtract size={16} weight="fill" />
         </ToggleGroupItem>
       </ToolbarAction>
-      <ToolbarAction actionbarIndicator asChild tooltip="Toggle zoom area">
+      <ToolbarAction asChild tooltip="Toggle zoom area">
         <ToggleGroupItem value="zoom">
           <CornersIn size={16} weight="bold" />
         </ToggleGroupItem>
