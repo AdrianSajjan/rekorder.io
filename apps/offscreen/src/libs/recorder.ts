@@ -60,7 +60,10 @@ class OffscreenRecorder {
   }
 
   private __resetState() {
+    if (this.video) this.video.getTracks().forEach((track) => track.stop());
+    if (this.audio) this.audio.getTracks().forEach((track) => track.stop());
     if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
+
     if (this.helperAudioContext) this.helperAudioContext.close();
     if (this.timerInterval) clearInterval(this.timerInterval);
 
@@ -80,6 +83,7 @@ class OffscreenRecorder {
     this.timerInterval = null;
     this.helperAudioContext = null;
     this.recordingState = 'inactive';
+
     this.__resetStorage();
   }
 
