@@ -71,8 +71,12 @@ class Thread {
     }
   }
 
+  private __preventContentInjection(tab: chrome.tabs.Tab) {
+    return tab.url?.includes('chrome://') || tab.url?.includes('chrome-extension://');
+  }
+
   private __injectContentScript() {
-    if (!this.enabled || !this.currentTab || !this.currentTab.id || this.currentTab.url!.includes('chrome://')) return;
+    if (!this.enabled || !this.currentTab || !this.currentTab.id || this.__preventContentInjection(this.currentTab)) return;
 
     const tab = this.currentTab;
     chrome.scripting.executeScript(
@@ -93,7 +97,7 @@ class Thread {
   private __handleActionClickListener(tab: chrome.tabs.Tab) {
     if (this.enabled) {
       this.__handleCloseExtension();
-    } else if (tab.url?.includes('chrome://')) {
+    } else if (this.__preventContentInjection(tab)) {
       // TODO: Tab is in the extension, we need to handle this case
       console.log('Tab is in the extension, we need to handle this case');
     } else if (!tab.id) {
