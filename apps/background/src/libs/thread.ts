@@ -4,6 +4,8 @@ import { checkBrowserName } from '@rekorder.io/utils';
 
 class Thread {
   tab?: number;
+  enabled?: boolean;
+  injected: Set<number>;
   offscreen?: Promise<void>;
 
   handleTabReloadListener = this.__handleTabReloadListener.bind(this);
@@ -13,6 +15,10 @@ class Thread {
 
   static createInstance() {
     return new Thread();
+  }
+
+  constructor() {
+    this.injected = new Set();
   }
 
   private async __handleSetupOffscreenDocument(path: string) {
@@ -55,19 +61,21 @@ class Thread {
   private __handleActionClickListener(tab: chrome.tabs.Tab) {
     if (tab.id) {
       this.tab = tab.id;
+      this.enabled = true;
+      this.injected.add(tab.id);
       this.__injectContentScript();
     }
   }
 
   private __handleTabReloadListener(details: chrome.webNavigation.WebNavigationTransitionCallbackDetails) {
-    if (details.tabId === this.tab) {
-      this.__injectContentScript();
-    }
+    if (details.tabId !== this.tab || !this.enabled) return;
+    this.__injectContentScript();
   }
 
-  private __handleTabChangeListener(tab: number, change: chrome.tabs.TabChangeInfo) {
-    if (this.tab === tab || change.status !== 'complete') return;
+  private __handleTabChangeListener(tab: number, change: chrome.tabs.TabChangeInfo, data: chrome.tabs.Tab) {
+    if (this.tab === tab || change.status !== 'complete' || data.url?.includes('chrome-extension://') || !this.enabled) return;
     this.tab = tab;
+    this.injected.add(tab);
     this.__injectContentScript();
   }
 

@@ -1,6 +1,6 @@
 import { getGreeting } from '../support/app.po';
 
-describe('recorder-e2e', () => {
+describe('content-e2e', () => {
   beforeEach(() => cy.visit('/'));
 
   it('should display welcome message', () => {

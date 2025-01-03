@@ -9,13 +9,7 @@ export function CursorClickIcon({ height = 16, width = 16, ...props }: React.SVG
         strokeWidth="2"
         d="m8 8 2.214 5.313.785-2.314 2.314-.785L8 8Z"
       ></path>
-      <path
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="m11.133 11.13 1.878 1.88"
-      ></path>
+      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m11.133 11.13 1.878 1.88"></path>
       <path
         stroke="currentColor"
         strokeLinecap="round"

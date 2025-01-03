@@ -2,16 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "types": [
-      "node",
-      "@nx/react/typings/styled-jsx.d.ts",
-      "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts",
-      "vite/client",
-      "@types/chrome"
-    ],
+    "types": ["node", "@nx/react/typings/styled-jsx.d.ts", "@nx/react/typings/cssmodule.d.ts", "@nx/react/typings/image.d.ts", "vite/client", "@types/chrome"],
     "composite": true,
-    "declaration": true,
+    "declaration": true
   },
   "exclude": [
     "src/**/*.spec.ts",
@@ -21,7 +14,7 @@
     "src/**/*.spec.js",
     "src/**/*.test.js",
     "src/**/*.spec.jsx",
-    "src/**/*.test.jsx",
+    "src/**/*.test.jsx"
   ],
   "include": [
     "src/**/*",

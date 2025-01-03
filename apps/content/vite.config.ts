@@ -6,7 +6,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig({
   root: __dirname,
-  cacheDir: '../../node_modules/.vite/apps/recorder',
+  cacheDir: '../../node_modules/.vite/apps/content',
   server: {
     port: 4200,
     host: 'localhost',
@@ -28,7 +28,7 @@ export default defineConfig({
     nxCopyAssetsPlugin(['*.md']),
   ],
   build: {
-    outDir: '../../dist/apps/recorder',
+    outDir: '../../dist/apps/content',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
@@ -36,7 +36,7 @@ export default defineConfig({
     },
     lib: {
       entry: 'src/main.tsx',
-      name: 'recorder',
+      name: 'content',
     },
     rollupOptions: {
       output: {
@@ -51,7 +51,7 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     reporters: ['default'],
     coverage: {
-      reportsDirectory: '../../coverage/apps/recorder',
+      reportsDirectory: '../../coverage/apps/content',
       provider: 'v8',
     },
   },

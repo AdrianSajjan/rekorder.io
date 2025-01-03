@@ -7,10 +7,10 @@ export default defineConfig({
       cypressDir: 'src',
       bundler: 'vite',
       webServerCommands: {
-        default: 'pnpm exec nx run recorder:serve',
-        production: 'pnpm exec nx run recorder:preview',
+        default: 'pnpm exec nx run content:serve',
+        production: 'pnpm exec nx run content:preview',
       },
-      ciWebServerCommand: 'pnpm exec nx run recorder:preview',
+      ciWebServerCommand: 'pnpm exec nx run content:preview',
       ciBaseUrl: 'http://localhost:4300',
     }),
     baseUrl: 'http://localhost:4200',
