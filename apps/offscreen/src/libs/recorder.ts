@@ -1,5 +1,9 @@
 import exportWebmBlob from 'fix-webm-duration';
+import { nanoid } from 'nanoid';
+
+import { ExtensionOfflineDatabase } from '@rekorder.io/utils';
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
+
 import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';
 
 class OffscreenRecorder {
@@ -20,6 +24,7 @@ class OffscreenRecorder {
   recordingState: RecordingState;
   timerInterval: NodeJS.Timer | null;
   helperAudioContext: AudioContext | null;
+  offlineDatabase: ExtensionOfflineDatabase;
 
   constructor() {
     this.chunks = [];
@@ -39,6 +44,7 @@ class OffscreenRecorder {
     this.timerInterval = null;
     this.helperAudioContext = null;
     this.recordingState = 'inactive';
+    this.offlineDatabase = ExtensionOfflineDatabase.createInstance();
   }
 
   static createInstance() {
@@ -49,13 +55,7 @@ class OffscreenRecorder {
     chrome.runtime.sendMessage({ type: EventConfig.SetSessionStorage, payload: data });
   }
 
-  // private __getSessionStorage(keys: string[]) {
-  //   chrome.runtime.sendMessage({ type: EventConfig.GetSessionStorage, payload: keys }, (response) => {
-  //     // TODO: handle response
-  //   });
-  // }
-
-  private __resetStorage() {
+  private __resetSessionStorage() {
     this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState, [StorageConfig.RecorderTimestamp]: this.timestamp });
   }
 
@@ -83,8 +83,7 @@ class OffscreenRecorder {
     this.timerInterval = null;
     this.helperAudioContext = null;
     this.recordingState = 'inactive';
-
-    this.__resetStorage();
+    this.__resetSessionStorage();
   }
 
   private __startTimer() {
@@ -114,12 +113,19 @@ class OffscreenRecorder {
   }
 
   /**
-   * Export the blob to the content script / Upload the blob to the server and send the url back to the content script
-   * URL.createObjectURL(blob) is placeholder for the actual url
+   * Save the blob to the offline database and send the uuid and id back to the content script
    */
-  private __exportWebmBlob(blob: Blob) {
-    this.__resetState();
-    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { blob, url: URL.createObjectURL(blob) } });
+  private async __exportWebmBlob(blob: Blob) {
+    try {
+      const uuid = nanoid();
+      const id = await this.offlineDatabase.blobs.add({ uuid, blob, duration: this.timestamp, created_at: Date.now() });
+      chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
+    } catch (error) {
+      console.warn('Error in offscreen recorder while saving captured stream to offline database', error);
+      chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamError, payload: { error } });
+    } finally {
+      this.__resetState();
+    }
   }
 
   private __recorderStopEvent() {
@@ -128,7 +134,7 @@ class OffscreenRecorder {
       chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCaptureSuccess, payload: null });
     } else {
       const blob = new Blob(this.chunks, { type: 'video/webm' });
-      exportWebmBlob(blob, this.timestamp, this.__exportWebmBlob.bind(this), { logger: false });
+      exportWebmBlob(blob, this.timestamp, (blob) => this.__exportWebmBlob(blob), { logger: false });
     }
   }
 

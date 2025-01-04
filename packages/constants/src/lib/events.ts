@@ -42,4 +42,8 @@ export const EventConfig = {
   GetSessionStorage: 'get.session.storage',
   GetSessionStorageSuccess: 'get.session.storage.success',
   GetSessionStorageError: 'get.session.storage.error',
+
+  InitializeEditor: 'initialize.editor',
+  InitializeEditorSuccess: 'initialize.editor.success',
+  InitializeEditorError: 'initialize.editor.error',
 } as const;

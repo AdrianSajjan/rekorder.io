@@ -3,25 +3,19 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": [
+      "vitest/globals",
+      "vitest/importMeta",
+      "vite/client",
       "node",
+      "vitest",
       "@nx/react/typings/styled-jsx.d.ts",
       "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts",
-      "vite/client",
-      "@types/chrome"
+      "@nx/react/typings/image.d.ts"
     ],
-    "composite": true,
-    "declaration": true
+    "declaration": true,
+    "composite": true
   },
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "**/*.spec.tsx",
-    "**/*.test.tsx",
-    "**/*.spec.js",
-    "**/*.test.js",
-    "**/*.spec.jsx",
-    "**/*.test.jsx",
+  "include": [
     "vite.config.ts",
     "vite.config.mts",
     "vitest.config.ts",
@@ -33,13 +27,7 @@
     "src/**/*.test.js",
     "src/**/*.spec.js",
     "src/**/*.test.jsx",
-    "src/**/*.spec.jsx"
-  ],
-  "include": [
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "../constants/src/**/*.ts"
+    "src/**/*.spec.jsx",
+    "src/**/*.d.ts"
   ]
 }

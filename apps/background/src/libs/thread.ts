@@ -6,8 +6,10 @@ const OFFSCREEN_PATH = 'build/offscreen.html';
 
 class Thread {
   enabled: boolean;
-  offscreen: Promise<void> | null;
+  offscreenPromise: Promise<void> | null;
+  editorResolvers: PromiseWithResolvers<void> | null;
 
+  editorTab: chrome.tabs.Tab | null;
   currentTab: chrome.tabs.Tab | null;
   originalTab: chrome.tabs.Tab | null;
   injectedTabs: Set<chrome.tabs.Tab>;
@@ -22,8 +24,10 @@ class Thread {
 
   constructor() {
     this.enabled = false;
-    this.offscreen = null;
+    this.editorResolvers = null;
+    this.offscreenPromise = null;
 
+    this.editorTab = null;
     this.currentTab = null;
     this.originalTab = null;
     this.injectedTabs = new Set();
@@ -38,9 +42,9 @@ class Thread {
     }
 
     this.enabled = false;
-    this.offscreen = null;
     this.currentTab = null;
     this.originalTab = null;
+    this.offscreenPromise = null;
 
     this.injectedTabs.forEach((tab) => {
       if (tab.id) {
@@ -55,16 +59,16 @@ class Thread {
     const exists = await chrome.offscreen.hasDocument();
     if (exists) return console.log('Offscreen document already exists, not creating a new one');
 
-    if (this.offscreen) {
-      await this.offscreen;
+    if (this.offscreenPromise) {
+      await this.offscreenPromise;
     } else {
-      this.offscreen = chrome.offscreen.createDocument({
+      this.offscreenPromise = chrome.offscreen.createDocument({
         url: OFFSCREEN_PATH,
         reasons: [chrome.offscreen.Reason.USER_MEDIA, chrome.offscreen.Reason.DISPLAY_MEDIA, chrome.offscreen.Reason.AUDIO_PLAYBACK],
         justification: 'Record either tab stream or desktop screen and audio as well as microphone audio',
       });
-      await this.offscreen;
-      this.offscreen = null;
+      await this.offscreenPromise;
+      this.offscreenPromise = null;
     }
   }
 
@@ -110,13 +114,19 @@ class Thread {
     }
   }
 
-  private __handleTabChangeListener(_: number, change: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
-    if (change.status !== 'complete') return;
-
-    this.currentTab = tab;
-    this.injectedTabs.add(tab);
-
-    this.__injectContentScript();
+  private __handleTabChangeListener(tabId: number, change: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
+    if (tabId === this.editorTab?.id) {
+      if (change.status === 'complete') {
+        this.editorResolvers?.resolve();
+        this.editorResolvers = null;
+      }
+    } else {
+      if (change.status === 'complete') {
+        this.currentTab = tab;
+        this.injectedTabs.add(tab);
+        this.__injectContentScript();
+      }
+    }
   }
 
   private __sendMessageToContentScript(message: RuntimeMessage, success?: () => void, error?: () => void) {
@@ -130,6 +140,12 @@ class Thread {
         console.warn('No active tab found, message not sent', message);
       }
     });
+  }
+
+  private async __waitForEditorTabLoad(tab: chrome.tabs.Tab) {
+    this.editorTab = tab;
+    this.editorResolvers = Promise.withResolvers();
+    await this.editorResolvers.promise;
   }
 
   private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
@@ -208,10 +224,22 @@ class Thread {
       }
 
       /**
-       * Successfully saved the captured stream in the offscreen document,do something with the blob / url, sent from the offscreen document
+       * Successfully saved the captured stream in the offscreen document, close the extension and offscreen document and open the editor
        */
       case EventConfig.SaveCapturedStreamSuccess: {
-        this.__handleCloseExtension();
+        this.__handleCloseExtension().finally(() => {
+          chrome.tabs.create({ url: chrome.runtime.getURL('build/editor.html') }, async (tab) => {
+            if (tab.id) {
+              console.log('Editor tab created, waiting for the tab to load');
+              await this.__waitForEditorTabLoad(tab);
+              console.log('Editor tab is loaded, sending message to initialize editor');
+              chrome.tabs.sendMessage(tab.id, { type: EventConfig.InitializeEditor, payload: message.payload });
+            } else {
+              console.warn('Failed to create editor tab, id is not present', tab);
+            }
+          });
+        });
+
         return false;
       }
 
