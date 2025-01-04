@@ -23,6 +23,7 @@ class OffscreenRecorder {
 
   recordingState: RecordingState;
   timerInterval: NodeJS.Timer | null;
+  timerCountdown: NodeJS.Timeout | null;
   helperAudioContext: AudioContext | null;
   offlineDatabase: ExtensionOfflineDatabase;
 
@@ -42,6 +43,7 @@ class OffscreenRecorder {
     this.recorder = null;
 
     this.timerInterval = null;
+    this.timerCountdown = null;
     this.helperAudioContext = null;
     this.recordingState = 'inactive';
     this.offlineDatabase = ExtensionOfflineDatabase.createInstance();
@@ -194,7 +196,10 @@ class OffscreenRecorder {
     this.recorder.addEventListener('dataavailable', this.__recorderDataAvailableEvent.bind(this));
 
     this.__preventTabSilence(this.video);
-    this.recorder.start(100);
+    this.timerCountdown = setTimeout(() => {
+      this.recorder!.start(100);
+      this.timerCountdown = null;
+    }, 300); // Start the recorder after a short time to prevent screen jerk from the "Screen Capture banner"
   }
 
   private async __captureDisplayVideoStream() {
@@ -258,9 +263,18 @@ class OffscreenRecorder {
     this.recorder?.stop();
   }
 
-  cancel() {
+  delete() {
     this.discard = true;
     this.stop();
+  }
+
+  cancel() {
+    if (this.timerCountdown) {
+      clearTimeout(this.timerCountdown);
+      this.timerCountdown = null;
+    } else {
+      this.delete();
+    }
   }
 
   pause() {

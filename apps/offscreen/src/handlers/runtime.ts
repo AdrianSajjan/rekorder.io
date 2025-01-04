@@ -50,6 +50,11 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
      * Message received from the content script relayed by background worker to cancel the captured stream
      */
     case EventConfig.DiscardStreamCapture: {
+      recorder.delete();
+      return false;
+    }
+
+    case EventConfig.CancelStreamCapture: {
       recorder.cancel();
       return false;
     }
