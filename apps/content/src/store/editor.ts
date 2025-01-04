@@ -18,11 +18,12 @@ class Editor {
   workspace: HTMLDivElement | null;
 
   color: string;
+  fill: boolean;
   width: number;
-  mode: EditorMode;
 
   line: LineMode;
   shape: ShapeMode;
+  mode: EditorMode;
   scrollSync: boolean;
 
   private _eraser: EraserBrush | null = null;
@@ -31,6 +32,7 @@ class Editor {
 
   private _lastScrollY = 0;
   private _disposables: VoidFunction[] = [];
+
   private _drawnShape: fabric.FabricObject | null = null;
   private _originPointer: Pick<DOMPoint, 'x' | 'y'> | null = null;
 
@@ -40,6 +42,7 @@ class Editor {
     this.scrollSync = true;
 
     this.width = 10;
+    this.fill = false;
     this.mode = 'pencil';
     this.color = '#000000';
 
@@ -54,7 +57,7 @@ class Editor {
   }
 
   private get _freeDrawingShapeEnabled() {
-    return this.mode === 'shape' || this.mode === 'line';
+    return this.mode === 'shape' || this.mode === 'line' || this.mode === 'text';
   }
 
   private __resizeCanvas() {
@@ -87,26 +90,46 @@ class Editor {
   private __canvasMouseDownEvent(event: fabric.TPointerEventInfo<fabric.TPointerEvent>) {
     if (!this.canvas || !this._freeDrawingShapeEnabled) return;
 
-    this.canvas.selection = false;
-    const point = this.canvas.getScenePoint(event.e);
-    this._originPointer = { x: point.x, y: point.y };
+    switch (this.mode) {
+      case 'shape': {
+        const pointer = this.canvas.getScenePoint(event.e);
+        const fill = this.fill ? this.color : 'transparent';
+        const props = { left: pointer.x, top: pointer.y, fill, stroke: this.color, strokeWidth: this.width, selectable: false, erasable: true };
 
-    switch (this.shape) {
-      case 'rectangle':
-        this._drawnShape = new fabric.Rect({
-          left: this._originPointer.x,
-          top: this._originPointer.y,
-          width: point.x - this._originPointer.x,
-          height: point.y - this._originPointer.y,
-          selectable: false,
-          erasable: true,
-        });
+        this.canvas.selection = false;
+        this._originPointer = { x: pointer.x, y: pointer.y };
+
+        switch (this.shape) {
+          case 'circle':
+            this._drawnShape = new fabric.Ellipse(Object.assign({ rx: 1, ry: 1 }, props));
+            break;
+
+          case 'rectangle':
+            this._drawnShape = new fabric.Rect(Object.assign({ width: 1, height: 1 }, props));
+            break;
+
+          case 'triangle':
+            this._drawnShape = new fabric.Triangle(Object.assign({ width: 1, height: 1 }, props));
+            break;
+        }
+
+        if (this._drawnShape) this.canvas.add(this._drawnShape);
+        this.canvas.requestRenderAll();
         break;
-    }
+      }
 
-    if (this._drawnShape) {
-      this.canvas.add(this._drawnShape);
-      this.canvas.requestRenderAll();
+      case 'text': {
+        const pointer = this.canvas.getScenePoint(event.e);
+        const text = new fabric.Textbox('Text', { left: pointer.x, top: pointer.y, color: this.color, fontSize: 36, fontFamily: 'Arial' });
+
+        this.canvas.add(text);
+        this.canvas.setActiveObject(text);
+        this.canvas.requestRenderAll();
+
+        this.mode = 'select';
+        text.enterEditing(event.e);
+        break;
+      }
     }
   }
 
@@ -117,10 +140,23 @@ class Editor {
     if (this._originPointer.x > pointer.x) this._drawnShape.set({ left: Math.abs(pointer.x) });
     if (this._originPointer.y > pointer.y) this._drawnShape.set({ top: Math.abs(pointer.y) });
 
-    this._drawnShape.set({
-      width: Math.abs(pointer.x - this._originPointer.x),
-      height: Math.abs(pointer.y - this._originPointer.y),
-    });
+    let width = Math.abs(pointer.x - this._originPointer.x);
+    let height = Math.abs(pointer.y - this._originPointer.y);
+
+    if (event.e.shiftKey) {
+      width = Math.max(width, height);
+      height = width;
+    }
+
+    switch (this.shape) {
+      case 'circle':
+        this._drawnShape.set({ rx: width / 2, ry: height / 2 });
+        break;
+
+      default:
+        this._drawnShape.set({ width, height });
+        break;
+    }
 
     this._drawnShape.setCoords();
     this.canvas.requestRenderAll();
@@ -138,9 +174,9 @@ class Editor {
     document.addEventListener('scroll', this.__windowScrollEvent);
 
     if (this.canvas) {
+      const disposeMouseUp = this.canvas.on('mouse:up', this.__canvasMouseUpEvent);
       const disposeMouseMove = this.canvas.on('mouse:move', this.__canvasMouseMoveEvent);
       const disposeMouseDown = this.canvas.on('mouse:down', this.__canvasMouseDownEvent);
-      const disposeMouseUp = this.canvas.on('mouse:up', this.__canvasMouseUpEvent);
       this._disposables.push(disposeMouseDown, disposeMouseMove, disposeMouseUp);
     }
   }
