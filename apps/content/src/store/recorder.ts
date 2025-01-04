@@ -48,22 +48,22 @@ class Recorder {
    * Comment out during development and uncomment runInAction(() => (this.initialized = true));
    */
   private async __setupState() {
-    // runInAction(() => (this.initialized = true));
-    try {
-      const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
-      const state = result[StorageConfig.RecorderStatus] as RecordingState;
-      runInAction(() => {
-        this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
-        this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
-      });
-      if (this.status === 'active') this.__startTimer();
-    } catch (error) {
-      console.log('Error setting up state from storage', error);
-    } finally {
-      runInAction(() => {
-        this.initialized = true;
-      });
-    }
+    runInAction(() => (this.initialized = true));
+    // try {
+    //   const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
+    //   const state = result[StorageConfig.RecorderStatus] as RecordingState;
+    //   runInAction(() => {
+    //     this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
+    //     this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
+    //   });
+    //   if (this.status === 'active') this.__startTimer();
+    // } catch (error) {
+    //   console.log('Error setting up state from storage', error);
+    // } finally {
+    //   runInAction(() => {
+    //     this.initialized = true;
+    //   });
+    // }
   }
 
   private __startTimer() {
@@ -121,7 +121,7 @@ class Recorder {
    * Comment out during development
    */
   private __setupEvents() {
-    chrome.runtime.onMessage.addListener(this._runtimeEvents);
+    // chrome.runtime.onMessage.addListener(this._runtimeEvents);
   }
 
   startScreenCapture() {

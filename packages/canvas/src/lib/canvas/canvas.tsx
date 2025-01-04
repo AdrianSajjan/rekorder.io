@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as fabric from 'fabric';
 
 import { isFunction } from 'lodash';
+import '../fabric/setup';
 
 interface FabricJSCanvasProps extends Omit<React.CanvasHTMLAttributes<HTMLCanvasElement>, 'onLoad'> {
   onLoad?: (canvas: fabric.Canvas) => void;

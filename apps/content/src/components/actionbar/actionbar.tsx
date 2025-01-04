@@ -67,6 +67,7 @@ export function Actionbar({ children, content, container, indicator = 'mask', ..
           data-indicator={indicator}
           className={clsx(ActionbarCSS.className, 'rekorder-actionbar-popover-content')}
           avoidCollisions={false}
+          onOpenAutoFocus={(e) => e.preventDefault()}
           sideOffset={indicator === 'arrow' ? 7 : 14}
         >
           {content}

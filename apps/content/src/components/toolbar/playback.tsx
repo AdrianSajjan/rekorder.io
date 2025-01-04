@@ -9,7 +9,7 @@ const disabled = ['idle', 'saving', 'countdown', 'pending', 'error'];
 const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div {...props}>
-      <ToolbarAction tooltip="Download recording" disabled={disabled.includes(recorder.status)}>
+      <ToolbarAction tooltip="Save recording" disabled={disabled.includes(recorder.status)}>
         <Record size={16} weight="fill" onClick={recorder.saveScreenCapture} />
       </ToolbarAction>
       <ToolbarRecorderPlayPause />
