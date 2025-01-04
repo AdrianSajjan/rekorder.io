@@ -16,19 +16,23 @@ type LineMode = 'line' | 'arrow' | 'dashed' | 'dotted';
 class Editor {
   canvas: fabric.Canvas | null;
   workspace: HTMLDivElement | null;
-  scrollSync: boolean;
 
   color: string;
   width: number;
   mode: EditorMode;
+
   line: LineMode;
   shape: ShapeMode;
+  scrollSync: boolean;
 
   private _eraser: EraserBrush | null = null;
   private _observer: ResizeObserver | null = null;
   private _pencil: fabric.PencilBrush | null = null;
-  private _disposables: VoidFunction[] = [];
+
   private _lastScrollY = 0;
+  private _disposables: VoidFunction[] = [];
+  private _drawnShape: fabric.FabricObject | null = null;
+  private _originPointer: Pick<DOMPoint, 'x' | 'y'> | null = null;
 
   constructor() {
     this.canvas = null;
@@ -49,6 +53,10 @@ class Editor {
     return new Editor();
   }
 
+  private get _freeDrawingShapeEnabled() {
+    return this.mode === 'shape' || this.mode === 'line';
+  }
+
   private __resizeCanvas() {
     if (!this.workspace || !this.canvas) return;
     const dimensions = measureElement(this.workspace);
@@ -64,7 +72,7 @@ class Editor {
     this.__resizeCanvas();
   }
 
-  private __syncViewportWithScroll() {
+  private __windowScrollEvent() {
     if (!this.canvas || !this.scrollSync) return;
 
     const currentScrollY = window.scrollY;
@@ -76,12 +84,70 @@ class Editor {
     this._lastScrollY = currentScrollY;
   }
 
+  private __canvasMouseDownEvent(event: fabric.TPointerEventInfo<fabric.TPointerEvent>) {
+    if (!this.canvas || !this._freeDrawingShapeEnabled) return;
+
+    this.canvas.selection = false;
+    const point = this.canvas.getScenePoint(event.e);
+    this._originPointer = { x: point.x, y: point.y };
+
+    switch (this.shape) {
+      case 'rectangle':
+        this._drawnShape = new fabric.Rect({
+          left: this._originPointer.x,
+          top: this._originPointer.y,
+          width: point.x - this._originPointer.x,
+          height: point.y - this._originPointer.y,
+          selectable: false,
+          erasable: true,
+        });
+        break;
+    }
+
+    if (this._drawnShape) {
+      this.canvas.add(this._drawnShape);
+      this.canvas.requestRenderAll();
+    }
+  }
+
+  private __canvasMouseMoveEvent(event: fabric.TPointerEventInfo<fabric.TPointerEvent>) {
+    if (!this.canvas || !this._freeDrawingShapeEnabled || !this._drawnShape || !this._originPointer) return;
+
+    const pointer = this.canvas.getScenePoint(event.e);
+    if (this._originPointer.x > pointer.x) this._drawnShape.set({ left: Math.abs(pointer.x) });
+    if (this._originPointer.y > pointer.y) this._drawnShape.set({ top: Math.abs(pointer.y) });
+
+    this._drawnShape.set({
+      width: Math.abs(pointer.x - this._originPointer.x),
+      height: Math.abs(pointer.y - this._originPointer.y),
+    });
+
+    this._drawnShape.setCoords();
+    this.canvas.requestRenderAll();
+  }
+
+  private __canvasMouseUpEvent() {
+    if (!this.canvas || !this._freeDrawingShapeEnabled) return;
+
+    this._drawnShape = null;
+    this._originPointer = null;
+    this.canvas.selection = true;
+  }
+
   private __setupEvents() {
-    document.addEventListener('scroll', this.__syncViewportWithScroll);
+    document.addEventListener('scroll', this.__windowScrollEvent);
+
+    if (this.canvas) {
+      const disposeMouseMove = this.canvas.on('mouse:move', this.__canvasMouseMoveEvent);
+      const disposeMouseDown = this.canvas.on('mouse:down', this.__canvasMouseDownEvent);
+      const disposeMouseUp = this.canvas.on('mouse:up', this.__canvasMouseUpEvent);
+      this._disposables.push(disposeMouseDown, disposeMouseMove, disposeMouseUp);
+    }
   }
 
   private __resetEvents() {
-    document.removeEventListener('scroll', this.__syncViewportWithScroll);
+    document.removeEventListener('scroll', this.__windowScrollEvent);
+    this._disposables.forEach((dispose) => dispose());
   }
 
   private __setupDrawingBrush() {
@@ -200,7 +266,6 @@ class Editor {
   dispose() {
     this.__resetEvents();
     this._observer?.disconnect();
-    this._disposables.forEach((dispose) => dispose());
 
     this.canvas = null;
     this.workspace = null;

@@ -140,8 +140,8 @@ const EditorActionbar = observer(() => {
             </ToggleGroupItem>
           </ToolbarAction>
           <Actionbar indicator="arrow" content={<ShapesActionbar />} container={toolbarContainer}>
-            <ToolbarAction asChild tooltip="Shapes">
-              <ToggleGroupItem value="shapes">{ShapeComponents[editor.shape]}</ToggleGroupItem>
+            <ToolbarAction asChild tooltip="Shape">
+              <ToggleGroupItem value="shape">{ShapeComponents[editor.shape]}</ToggleGroupItem>
             </ToolbarAction>
           </Actionbar>
           <ToolbarAction asChild tooltip="Text">

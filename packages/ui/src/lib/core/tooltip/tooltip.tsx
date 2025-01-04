@@ -39,8 +39,10 @@ const TooltipCSS = css.resolve`
     box-shadow: ${theme.shadow().md};
     border-radius: ${theme.space(2)};
     padding: ${theme.space(2)} ${theme.space(3)};
+    max-width: ${theme.space(80)};
 
     font-size: 13px;
+    line-height: 1.4;
     font-family: ${theme.fonts.default};
     z-index: ${theme.zIndex(300)};
 
@@ -124,13 +126,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
     const TooltipPortal = portal ? TooltipPrimitive.Portal : React.Fragment;
     return (
       <TooltipPortal>
-        <TooltipPrimitive.Content
-          ref={ref}
-          side={side}
-          className={clsx(TooltipCSS.className, 'content', colorScheme)}
-          align={align}
-          {...props}
-        >
+        <TooltipPrimitive.Content ref={ref} side={side} className={clsx(TooltipCSS.className, 'content', colorScheme)} align={align} {...props}>
           {children}
           {arrow ? <TooltipArrow /> : null}
         </TooltipPrimitive.Content>
