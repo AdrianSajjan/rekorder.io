@@ -175,10 +175,10 @@ const EditorActionbar = observer(() => {
         </div>
         <Divider orientation="vertical" className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-divider')} />
         <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-group')}>
-          <ToolbarAction tooltip="Undo">
+          <ToolbarAction tooltip="Undo" disabled={!editor.history.canUndo} onClick={editor.history.undo}>
             <ArrowBendUpLeft size={16} weight="bold" />
           </ToolbarAction>
-          <ToolbarAction tooltip="Redo">
+          <ToolbarAction tooltip="Redo" disabled={!editor.history.canRedo} onClick={editor.history.redo}>
             <ArrowBendUpRight size={16} weight="bold" />
           </ToolbarAction>
           <ToolbarAction tooltip="Clear canvas" onClick={editor.clearCanvas}>

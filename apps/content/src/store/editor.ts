@@ -1,9 +1,12 @@
 import * as fabric from 'fabric';
-import { EraserBrush } from '@erase2d/fabric';
 
-import { makeAutoObservable } from 'mobx';
 import { throttle } from 'lodash';
-import { theme } from '@rekorder.io/ui';
+import { makeAutoObservable } from 'mobx';
+import { nanoid } from 'nanoid';
+
+import { theme } from '@rekorder.io/constants';
+import { EraserBrush } from '@erase2d/fabric';
+import { HistoryPlugin } from '@rekorder.io/canvas';
 
 import { measureElement } from '../lib/utils';
 
@@ -16,6 +19,7 @@ type LineMode = 'line' | 'arrow' | 'dashed' | 'dotted';
 class Editor {
   canvas: fabric.Canvas | null;
   workspace: HTMLDivElement | null;
+  history: HistoryPlugin;
 
   color: string;
   fill: boolean;
@@ -49,6 +53,7 @@ class Editor {
     this.line = 'arrow';
     this.shape = 'rectangle';
 
+    this.history = HistoryPlugin.createInstance();
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -92,9 +97,10 @@ class Editor {
 
     switch (this.mode) {
       case 'shape': {
+        const uuid = nanoid();
         const pointer = this.canvas.getScenePoint(event.e);
         const fill = this.fill ? this.color : 'transparent';
-        const props = { left: pointer.x, top: pointer.y, fill, stroke: this.color, strokeWidth: this.width, selectable: false, erasable: true };
+        const props = { id: uuid, left: pointer.x, top: pointer.y, fill, stroke: this.color, strokeWidth: this.width, selectable: false, erasable: true };
 
         this.canvas.selection = false;
         this._originPointer = { x: pointer.x, y: pointer.y };
@@ -113,21 +119,23 @@ class Editor {
             break;
         }
 
-        if (this._drawnShape) this.canvas.add(this._drawnShape);
+        this.canvas.add(this._drawnShape);
         this.canvas.requestRenderAll();
         break;
       }
 
       case 'text': {
+        const uuid = nanoid();
         const pointer = this.canvas.getScenePoint(event.e);
-        const text = new fabric.Textbox('Text', { left: pointer.x, top: pointer.y, color: this.color, fontSize: 36, fontFamily: 'Arial' });
+        const props = { id: uuid, left: pointer.x, top: pointer.y, color: this.color, erasable: true, fontSize: 36, fontFamily: theme.fonts.default };
+        const text = new fabric.Textbox('Text', props);
 
         this.canvas.add(text);
         this.canvas.setActiveObject(text);
         this.canvas.requestRenderAll();
 
         this.mode = 'select';
-        text.enterEditing(event.e);
+        text.enterEditing();
         break;
       }
     }
@@ -170,20 +178,26 @@ class Editor {
     this.canvas.selection = true;
   }
 
+  private __canvasBeforePathCreatedEvent({ path }: { path: fabric.Path }) {
+    path.set({ erasable: true, id: nanoid() });
+  }
+
   private __setupEvents() {
     document.addEventListener('scroll', this.__windowScrollEvent);
-
     if (this.canvas) {
-      const disposeMouseUp = this.canvas.on('mouse:up', this.__canvasMouseUpEvent);
-      const disposeMouseMove = this.canvas.on('mouse:move', this.__canvasMouseMoveEvent);
-      const disposeMouseDown = this.canvas.on('mouse:down', this.__canvasMouseDownEvent);
-      this._disposables.push(disposeMouseDown, disposeMouseMove, disposeMouseUp);
+      this._disposables.push(
+        this.canvas.on('mouse:up', this.__canvasMouseUpEvent),
+        this.canvas.on('mouse:move', this.__canvasMouseMoveEvent),
+        this.canvas.on('mouse:down', this.__canvasMouseDownEvent),
+        this.canvas.on('before:path:created', this.__canvasBeforePathCreatedEvent)
+      );
     }
   }
 
   private __resetEvents() {
     document.removeEventListener('scroll', this.__windowScrollEvent);
     this._disposables.forEach((dispose) => dispose());
+    if (this._observer) this._observer.disconnect();
   }
 
   private __setupDrawingBrush() {
@@ -191,9 +205,6 @@ class Editor {
 
     this._pencil = new fabric.PencilBrush(this.canvas);
     this._eraser = new EraserBrush(this.canvas);
-
-    const dispose = this.canvas.on('path:created', ({ path }) => (path.erasable = true));
-    this._disposables.push(dispose);
   }
 
   private __toggleSelectionMode(mode: EditorMode) {
@@ -217,17 +228,19 @@ class Editor {
   initialize(canvas: fabric.Canvas, workspace: HTMLDivElement) {
     this.canvas = canvas;
     this.workspace = workspace;
+    this.history.initialize(canvas);
+
     this.__setupResizeObserver();
     this.__setupDrawingBrush();
     this.__setupEvents();
   }
 
   updateShapeMode(shape: ShapeMode) {
-    this.shape = shape;
+    if (shape) this.shape = shape;
   }
 
   updateLineMode(line: LineMode) {
-    this.line = line;
+    if (line) this.line = line;
   }
 
   updateColor(color: string) {
@@ -256,6 +269,7 @@ class Editor {
     if (!this.canvas) return;
     this.canvas.clear();
     this.canvas.requestRenderAll();
+    this.history.flush();
   }
 
   toggleDrawingMode(mode?: EditorMode) {
@@ -282,18 +296,6 @@ class Editor {
         this.canvas.freeDrawingBrush = this._eraser;
         this.canvas.freeDrawingBrush.width = this.width;
         break;
-
-      case 'shape':
-        // TODO: Implement rectangle tool
-        break;
-
-      case 'text':
-        // TODO: Implement text tool
-        break;
-
-      case 'line':
-        // TODO: Implement line tool
-        break;
     }
 
     this.canvas.requestRenderAll();
@@ -301,7 +303,7 @@ class Editor {
 
   dispose() {
     this.__resetEvents();
-    this._observer?.disconnect();
+    this.history.destroy();
 
     this.canvas = null;
     this.workspace = null;
