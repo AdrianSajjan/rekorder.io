@@ -1,7 +1,7 @@
 # Add files here to ignore them from prettier formatting
 /dist
+/extension/build
 /coverage
 /.nx/cache
-/extensions
 /.nx/workspace-data
 /tmp

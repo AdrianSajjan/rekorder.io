@@ -1,7 +1,7 @@
 import exportWebmBlob from 'fix-webm-duration';
 import { nanoid } from 'nanoid';
 
-import { ExtensionOfflineDatabase } from '@rekorder.io/utils';
+import { ExtensionOfflineDatabase } from '@rekorder.io/database';
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 
 import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';

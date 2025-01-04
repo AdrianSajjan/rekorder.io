@@ -1,7 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
-import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/utils';
+import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
 
 class Editor {
   video: BlobStorage | null;

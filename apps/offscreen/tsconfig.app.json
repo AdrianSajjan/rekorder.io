@@ -31,7 +31,8 @@
     "../../packages/ui/src/**/*",
     "../../packages/canvas/src/**/*",
     "../../packages/hooks/src/**/*",
-    "../../packages/types/src/**/*"
+    "../../packages/types/src/**/*",
+    "../../packages/database/src/**/*"
 
   ]
 }

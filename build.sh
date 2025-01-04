@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
-
 # Step 1: Run the build command for all apps/libs
 echo "Running nx build..."
 nx run-many -t=build

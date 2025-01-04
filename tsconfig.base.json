@@ -17,6 +17,7 @@
     "paths": {
       "@rekorder.io/canvas": ["packages/canvas/src/index.ts"],
       "@rekorder.io/constants": ["packages/constants/src/index.ts"],
+      "@rekorder.io/database": ["packages/database/src/index.ts"],
       "@rekorder.io/hooks": ["packages/hooks/src/index.ts"],
       "@rekorder.io/types": ["packages/types/src/index.ts"],
       "@rekorder.io/ui": ["packages/ui/src/index.ts"],

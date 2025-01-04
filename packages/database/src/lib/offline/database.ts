@@ -1,12 +1,12 @@
 import Dexie, { Entity, EntityTable } from 'dexie';
-import { OfflineDatabaseConfig } from '@rekorder.io/constants';
+import { DatabaseConfig } from '@rekorder.io/constants';
 
 class ExtensionOfflineDatabase extends Dexie {
   blobs!: EntityTable<BlobStorage, 'id'>;
 
   constructor() {
-    super(OfflineDatabaseConfig.ExtensionDatabaseName);
-    this.version(OfflineDatabaseConfig.ExtensionDatabaseVersion).stores({ blobs: '++id, uuid, blob, duration, created_at' });
+    super(DatabaseConfig.ExtensionOfflineDatabaseName);
+    this.version(DatabaseConfig.ExtensionOfflineDatabaseVersion).stores({ blobs: '++id, uuid, blob, duration, created_at' });
     this.blobs.mapToClass(BlobStorage);
   }
 
