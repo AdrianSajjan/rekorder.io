@@ -94,6 +94,8 @@ class Recorder {
   }
 
   private __runtimeEvents(message: RuntimeMessage) {
+    console.log(message);
+
     switch (message.type) {
       case EventConfig.StartStreamCaptureSuccess: {
         runInAction(() => (this.status = 'active'));
