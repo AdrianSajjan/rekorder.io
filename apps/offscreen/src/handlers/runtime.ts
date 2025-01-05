@@ -9,7 +9,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
      * If stream id is present, the tab stream will be captured without prompting the user to select a display
      */
     case EventConfig.StartTabStreamCapture: {
-      recorder.start(message.payload.streamId);
+      recorder.start(message.payload);
       return false;
     }
 
