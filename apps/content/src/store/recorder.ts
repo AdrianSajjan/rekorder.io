@@ -27,7 +27,7 @@ class Recorder {
     this.initialized = false;
     this.status = 'idle';
 
-    this.audio = false;
+    this.audio = true;
     this.timestamp = 0;
     this.surface = 'tab';
 
@@ -52,30 +52,30 @@ class Recorder {
   /**
    * Uncomment the whole block during development
    */
-  private __setupState() {
-    runInAction(() => (this.initialized = true));
-  }
+  // private __setupState() {
+  //   runInAction(() => (this.initialized = true));
+  // }
 
   /**
    * Comment the whole block out during development
    */
-  // private async __setupState() {
-  //   try {
-  //     const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
-  //     const state = result[StorageConfig.RecorderStatus] as RecordingState;
-  //     runInAction(() => {
-  //       this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
-  //       this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
-  //     });
-  //     if (this.status === 'active') this.__startTimer();
-  //   } catch (error) {
-  //     console.log('Error setting up state from storage', error);
-  //   } finally {
-  //     runInAction(() => {
-  //       this.initialized = true;
-  //     });
-  //   }
-  // }
+  private async __setupState() {
+    try {
+      const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
+      const state = result[StorageConfig.RecorderStatus] as RecordingState;
+      runInAction(() => {
+        this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
+        this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
+      });
+      if (this.status === 'active') this.__startTimer();
+    } catch (error) {
+      console.log('Error setting up state from storage', error);
+    } finally {
+      runInAction(() => {
+        this.initialized = true;
+      });
+    }
+  }
 
   private __startTimer() {
     if (!this._interval) {
@@ -132,7 +132,7 @@ class Recorder {
    * Comment out during development - chrome.runtime.onMessage.addListener(this._runtimeEvents);
    */
   private __setupEvents() {
-    // chrome.runtime.onMessage.addListener(this._runtimeEvents);
+    chrome.runtime.onMessage.addListener(this._runtimeEvents);
   }
 
   startScreenCapture() {

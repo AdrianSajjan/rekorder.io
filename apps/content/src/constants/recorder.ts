@@ -6,7 +6,7 @@ export const RECORD_SURFACE_OPTIONS = [
     value: 'monitor',
   },
   {
-    label: 'Window',
+    label: 'Application Window',
     value: 'window',
   },
   {
