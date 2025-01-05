@@ -20,12 +20,9 @@ class Editor {
   }
 
   private async __runtimeEventHandler(message: RuntimeMessage) {
-    console.log('Runtime event handler received message:', message);
-
     switch (message.type) {
       case EventConfig.InitializeEditor: {
         const blob = await this._offlineDatabase.blobs.get(message.payload.id);
-        console.log('Blob:', blob);
         if (blob) {
           runInAction(() => {
             this.video = blob;

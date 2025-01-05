@@ -4,9 +4,9 @@ import { throttle } from 'lodash';
 import { makeAutoObservable } from 'mobx';
 import { nanoid } from 'nanoid';
 
-import { theme } from '@rekorder.io/constants';
-import { EraserBrush } from '@erase2d/fabric';
+import { EraserBrush, ErasingEvent } from '@erase2d/fabric';
 import { HistoryPlugin } from '@rekorder.io/canvas';
+import { theme } from '@rekorder.io/constants';
 
 import { measureElement } from '../lib/utils';
 
@@ -182,8 +182,21 @@ class Editor {
     path.set({ erasable: true, id: nanoid() });
   }
 
+  private async __canvasEraserEndEvent(event: ErasingEvent<'end'>) {
+    if (!this._eraser) return;
+
+    event.preventDefault();
+    const path = await this._eraser.commit(event.detail);
+    this.history.erased(event.detail, path);
+  }
+
   private __setupEvents() {
     document.addEventListener('scroll', this.__windowScrollEvent);
+
+    if (this._eraser) {
+      this._disposables.push(this._eraser.on('end', this.__canvasEraserEndEvent));
+    }
+
     if (this.canvas) {
       this._disposables.push(
         this.canvas.on('mouse:up', this.__canvasMouseUpEvent),
@@ -198,13 +211,6 @@ class Editor {
     document.removeEventListener('scroll', this.__windowScrollEvent);
     this._disposables.forEach((dispose) => dispose());
     if (this._observer) this._observer.disconnect();
-  }
-
-  private __setupDrawingBrush() {
-    if (!this.canvas) return;
-
-    this._pencil = new fabric.PencilBrush(this.canvas);
-    this._eraser = new EraserBrush(this.canvas);
   }
 
   private __toggleSelectionMode(mode: EditorMode) {
@@ -228,11 +234,13 @@ class Editor {
   initialize(canvas: fabric.Canvas, workspace: HTMLDivElement) {
     this.canvas = canvas;
     this.workspace = workspace;
-    this.history.initialize(canvas);
 
-    this.__setupResizeObserver();
-    this.__setupDrawingBrush();
+    this._pencil = new fabric.PencilBrush(this.canvas);
+    this._eraser = new EraserBrush(this.canvas);
+    this.history.initialize(canvas, this._eraser);
+
     this.__setupEvents();
+    this.__setupResizeObserver();
   }
 
   updateShapeMode(shape: ShapeMode) {
@@ -268,8 +276,8 @@ class Editor {
   clearCanvas() {
     if (!this.canvas) return;
     this.canvas.clear();
-    this.canvas.requestRenderAll();
     this.history.flush();
+    this.canvas.requestRenderAll();
   }
 
   toggleDrawingMode(mode?: EditorMode) {
@@ -312,4 +320,4 @@ class Editor {
 
 const editor = Editor.createInstance();
 
-export { editor, Editor, type EditorMode, type ShapeMode, type LineMode };
+export { editor, Editor, type EditorMode, type LineMode, type ShapeMode };

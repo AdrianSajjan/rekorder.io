@@ -203,5 +203,5 @@ export function setupFabric() {
     },
   };
 
-  fabric.FabricObject.customProperties = ['name', 'id'];
+  fabric.FabricObject.customProperties = ['name', 'id', 'erasable', 'evented', 'selectable'];
 }

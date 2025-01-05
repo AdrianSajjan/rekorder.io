@@ -1,19 +1,31 @@
 import * as fabric from 'fabric';
 
-import { makeAutoObservable, runInAction, toJS } from 'mobx';
+import { ClippingGroup, EraserBrush, ErasingEvent } from '@erase2d/fabric';
 import { clone } from '@rekorder.io/utils';
+import { makeAutoObservable, runInAction } from 'mobx';
 
 import { findCanvasHistoryById, findCanvasObjectById } from '../utils/find-object-by-id';
 
-type CanvasHistoryType = 'add' | 'remove' | 'modify' | 'erase';
-interface CanvasHistory {
+type ObjectHistoryAction = 'add' | 'remove' | 'modify';
+
+type CanvasHistory = ObjectHistory | EraserHistory;
+
+interface EraserHistory {
+  detail: ErasingEvent<'end'>['detail'];
+  commit: Map<fabric.FabricObject, fabric.Path>;
+  state: fabric.FabricObject[];
+  type: 'erase';
+}
+
+interface ObjectHistory {
   id: string;
   target: fabric.FabricObject;
   state: fabric.FabricObject[];
-  type: CanvasHistoryType;
+  type: ObjectHistoryAction;
 }
 
 class HistoryPlugin {
+  private _eraser: EraserBrush | null = null;
   private _canvas: fabric.Canvas | null = null;
 
   private _undo: CanvasHistory[] = [];
@@ -38,17 +50,16 @@ class HistoryPlugin {
     return this._redo.length > 0;
   }
 
-  private __handleHistoryEvent(event: fabric.ModifiedEvent<fabric.TPointerEvent>, type: CanvasHistoryType) {
-    if (!this._canvas || !this._enabled) return;
+  private __handleHistoryEvent(event: fabric.ModifiedEvent<fabric.TPointerEvent>, type: ObjectHistoryAction) {
+    if (!this._enabled) return;
 
     const object = event.target;
     this._undo.push({ id: object.id, target: clone(object), state: this.__currentState(), type });
-    console.log(toJS(this._undo));
+    this._redo = [];
   }
 
   private __serializeState(state: fabric.FabricObject) {
-    const cloned = clone(state);
-    const { type, ...props } = cloned;
+    const { type: _, ...props } = clone(state);
     return props;
   }
 
@@ -67,6 +78,12 @@ class HistoryPlugin {
 
   private __removeEvents() {
     this._disposables.forEach((dispose) => dispose());
+  }
+
+  erased(detail: ErasingEvent<'end'>['detail'], commit: Map<fabric.FabricObject, fabric.Path>) {
+    if (!this._enabled) return;
+    this._undo.push({ detail, commit, state: this.__currentState(), type: 'erase' });
+    this._redo = [];
   }
 
   async undo() {
@@ -117,6 +134,16 @@ class HistoryPlugin {
         break;
       }
 
+      case 'erase': {
+        history.commit.forEach((_, object) => {
+          if (object.clipPath instanceof ClippingGroup) {
+            object.clipPath._objects = object.clipPath._objects.slice(0, -1);
+            object.set({ clipPath: object.clipPath, dirty: true });
+          }
+        });
+        break;
+      }
+
       default: {
         console.warn('Undo aborted: Unknown history type');
       }
@@ -124,13 +151,13 @@ class HistoryPlugin {
 
     this._canvas.requestRenderAll();
     runInAction(() => {
-      this._redo.push({ id: history.id, target: history.target, type: history.type, state: current });
+      this._redo.push({ ...history, state: current });
       this._enabled = true;
     });
   }
 
   async redo() {
-    if (!this._redo.length || !this._canvas) return;
+    if (!this._redo.length || !this._canvas || !this._eraser) return;
 
     runInAction(() => {
       this._enabled = false;
@@ -142,8 +169,12 @@ class HistoryPlugin {
     switch (history.type) {
       case 'remove': {
         const object = findCanvasObjectById(this._canvas, history.id);
-        if (object) this._canvas.remove(object);
-        else console.warn('Redo aborted: Object does not exist');
+
+        if (object) {
+          this._canvas.remove(object);
+        } else {
+          console.warn('Redo aborted: Object does not exist');
+        }
         break;
       }
 
@@ -154,8 +185,11 @@ class HistoryPlugin {
             const objects = await fabric.util.enlivenObjects([state]);
             const object = objects.at(0) as fabric.FabricObject | undefined;
 
-            if (object) this._canvas!.add(object);
-            else console.warn('Redo aborted: Enlivened object does not exist');
+            if (object) {
+              this._canvas!.add(object);
+            } else {
+              console.warn('Redo aborted: Enlivened object does not exist');
+            }
           } catch (error) {
             console.warn('Redo aborted: Failed to enliven objects', error);
           }
@@ -170,9 +204,22 @@ class HistoryPlugin {
         if (!object || !state) {
           console.warn("Redo aborted: Either object or state doesn't exist");
         } else {
-          object.set(this.__serializeState(state));
-          object.setCoords();
+          try {
+            object.set(this.__serializeState(state));
+            object.setCoords();
+            if (state.clipPath) {
+              const [clipPath] = await fabric.util.enlivenObjects([state.clipPath]);
+              object.set({ clipPath });
+            }
+          } catch (error) {
+            console.warn('Redo aborted: Failed to enliven objects', error);
+          }
         }
+        break;
+      }
+
+      case 'erase': {
+        await this._eraser.commit(history.detail);
         break;
       }
 
@@ -183,7 +230,7 @@ class HistoryPlugin {
 
     this._canvas.requestRenderAll();
     runInAction(() => {
-      this._undo.push({ id: history.id, target: history.target, type: history.type, state: current });
+      this._undo.push({ ...history, state: current });
       this._enabled = true;
     });
   }
@@ -193,8 +240,9 @@ class HistoryPlugin {
     this._redo = [];
   }
 
-  initialize(canvas: fabric.Canvas) {
+  initialize(canvas: fabric.Canvas, eraser: EraserBrush) {
     this._canvas = canvas;
+    this._eraser = eraser;
     this.__setupEvents();
   }
 
