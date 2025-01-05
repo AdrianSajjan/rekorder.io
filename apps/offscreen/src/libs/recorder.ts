@@ -269,7 +269,7 @@ class OffscreenRecorder {
     if (index === -1) {
       this.__captureStreamSuccess();
     } else {
-      const error = results[index] as unknown as PromiseRejectionEvent;
+      const error = results[index] as PromiseRejectedResult;
       this.__captureStreamError(error.reason);
     }
   }
