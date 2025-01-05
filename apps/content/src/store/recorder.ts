@@ -3,18 +3,21 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { isUndefined } from 'lodash';
 
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
-import { RuntimeMessage } from '@rekorder.io/types';
+import { RecorderSurface, RuntimeMessage } from '@rekorder.io/types';
 import { unwrapError } from '@rekorder.io/utils';
 
 import { microphone } from './microphone';
 import { RECORDER_ROOT } from '../constants/layout';
 import { RECORD_TIMEOUT } from '../constants/recorder';
 
+type RecorderStatus = 'idle' | 'countdown' | 'pending' | 'active' | 'paused' | 'saving' | 'error';
+
 class Recorder {
   audio: boolean;
   timestamp: number;
   initialized: boolean;
-  status: 'idle' | 'countdown' | 'pending' | 'active' | 'paused' | 'saving' | 'error';
+  status: RecorderStatus;
+  surface: RecorderSurface;
 
   private _interval: NodeJS.Timer | null;
   private _timeout: NodeJS.Timeout | null;
@@ -23,8 +26,10 @@ class Recorder {
   constructor() {
     this.initialized = false;
     this.status = 'idle';
-    this.timestamp = 0;
+
     this.audio = false;
+    this.timestamp = 0;
+    this.surface = 'tab';
 
     this._interval = null;
     this._timeout = null;
@@ -45,26 +50,32 @@ class Recorder {
   }
 
   /**
-   * Comment out during development and uncomment runInAction(() => (this.initialized = true));
+   * Uncomment the whole block during development
    */
-  private async __setupState() {
+  private __setupState() {
     runInAction(() => (this.initialized = true));
-    // try {
-    //   const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
-    //   const state = result[StorageConfig.RecorderStatus] as RecordingState;
-    //   runInAction(() => {
-    //     this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
-    //     this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
-    //   });
-    //   if (this.status === 'active') this.__startTimer();
-    // } catch (error) {
-    //   console.log('Error setting up state from storage', error);
-    // } finally {
-    //   runInAction(() => {
-    //     this.initialized = true;
-    //   });
-    // }
   }
+
+  /**
+   * Comment the whole block out during development
+   */
+  // private async __setupState() {
+  //   try {
+  //     const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
+  //     const state = result[StorageConfig.RecorderStatus] as RecordingState;
+  //     runInAction(() => {
+  //       this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
+  //       this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
+  //     });
+  //     if (this.status === 'active') this.__startTimer();
+  //   } catch (error) {
+  //     console.log('Error setting up state from storage', error);
+  //   } finally {
+  //     runInAction(() => {
+  //       this.initialized = true;
+  //     });
+  //   }
+  // }
 
   private __startTimer() {
     if (!this._interval) {
@@ -118,7 +129,7 @@ class Recorder {
   }
 
   /**
-   * Comment out during development
+   * Comment out during development - chrome.runtime.onMessage.addListener(this._runtimeEvents);
    */
   private __setupEvents() {
     // chrome.runtime.onMessage.addListener(this._runtimeEvents);
@@ -133,10 +144,17 @@ class Recorder {
       });
 
       setTimeout(() => {
-        chrome.runtime.sendMessage({
-          type: EventConfig.StartDisplayStreamCapture,
-          payload: { microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
-        });
+        if (this.surface !== 'tab') {
+          chrome.runtime.sendMessage({
+            type: EventConfig.StartDisplayStreamCapture,
+            payload: { surface: this.surface, microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
+          });
+        } else {
+          chrome.runtime.sendMessage({
+            type: EventConfig.StartTabStreamCapture,
+            payload: { surface: this.surface, microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
+          });
+        }
       }, 0);
     }, RECORD_TIMEOUT * 1000);
   }
@@ -177,6 +195,10 @@ class Recorder {
 
   changeDesktopAudio(audio?: boolean) {
     this.audio = isUndefined(audio) ? !this.audio : audio;
+  }
+
+  changeDisplaySurface(surface: RecorderSurface) {
+    this.surface = surface;
   }
 }
 

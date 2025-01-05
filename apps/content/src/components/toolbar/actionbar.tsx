@@ -8,8 +8,9 @@ import { cursor } from '../../store/cursor';
 import { Actionbar } from '../actionbar/actionbar';
 import { CursorActionbar } from '../actionbar/cursor';
 import { EditorActionbar } from '../actionbar/editor';
-import { ToolbarAction } from '../ui/toolbar-action';
+import { BlurActionbar } from '../actionbar/blur';
 
+import { ToolbarAction } from '../ui/toolbar-action';
 import { CursorClickIcon } from '../icons/cursor-click';
 import { CursorHighlightIcon } from '../icons/cursor-highlight';
 import { CursorSpotlightIcon } from '../icons/cursor-spotlight';
@@ -33,11 +34,13 @@ const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, '
           </ToggleGroupItem>
         </ToolbarAction>
       </Actionbar>
-      <ToolbarAction asChild tooltip="Toggle blur mode">
-        <ToggleGroupItem value="blur">
-          <Subtract size={16} weight="fill" />
-        </ToggleGroupItem>
-      </ToolbarAction>
+      <Actionbar open={toolbar.actionbarState === 'blur'} container={toolbarContainer} content={<BlurActionbar />}>
+        <ToolbarAction actionbarIndicator asChild tooltip="Toggle blur mode">
+          <ToggleGroupItem value="blur">
+            <Subtract size={16} weight="fill" />
+          </ToggleGroupItem>
+        </ToolbarAction>
+      </Actionbar>
       <ToolbarAction asChild tooltip="Toggle zoom area">
         <ToggleGroupItem value="zoom">
           <CornersIn size={16} weight="bold" />

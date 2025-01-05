@@ -9,16 +9,24 @@ class ElementBlur {
   blurAmount: number;
 
   private _styles: Map<HTMLElement, Styles>;
+  private _history: HTMLElement[];
 
   constructor() {
     this.enabled = false;
     this.blurAmount = 5;
+
+    this._history = [];
     this._styles = new Map();
+
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
   static createInstance() {
     return new ElementBlur();
+  }
+
+  get canUndo() {
+    return this._history.length > 0;
   }
 
   private __isRecorderRoot(event: MouseEvent) {
@@ -59,9 +67,11 @@ class ElementBlur {
     if (!style?.blurred) {
       this._styles.set(element, { ...style, filter: element.style.filter, blurred: true });
       element.style.filter = `blur(${this.blurAmount}px)`;
+      this._history.push(element);
     } else {
       element.style.filter = style.filter ?? 'none';
       this._styles.delete(element);
+      this._history = this._history.filter((e) => e !== element);
     }
   }
 
@@ -99,6 +109,26 @@ class ElementBlur {
   initialize() {
     this.enabled = true;
     this.__setupEvents();
+  }
+
+  undo() {
+    const element = this._history.pop();
+    if (element) {
+      const style = this._styles.get(element);
+      if (style?.blurred) {
+        element.style.filter = style.filter ?? 'none';
+        this._styles.delete(element);
+      }
+    }
+  }
+
+  clear() {
+    for (const [element, style] of this._styles.entries()) {
+      if (style.blurred) {
+        element.style.filter = style.filter ?? 'none';
+        this._styles.delete(element);
+      }
+    }
   }
 
   dispose() {

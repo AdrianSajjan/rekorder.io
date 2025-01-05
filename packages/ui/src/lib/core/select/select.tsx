@@ -117,7 +117,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(({ c
     <React.Fragment>
       {SelectInputCSS.styles}
       <SelectPrimitive.Trigger ref={ref} className={clsx(SelectInputCSS.className, 'rekorder-trigger', theme.createClassName(size), className)} {...props}>
-        {children ?? <SelectPrimitive.Value placeholder={placeholder} />}
+        <SelectPrimitive.Value placeholder={placeholder}>{children}</SelectPrimitive.Value>
         <SelectPrimitive.Icon className={clsx(SelectInputCSS.className, 'rekorder-icon')}>
           <CaretDown size={14} weight="bold" />
         </SelectPrimitive.Icon>
@@ -191,15 +191,14 @@ const SelectContentCSS = css.resolve`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: ${theme.space(3)};
+    font-size: 14px;
+    transition: background-color 200ms ease-in-out;
+    cursor: pointer;
 
+    gap: ${theme.space(3)};
     padding: ${theme.space(2.5)} ${theme.space(3.5)};
     color: ${theme.colors.background.text};
     border-radius: ${theme.space(1.5)};
-    font-size: 14px;
-
-    transition: background-color 200ms ease-in-out;
-    cursor: pointer;
   }
 
   .rekorder-content .rekorder-item:focus {

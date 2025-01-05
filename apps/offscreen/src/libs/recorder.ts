@@ -1,10 +1,19 @@
 import exportWebmBlob from 'fix-webm-duration';
 import { nanoid } from 'nanoid';
 
+import { RecorderSurface } from '@rekorder.io/types';
 import { ExtensionOfflineDatabase } from '@rekorder.io/database';
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 
 import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';
+
+interface OffscreenRecorderStart {
+  streamId?: string;
+  microphoneId: string;
+  captureDeviceAudio: boolean;
+  pushToTalk: boolean;
+  surface: RecorderSurface;
+}
 
 class OffscreenRecorder {
   chunks: Blob[];
@@ -12,9 +21,10 @@ class OffscreenRecorder {
   timestamp: number;
   discard: boolean;
 
-  sourceId: string;
+  streamId: string;
   microphoneId: string;
   captureDeviceAudio: boolean;
+  displaySurface: RecorderSurface;
 
   audio: MediaStream | null;
   video: MediaStream | null;
@@ -33,8 +43,9 @@ class OffscreenRecorder {
     this.muted = false;
     this.discard = false;
 
-    this.sourceId = '';
+    this.streamId = '';
     this.microphoneId = 'n/a';
+    this.displaySurface = 'tab';
     this.captureDeviceAudio = false;
 
     this.video = null;
@@ -73,7 +84,7 @@ class OffscreenRecorder {
     this.timestamp = 0;
     this.discard = false;
 
-    this.sourceId = '';
+    this.streamId = '';
     this.microphoneId = 'n/a';
     this.captureDeviceAudio = false;
 
@@ -203,24 +214,28 @@ class OffscreenRecorder {
   }
 
   private async __captureDisplayVideoStream() {
-    if (this.sourceId) {
+    if (this.displaySurface === 'tab') {
+      if (!this.streamId) {
+        throw new Error('Selected display surface is tab, but unable to obtain a media stream id');
+      }
+
       this.video = await navigator.mediaDevices.getUserMedia({
-        audio: this.captureDeviceAudio ? { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId } } : false,
-        video: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.sourceId, maxFrameRate: 30 } },
+        audio: this.captureDeviceAudio ? { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.streamId } } : false,
+        video: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.streamId, maxFrameRate: 30 } },
       } as MediaStreamConstraints);
     } else {
       this.video = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
+        video: { displaySurface: this.displaySurface },
         audio: this.captureDeviceAudio,
-      });
+      } as DisplayMediaStreamOptions);
     }
 
     if (!this.video.getVideoTracks().length) {
-      throw new Error(`No video tracks found in the created display media stream: ${this.sourceId}`);
+      throw new Error(`No video tracks found in the created display media stream: ${this.streamId}`);
     }
 
     if (this.captureDeviceAudio && !this.video.getAudioTracks().length) {
-      throw new Error(`No audio tracks found in the created display media stream: ${this.sourceId}`);
+      throw new Error(`No audio tracks found in the created display media stream: ${this.streamId}`);
     }
   }
 
@@ -240,10 +255,10 @@ class OffscreenRecorder {
     }
   }
 
-  async start(sourceId: string, microphoneId = 'n/a', captureDeviceAudio = false, pushToTalk = false) {
+  async start({ captureDeviceAudio, microphoneId, pushToTalk, surface, streamId = '' }: OffscreenRecorderStart) {
     this.muted = pushToTalk;
-    this.sourceId = sourceId;
-
+    this.streamId = streamId;
+    this.displaySurface = surface;
     this.microphoneId = microphoneId;
     this.captureDeviceAudio = captureDeviceAudio;
 
