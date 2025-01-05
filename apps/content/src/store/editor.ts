@@ -5,16 +5,16 @@ import { makeAutoObservable } from 'mobx';
 import { nanoid } from 'nanoid';
 
 import { EraserBrush, ErasingEvent } from '@erase2d/fabric';
-import { HistoryPlugin } from '@rekorder.io/canvas';
+import { FabricArrow, HistoryPlugin } from '@rekorder.io/canvas';
 import { theme } from '@rekorder.io/constants';
 
 import { measureElement } from '../lib/utils';
 
-type EditorMode = 'pencil' | 'highlighter' | 'eraser' | 'shape' | 'line' | 'text' | 'select';
+type EditorMode = 'pencil' | 'highlighter' | 'eraser' | 'shape' | 'line' | 'text' | 'select' | 'delete';
 
 type ShapeMode = 'rectangle' | 'circle' | 'triangle';
 
-type LineMode = 'line' | 'arrow' | 'dashed' | 'dotted';
+type LineMode = 'line' | 'arrow';
 
 class Editor {
   canvas: fabric.Canvas | null;
@@ -93,9 +93,17 @@ class Editor {
   }
 
   private __canvasMouseDownEvent(event: fabric.TPointerEventInfo<fabric.TPointerEvent>) {
-    if (!this.canvas || !this._freeDrawingShapeEnabled) return;
+    if (!this.canvas) return;
 
     switch (this.mode) {
+      case 'delete': {
+        if (event.target) {
+          this.canvas.remove(event.target);
+          this.canvas.requestRenderAll();
+        }
+        break;
+      }
+
       case 'shape': {
         const uuid = nanoid();
         const pointer = this.canvas.getScenePoint(event.e);
@@ -124,6 +132,32 @@ class Editor {
         break;
       }
 
+      case 'line': {
+        const uuid = nanoid();
+        const pointer = this.canvas.getScenePoint(event.e);
+        const fill = this.fill ? this.color : 'transparent';
+        const props = { id: uuid, left: pointer.x, top: pointer.y, fill, stroke: this.color, strokeWidth: this.width, selectable: false, erasable: true };
+
+        this.canvas.selection = false;
+        this._originPointer = { x: pointer.x, y: pointer.y };
+
+        switch (this.line) {
+          case 'arrow': {
+            this._drawnShape = new FabricArrow([pointer.x, pointer.y, pointer.x, pointer.y], props);
+            break;
+          }
+
+          case 'line': {
+            this._drawnShape = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], props);
+            break;
+          }
+        }
+
+        this.canvas.add(this._drawnShape);
+        this.canvas.requestRenderAll();
+        break;
+      }
+
       case 'text': {
         const uuid = nanoid();
         const pointer = this.canvas.getScenePoint(event.e);
@@ -145,25 +179,36 @@ class Editor {
     if (!this.canvas || !this._freeDrawingShapeEnabled || !this._drawnShape || !this._originPointer) return;
 
     const pointer = this.canvas.getScenePoint(event.e);
-    if (this._originPointer.x > pointer.x) this._drawnShape.set({ left: Math.abs(pointer.x) });
-    if (this._originPointer.y > pointer.y) this._drawnShape.set({ top: Math.abs(pointer.y) });
 
-    let width = Math.abs(pointer.x - this._originPointer.x);
-    let height = Math.abs(pointer.y - this._originPointer.y);
+    switch (this.mode) {
+      case 'shape': {
+        if (this._originPointer.x > pointer.x) this._drawnShape.set({ left: Math.abs(pointer.x) });
+        if (this._originPointer.y > pointer.y) this._drawnShape.set({ top: Math.abs(pointer.y) });
 
-    if (event.e.shiftKey) {
-      width = Math.max(width, height);
-      height = width;
-    }
+        let width = Math.abs(pointer.x - this._originPointer.x);
+        let height = Math.abs(pointer.y - this._originPointer.y);
 
-    switch (this.shape) {
-      case 'circle':
-        this._drawnShape.set({ rx: width / 2, ry: height / 2 });
+        if (event.e.shiftKey) {
+          width = Math.max(width, height);
+          height = width;
+        }
+
+        switch (this.shape) {
+          case 'circle':
+            this._drawnShape.set({ rx: width / 2, ry: height / 2 });
+            break;
+
+          default:
+            this._drawnShape.set({ width, height });
+            break;
+        }
         break;
+      }
 
-      default:
-        this._drawnShape.set({ width, height });
+      case 'line': {
+        this._drawnShape.set({ x2: pointer.x, y2: pointer.y });
         break;
+      }
     }
 
     this._drawnShape.setCoords();
@@ -271,6 +316,10 @@ class Editor {
       this.canvas.freeDrawingBrush.width = width;
       this.canvas.requestRenderAll();
     }
+  }
+
+  toggleFill(value?: boolean) {
+    this.fill = value ?? !this.fill;
   }
 
   clearCanvas() {

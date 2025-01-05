@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { ToggleGroup, ToggleGroupItem } from '@radix-ui/react-toggle-group';
+import { Toggle } from '@radix-ui/react-toggle';
 import { Divider, theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
@@ -21,6 +22,7 @@ import {
   TextT,
   TrashSimple,
   Triangle,
+  LineSegment,
 } from '@phosphor-icons/react';
 
 import { Actionbar } from './actionbar';
@@ -29,6 +31,7 @@ import { ShapesActionbar } from './shapes';
 import { ColorPicker } from '../ui/color-picker';
 import { ToolbarAction } from '../ui/toolbar-action';
 import { editor, EditorMode } from '../../store/editor';
+import { LinesActionbar } from './lines';
 
 const DrawingActionbarCSS = css.resolve`
   * {
@@ -96,6 +99,11 @@ const ShapeComponents = {
   circle: <Circle size={16} weight="bold" />,
 };
 
+const LinesComponents = {
+  arrow: <ArrowUp size={16} weight="bold" />,
+  line: <LineSegment size={16} weight="bold" />,
+};
+
 const EditorActionbar = observer(() => {
   const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
 
@@ -140,18 +148,18 @@ const EditorActionbar = observer(() => {
             </ToggleGroupItem>
           </ToolbarAction>
           <Actionbar indicator="arrow" content={<ShapesActionbar />} container={toolbarContainer}>
-            <ToolbarAction asChild tooltip="Shape">
+            <ToolbarAction asChild tooltip="Shapes">
               <ToggleGroupItem value="shape">{ShapeComponents[editor.shape]}</ToggleGroupItem>
+            </ToolbarAction>
+          </Actionbar>
+          <Actionbar indicator="arrow" content={<LinesActionbar />} container={toolbarContainer}>
+            <ToolbarAction asChild tooltip="Lines">
+              <ToggleGroupItem value="line">{LinesComponents[editor.line]}</ToggleGroupItem>
             </ToolbarAction>
           </Actionbar>
           <ToolbarAction asChild tooltip="Text">
             <ToggleGroupItem value="text">
               <TextT size={16} weight="bold" />
-            </ToggleGroupItem>
-          </ToolbarAction>
-          <ToolbarAction asChild tooltip="Arrow">
-            <ToggleGroupItem value="arrow">
-              <ArrowUp size={16} weight="bold" />
             </ToggleGroupItem>
           </ToolbarAction>
         </ToggleGroup>
@@ -169,8 +177,10 @@ const EditorActionbar = observer(() => {
               <span className={clsx(DrawingActionbarCSS.className)} />
             </div>
           </ToolbarAction>
-          <ToolbarAction tooltip="Toggle fill">
-            <PaintBucket size={16} weight="bold" />
+          <ToolbarAction asChild tooltip="Toggle fill">
+            <Toggle pressed={editor.fill} onPressedChange={editor.toggleFill}>
+              <PaintBucket size={16} weight="bold" />
+            </Toggle>
           </ToolbarAction>
         </div>
         <Divider orientation="vertical" className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-divider')} />

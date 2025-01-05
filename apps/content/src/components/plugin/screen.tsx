@@ -43,11 +43,20 @@ const ScreenPlugin = observer(() => {
         <div className={clsx('toggle-control', ScreenPluginCSS.className)}>
           <label className={clsx(ScreenPluginCSS.className, 'toggle-control-label')}>
             <span>Capture Device Audio</span>&nbsp;
-            <Tooltip content="When the share display popup is open, select tabs and enable share tab audio from the bottom right corner of the popup. Only Tabs have the system audio capture capability. Window and Entire Screen do not have the system audio capture option.">
+            <Tooltip content="If Silent Tab Capture is disabled, when the share display popup is open, select tabs and enable share tab audio from the bottom right corner of the popup. Only Tabs have the system audio capture capability. Window and Entire Screen do not have the system audio capture option.">
               <Info size={16} weight="fill" />
             </Tooltip>
           </label>
           <Switch checked={recorder.audio} onCheckedChange={recorder.changeDesktopAudio} />
+        </div>
+        <div className={clsx('toggle-control', ScreenPluginCSS.className)}>
+          <label className={clsx(ScreenPluginCSS.className, 'toggle-control-label')}>
+            <span>Silent Tab Capture</span>&nbsp;
+            <Tooltip content="The Current Tab will be captured without any prompt or popup, the audio will be enabled based on the Capture Device Audio settings. This is useful cause it doesn't show the 'Sharing tab' banner on top of the page which reduces the page dimensions. However, if this option is selected, you won't be able to record a different tab in between recording.">
+              <Info size={16} weight="fill" />
+            </Tooltip>
+          </label>
+          <Switch />
         </div>
         <div className={clsx('toggle-control', ScreenPluginCSS.className)}>
           <label className={clsx(ScreenPluginCSS.className, 'toggle-control-label')}>Zoom on Click</label>

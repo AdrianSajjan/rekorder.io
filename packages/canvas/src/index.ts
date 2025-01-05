@@ -3,3 +3,4 @@
 export * from './lib/canvas/canvas';
 export * from './lib/plugins/history';
 export * from './lib/utils/find-object-by-id';
+export * from './lib/custom/arrow';
