@@ -43,27 +43,20 @@ const DividerCSS = css.resolve`
     flex: 1;
     height: 1px;
     width: 100%;
-    background-color: ${theme.alpha(theme.colors.borders.input, 1)};
+    background-color: ${theme.alpha(theme.colors.borders.input, 0.7)};
   }
 `;
 
-const Divider = forwardRef<HTMLDivElement, DividerProps>(
-  ({ className, orientation = 'horizontal', children, ...props }, ref) => {
-    const mode = children ? 'text' : 'line';
-    return (
-      <Fragment>
-        {DividerCSS.styles}
-        <div
-          ref={ref}
-          role="separator"
-          className={clsx(DividerCSS.className, 'divider', orientation, mode, className)}
-          {...props}
-        >
-          {children}
-        </div>
-      </Fragment>
-    );
-  }
-);
+const Divider = forwardRef<HTMLDivElement, DividerProps>(({ className, orientation = 'horizontal', children, ...props }, ref) => {
+  const mode = children ? 'text' : 'line';
+  return (
+    <Fragment>
+      {DividerCSS.styles}
+      <div ref={ref} role="separator" className={clsx(DividerCSS.className, 'divider', orientation, mode, className)} {...props}>
+        {children}
+      </div>
+    </Fragment>
+  );
+});
 
 export { Divider, type DividerProps };

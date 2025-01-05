@@ -13,7 +13,8 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "build/*"
+                "build/*",
+                "assets/*"
             ],
             "matches": [
                 "<all_urls>"

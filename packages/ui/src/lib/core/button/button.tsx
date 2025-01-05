@@ -43,7 +43,7 @@ const ButtonRootCSS = css.resolve`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: ${theme.space(3)};
+    gap: ${theme.space(2)};
 
     cursor: pointer;
     font-weight: 400;

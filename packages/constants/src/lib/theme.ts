@@ -33,19 +33,19 @@ export const theme = {
       light: '#0ea5e9',
       main: '#0284c7',
       dark: '#0369a1',
-      text: '#fff',
+      text: '#ffffff',
     },
     warning: {
       light: '#f59e0b',
       main: '#d97706',
       dark: '#b45309',
-      text: '#fff',
+      text: '#ffffff',
     },
     background: {
       light: '#f5f5f5',
       main: '#eaeaea',
       dark: '#d6d6d6',
-      text: '#000',
+      text: '#000000',
     },
     borders: {
       input: '#e1e4ea',
@@ -54,8 +54,14 @@ export const theme = {
       black: '#0a0d14',
       white: '#ffffff',
     },
+    card: {
+      background: '#ffffff',
+      text: '#000000',
+    },
     text: {
       muted: '#969696',
+      dark: '#000000',
+      light: '#ffffff',
     },
   },
 
