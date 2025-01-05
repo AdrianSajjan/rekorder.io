@@ -2,7 +2,7 @@
 
 # Step 1: Run the build command for all apps/libs
 echo "Running nx build..."
-nx run-many -t=build
+nx run-many -t=build --exclude=dashboard
 
 # Step 2: Define paths
 TEMP_PATH="./tmp"
@@ -22,7 +22,7 @@ mkdir -p "$EXTENSION_PATH"
 # Step 5: Copy all files from dist subfolders to extension build directory
 echo "Copying files to extension build directory..."
 for dir in "$DIST_PATH"/*/ ; do
-    if [ -d "$dir" ]; then
+    if [ -d "$dir" ] && [[ "$dir" != *"dashboard"* ]]; then
         # Copy all files from each subfolder
         cp -r "$dir"* "$EXTENSION_PATH/"
     fi
