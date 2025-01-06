@@ -38,7 +38,7 @@ const SegmentedControlCSS = css.resolve`
     font-weight: 500;
 
     padding: ${theme.space(1)};
-    background-color: ${theme.colors.background.main};
+    background-color: ${theme.colors.background.light};
     border-radius: ${theme.space(3)};
   }
 

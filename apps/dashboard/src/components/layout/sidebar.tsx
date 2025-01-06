@@ -10,10 +10,10 @@ export function Sidebar() {
   const { sidebarMode, toggleSidebar } = useAppStore();
 
   return (
-    <aside className={cn('h-screen p-2.5 bg-card-background relative', sidebarMode === 'expanded' ? 'w-72' : 'w-24')}>
+    <aside className={cn('h-screen p-2.5 sticky top-0 bg-card-background shrink-0', sidebarMode === 'expanded' ? 'w-72' : 'w-24')}>
       <button
         onClick={toggleSidebar}
-        className="absolute top-1/2 -right-1.5 -translate-y-1/2 rounded-full h-8 w-8 grid place-items-center shadow-sm border border-borders-input bg-card-background hover:bg-background-light transition-colors"
+        className="absolute top-1/2 -right-1 -translate-y-1/2 rounded-full h-8 w-8 grid place-items-center shadow-sm border border-borders-input bg-card-background hover:bg-background-light transition-colors"
       >
         <CaretLeft size={16} weight="bold" className={cn(sidebarMode === 'collapsed' ? 'rotate-180' : '')} />
       </button>
@@ -78,7 +78,12 @@ function SidebarProfile({ mode }: { mode: SidebarMode }) {
 function SidebarChecklist({ mode }: { mode: SidebarMode }) {
   return (
     <div className={cn('py-5 mt-auto flex flex-col gap-3', mode === 'expanded' ? 'items-start' : 'items-center')}>
-      <Button variant="outline" size={mode === 'expanded' ? 'medium' : 'icon'} color="accent" className="w-full !bg-card-background hover:!bg-background-light">
+      <Button
+        color="accent"
+        variant="outline"
+        size={mode === 'expanded' ? 'medium' : 'icon'}
+        className="w-full !bg-card-background hover:!bg-background-light !gap-2"
+      >
         <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png" alt="Chrome" className="h-6 w-auto shrink-0" />
         {mode === 'expanded' ? <span>Install chrome extension</span> : null}
       </Button>

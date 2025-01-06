@@ -3,6 +3,7 @@ export * from './brand/brand';
 export * from './button/button';
 export * from './select/select';
 export * from './switch/switch';
+export * from './input/input';
 
 export * from './badge/status';
 export * from './tooltip/tooltip';
