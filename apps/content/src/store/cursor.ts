@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 
 type CursorMode = 'default-cursor' | 'highlight-click' | 'highlight-cursor' | 'spotlight-cursor';
 
@@ -21,16 +21,22 @@ class Cursor {
   }
 
   private __handleMouseMove(event: MouseEvent) {
-    this.clientX = event.clientX;
-    this.clientY = event.clientY;
+    runInAction(() => {
+      this.clientX = event.clientX;
+      this.clientY = event.clientY;
+    });
   }
 
   private __setupEvents() {
-    document.addEventListener('mousemove', (event) => this.__handleMouseMove(event));
+    document.addEventListener('mousemove', this.__handleMouseMove);
   }
 
   update(mode: CursorMode) {
     if (mode) this.mode = mode;
+  }
+
+  dispose() {
+    document.removeEventListener('mousemove', this.__handleMouseMove);
   }
 }
 

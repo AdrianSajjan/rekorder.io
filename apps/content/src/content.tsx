@@ -1,21 +1,22 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { Toaster } from 'sonner';
+import { animations, AnimationsProvider, theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
-import { AnimationsProvider, theme, animations } from '@rekorder.io/ui';
+import { Toaster } from 'sonner';
 
 import { CameraPreview } from './components/camera';
-import { Permission } from './components/permission';
-import { Overlay } from './components/overlay';
-import { TimerCountdown } from './components/timer';
-import { EditorArea } from './components/editor';
 import { Cursors } from './components/cursor';
+import { EditorArea } from './components/editor';
+import { Overlay } from './components/overlay';
+import { Permission } from './components/permission';
 import { PluginCard } from './components/plugin/plugin';
+import { TimerCountdown } from './components/timer';
 import { PluginToolbar } from './components/toolbar/toolbar';
 
-import { SAFE_AREA_PADDING } from './constants/layout';
 import { recorder } from './store/recorder';
+import { useCloseExtensionListener } from './hooks/use-close-extension';
+import { SAFE_AREA_PADDING } from './constants/layout';
 
 const RecorderCSS = css.resolve`
   * {
@@ -40,7 +41,13 @@ const RecorderCSS = css.resolve`
 `;
 
 const Content = observer(() => {
-  return recorder.initialized ? (
+  useCloseExtensionListener();
+
+  if (!recorder.initialized) {
+    return null;
+  }
+
+  return (
     <AnimationsProvider>
       {RecorderCSS.styles}
       <section className={clsx(RecorderCSS.className, 'rekorder-area')}>
@@ -57,7 +64,7 @@ const Content = observer(() => {
         <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
       </section>
     </AnimationsProvider>
-  ) : null;
+  );
 });
 
 export { Content };

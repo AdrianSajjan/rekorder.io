@@ -84,6 +84,10 @@ class Microphone {
       }
     }
   }
+
+  dispose() {
+    this.__removeEvents();
+  }
 }
 
 const microphone = Microphone.createInstance();

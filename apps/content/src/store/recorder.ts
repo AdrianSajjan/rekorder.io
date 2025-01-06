@@ -7,7 +7,6 @@ import { RecorderSurface, RuntimeMessage } from '@rekorder.io/types';
 import { unwrapError } from '@rekorder.io/utils';
 
 import { microphone } from './microphone';
-import { RECORDER_ROOT } from '../constants/layout';
 import { RECORD_TIMEOUT } from '../constants/recorder';
 
 type RecorderStatus = 'idle' | 'countdown' | 'pending' | 'active' | 'paused' | 'saving' | 'error';
@@ -102,12 +101,6 @@ class Recorder {
         break;
       }
 
-      case EventConfig.CloseExtension: {
-        const node = document.getElementById(RECORDER_ROOT);
-        if (node) node.remove();
-        break;
-      }
-
       case EventConfig.StartStreamCaptureError: {
         runInAction(() => (this.status = 'error'));
         this.__stopTimer(true);
@@ -134,6 +127,10 @@ class Recorder {
    */
   private __setupEvents() {
     chrome.runtime.onMessage.addListener(this._runtimeEvents);
+  }
+
+  private __resetEvents() {
+    chrome.runtime.onMessage.removeListener(this._runtimeEvents);
   }
 
   startScreenCapture() {
@@ -200,6 +197,10 @@ class Recorder {
 
   changeDisplaySurface(surface: RecorderSurface) {
     this.surface = surface;
+  }
+
+  dispose() {
+    this.__resetEvents();
   }
 }
 

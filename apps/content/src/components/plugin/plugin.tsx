@@ -10,8 +10,9 @@ import { AnimateHeight, Button, HorizontalTabs, SegmentedControl, theme } from '
 import { EventConfig } from '@rekorder.io/constants';
 
 import { recorder } from '../../store/recorder';
-import { useDragControls } from '../../hooks/use-drag-controls';
 import { RECORDER_ROOT } from '../../constants/layout';
+import { useDragControls } from '../../hooks/use-drag-controls';
+import { useDisposeEvents } from '../../hooks/use-dispose-events';
 
 import { AudioPlugin } from './audio';
 import { CameraPlugin } from './camera';
@@ -89,6 +90,7 @@ const PluginCardHOC = observer(() => {
 });
 
 const PluginCard = observer(() => {
+  const handleDisposeEvents = useDisposeEvents();
   const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 350, width: 375 } });
 
   const handleScreenCapture = () => {
@@ -104,6 +106,7 @@ const PluginCard = observer(() => {
   };
 
   const handleCloseExtension = () => {
+    handleDisposeEvents();
     chrome.runtime.sendMessage({ type: EventConfig.CloseExtension });
     const node = document.getElementById(RECORDER_ROOT);
     if (node) node.remove();

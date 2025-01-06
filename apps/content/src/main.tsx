@@ -4,15 +4,28 @@ import { createRoot } from 'react-dom/client';
 import { Content } from './content';
 import { RECORDER_ROOT } from './constants/layout';
 
-const node = document.getElementById(RECORDER_ROOT);
-if (node) node.parentNode?.removeChild(node);
+if (!window.__rekorder__) {
+  console.log('Injecting content script, initializing window.__rekorder__');
+  window.__rekorder__ = true;
 
-const root = document.createElement('div');
-root.id = RECORDER_ROOT;
-document.body.appendChild(root);
+  const node = document.getElementById(RECORDER_ROOT);
+  if (node) node.remove();
 
-createRoot(root).render(
-  <StrictMode>
-    <Content />
-  </StrictMode>
-);
+  const root = document.createElement('div');
+  root.id = RECORDER_ROOT;
+  document.body.appendChild(root);
+
+  createRoot(root).render(
+    <StrictMode>
+      <Content />
+    </StrictMode>
+  );
+} else {
+  console.log('Skipping injection: Document already contains content script');
+}
+
+declare global {
+  interface Window {
+    __rekorder__: boolean;
+  }
+}
