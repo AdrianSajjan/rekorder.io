@@ -253,25 +253,25 @@ const ButtonCSS = css.resolve`
     background-color: ${theme.alpha(theme.colors.info.main, 0.1)};
   }
 
-  .rekorder-button:focus {
+  .rekorder-button:focus-visible {
     outline: none;
   }
-  .rekorder-button.rekorder-primary:focus {
+  .rekorder-button.rekorder-primary:focus-visible {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.primary.main, 0.5) } })};
   }
-  .rekorder-button.rekorder-error:focus {
+  .rekorder-button.rekorder-error:focus-visible {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.destructive.main, 0.5) } })};
   }
-  .rekorder-button.rekorder-accent:focus {
+  .rekorder-button.rekorder-accent:focus-visible {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.accent.light, 0.5) } })};
   }
-  .rekorder-button.rekorder-success:focus {
+  .rekorder-button.rekorder-success:focus-visible {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.success.main, 0.5) } })};
   }
-  .rekorder-button.rekorder-warning:focus {
+  .rekorder-button.rekorder-warning:focus-visible {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.warning.main, 0.5) } })};
   }
-  .rekorder-button.rekorder-info:focus {
+  .rekorder-button.rekorder-info:focus-visible {
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.info.main, 0.5) } })};
   }
 
