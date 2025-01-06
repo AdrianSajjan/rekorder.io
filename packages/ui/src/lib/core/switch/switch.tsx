@@ -49,7 +49,7 @@ const SwitchCSS = css.resolve`
     cursor: not-allowed;
   }
 
-  .root:focus {
+  .root:focus-visible {
     outline: none;
     box-shadow: ${theme.ring({ ring: { width: 2, color: theme.alpha(theme.colors.primary.main, 0.4) } })};
   }

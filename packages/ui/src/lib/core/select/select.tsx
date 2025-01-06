@@ -74,7 +74,7 @@ const SelectInputCSS = css.resolve`
     background-color: ${theme.colors.background.light};
   }
 
-  .rekorder-trigger:focus {
+  .rekorder-trigger:focus-visible {
     outline: none;
     border-color: ${theme.colors.primary.main};
     box-shadow: ${theme.ring({ ring: { color: theme.alpha(theme.colors.primary.main, 0.25) } })};
@@ -201,7 +201,7 @@ const SelectContentCSS = css.resolve`
     border-radius: ${theme.space(1.5)};
   }
 
-  .rekorder-content .rekorder-item:focus {
+  .rekorder-content .rekorder-item:focus-visible {
     outline: none;
     background-color: ${theme.colors.background.main};
   }
