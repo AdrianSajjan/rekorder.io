@@ -6,18 +6,14 @@ import { Slot } from '@radix-ui/react-slot';
 
 import { theme } from '../../theme';
 
-interface Button extends React.ForwardRefExoticComponent<ButtonProps & React.RefAttributes<HTMLButtonElement>> {
-  Icon: typeof ButtonIcon;
-}
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   variant?: 'solid' | 'light' | 'outline' | 'ghost' | 'fancy';
   color?: 'primary' | 'error' | 'accent' | 'success' | 'warning' | 'info';
-  size?: 'medium' | 'small' | 'large';
+  size?: 'medium' | 'small' | 'large' | 'icon';
 }
 
-const ButtonRootCSS = css.resolve`
+const ButtonCSS = css.resolve`
   @property --gradient-form {
     syntax: '<color>';
     initial-value: rgba(255, 255, 255, 0.2);
@@ -303,19 +299,26 @@ const ButtonRootCSS = css.resolve`
     border-radius: ${theme.space(2)};
     font-size: 14px;
   }
+
+  .rekorder-button.rekorder-icon {
+    padding: 0;
+    width: ${theme.space(10)};
+    height: ${theme.space(10)};
+    border-radius: ${theme.space(2.5)};
+  }
 `;
 
-const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ asChild, children, color = 'primary', size = 'medium', variant = 'solid', className, ...rest }, forwardedRef) => {
     const Component = asChild ? Slot : 'button';
 
     return (
       <React.Fragment>
-        {ButtonRootCSS.styles}
+        {ButtonCSS.styles}
         <Component
           ref={forwardedRef}
           className={clsx(
-            ButtonRootCSS.className,
+            ButtonCSS.className,
             'rekorder-button',
             theme.createClassName(variant),
             theme.createClassName(color),
@@ -329,49 +332,8 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </React.Fragment>
     );
   }
-) as Button;
+);
 
-const ButtonIconCSS = css`
-  .icon {
-    z-index: 10;
-    flex-shrink: 0;
-    position: relative;
-  }
+Button.displayName = 'Button';
 
-  .icon.medium {
-    width: ${theme.space(5)};
-    height: ${theme.space(5)};
-    margin-inline: -4px;
-  }
-
-  .icon.small {
-    width: ${theme.space(4)};
-    height: ${theme.space(4)};
-    margin-inline: -4px;
-  }
-
-  .icon.xsmall {
-    width: ${theme.space(6)};
-    height: ${theme.space(6)};
-    margin-inline: -4px;
-  }
-`;
-
-interface ButtonIconProps extends ButtonProps {
-  as?: React.ElementType;
-}
-
-function ButtonIcon({ className, size = 'medium', as: Component = 'div', ...rest }: ButtonIconProps) {
-  return (
-    <React.Fragment>
-      <style jsx>{ButtonIconCSS}</style>
-      <Component className={clsx('icon', size, className)} {...rest} />
-    </React.Fragment>
-  );
-}
-
-ButtonRoot.Icon = ButtonIcon;
-ButtonRoot.displayName = 'Button';
-ButtonIcon.displayName = 'ButtonIcon';
-
-export { ButtonRoot as Button, type ButtonProps };
+export { Button, type ButtonProps };
