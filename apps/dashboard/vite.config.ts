@@ -3,6 +3,7 @@
 import react from '@vitejs/plugin-react';
 
 import { defineConfig } from 'vite';
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
@@ -18,6 +19,9 @@ export default defineConfig({
     host: 'localhost',
   },
   plugins: [
+    TanStackRouterVite({
+      generatedRouteTree: './src/routes.gen.ts',
+    }),
     react({
       babel: {
         plugins: ['styled-jsx/babel'],
