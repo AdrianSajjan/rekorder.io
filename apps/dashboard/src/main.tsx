@@ -1,6 +1,7 @@
 import './styles/globals.css';
 
 import * as ReactDOM from 'react-dom/client';
+
 import { StrictMode } from 'react';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { AnimationsProvider } from '@rekorder.io/ui';

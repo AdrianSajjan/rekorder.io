@@ -1,12 +1,12 @@
 import { VideoCamera } from '@phosphor-icons/react';
 import { Button, SegmentedControl } from '@rekorder.io/ui';
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createLazyFileRoute('/')({
+export const Route = createFileRoute('/(app)/_layout/dashboard')({
   component: HomePage,
 });
 
-export function HomePage() {
+function HomePage() {
   return (
     <div className="container w-full max-w-screen-xl mx-auto h-full">
       <div className="flex items-center w-full pt-10 gap-5">

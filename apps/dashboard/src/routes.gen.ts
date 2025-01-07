@@ -13,18 +13,57 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as IndexImport } from './routes/index'
+import { Route as authLayoutImport } from './routes/(auth)/_layout'
+import { Route as appLayoutImport } from './routes/(app)/_layout'
+import { Route as authLayoutLoginImport } from './routes/(auth)/_layout.login'
+import { Route as appLayoutDashboardImport } from './routes/(app)/_layout.dashboard'
 
 // Create Virtual Routes
 
-const IndexLazyImport = createFileRoute('/')()
+const authImport = createFileRoute('/(auth)')()
+const appImport = createFileRoute('/(app)')()
 
 // Create/Update Routes
 
-const IndexLazyRoute = IndexLazyImport.update({
+const authRoute = authImport.update({
+  id: '/(auth)',
+  path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const appRoute = appImport.update({
+  id: '/(app)',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
+
+const authLayoutRoute = authLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => authRoute,
+} as any)
+
+const appLayoutRoute = appLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => appRoute,
+} as any)
+
+const authLayoutLoginRoute = authLayoutLoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => authLayoutRoute,
+} as any)
+
+const appLayoutDashboardRoute = appLayoutDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => appLayoutRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -34,42 +73,150 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+      preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
+    }
+    '/(app)': {
+      id: '/(app)'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof appImport
+      parentRoute: typeof rootRoute
+    }
+    '/(app)/_layout': {
+      id: '/(app)/_layout'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof appLayoutImport
+      parentRoute: typeof appRoute
+    }
+    '/(auth)': {
+      id: '/(auth)'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof authImport
+      parentRoute: typeof rootRoute
+    }
+    '/(auth)/_layout': {
+      id: '/(auth)/_layout'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof authLayoutImport
+      parentRoute: typeof authRoute
+    }
+    '/(app)/_layout/dashboard': {
+      id: '/(app)/_layout/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof appLayoutDashboardImport
+      parentRoute: typeof appLayoutImport
+    }
+    '/(auth)/_layout/login': {
+      id: '/(auth)/_layout/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof authLayoutLoginImport
+      parentRoute: typeof authLayoutImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface appLayoutRouteChildren {
+  appLayoutDashboardRoute: typeof appLayoutDashboardRoute
+}
+
+const appLayoutRouteChildren: appLayoutRouteChildren = {
+  appLayoutDashboardRoute: appLayoutDashboardRoute,
+}
+
+const appLayoutRouteWithChildren = appLayoutRoute._addFileChildren(
+  appLayoutRouteChildren,
+)
+
+interface appRouteChildren {
+  appLayoutRoute: typeof appLayoutRouteWithChildren
+}
+
+const appRouteChildren: appRouteChildren = {
+  appLayoutRoute: appLayoutRouteWithChildren,
+}
+
+const appRouteWithChildren = appRoute._addFileChildren(appRouteChildren)
+
+interface authLayoutRouteChildren {
+  authLayoutLoginRoute: typeof authLayoutLoginRoute
+}
+
+const authLayoutRouteChildren: authLayoutRouteChildren = {
+  authLayoutLoginRoute: authLayoutLoginRoute,
+}
+
+const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
+  authLayoutRouteChildren,
+)
+
+interface authRouteChildren {
+  authLayoutRoute: typeof authLayoutRouteWithChildren
+}
+
+const authRouteChildren: authRouteChildren = {
+  authLayoutRoute: authLayoutRouteWithChildren,
+}
+
+const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
+  '/': typeof authLayoutRouteWithChildren
+  '/dashboard': typeof appLayoutDashboardRoute
+  '/login': typeof authLayoutLoginRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
+  '/': typeof authLayoutRouteWithChildren
+  '/dashboard': typeof appLayoutDashboardRoute
+  '/login': typeof authLayoutLoginRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
+  '/(app)': typeof appRouteWithChildren
+  '/(app)/_layout': typeof appLayoutRouteWithChildren
+  '/(auth)': typeof authRouteWithChildren
+  '/(auth)/_layout': typeof authLayoutRouteWithChildren
+  '/(app)/_layout/dashboard': typeof appLayoutDashboardRoute
+  '/(auth)/_layout/login': typeof authLayoutLoginRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/dashboard' | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/dashboard' | '/login'
+  id:
+    | '__root__'
+    | '/'
+    | '/(app)'
+    | '/(app)/_layout'
+    | '/(auth)'
+    | '/(auth)/_layout'
+    | '/(app)/_layout/dashboard'
+    | '/(auth)/_layout/login'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
+  IndexRoute: typeof IndexRoute
+  appRoute: typeof appRouteWithChildren
+  authRoute: typeof authRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
+  IndexRoute: IndexRoute,
+  appRoute: appRouteWithChildren,
+  authRoute: authRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -82,11 +229,47 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/(app)",
+        "/(auth)"
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
+      "filePath": "index.tsx"
+    },
+    "/(app)": {
+      "filePath": "(app)",
+      "children": [
+        "/(app)/_layout"
+      ]
+    },
+    "/(app)/_layout": {
+      "filePath": "(app)/_layout.tsx",
+      "parent": "/(app)",
+      "children": [
+        "/(app)/_layout/dashboard"
+      ]
+    },
+    "/(auth)": {
+      "filePath": "(auth)",
+      "children": [
+        "/(auth)/_layout"
+      ]
+    },
+    "/(auth)/_layout": {
+      "filePath": "(auth)/_layout.tsx",
+      "parent": "/(auth)",
+      "children": [
+        "/(auth)/_layout/login"
+      ]
+    },
+    "/(app)/_layout/dashboard": {
+      "filePath": "(app)/_layout.dashboard.tsx",
+      "parent": "/(app)/_layout"
+    },
+    "/(auth)/_layout/login": {
+      "filePath": "(auth)/_layout.login.tsx",
+      "parent": "/(auth)/_layout"
     }
   }
 }
