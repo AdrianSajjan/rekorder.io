@@ -8,9 +8,9 @@ import { theme } from '../../theme';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
+  size?: 'medium' | 'small' | 'large' | 'icon';
   variant?: 'solid' | 'light' | 'outline' | 'ghost' | 'fancy';
   color?: 'primary' | 'secondary' | 'error' | 'accent' | 'success' | 'warning' | 'info';
-  size?: 'medium' | 'small' | 'large' | 'icon';
 }
 
 const ButtonCSS = css.resolve`

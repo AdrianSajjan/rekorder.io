@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { theme } from '../../theme';
-import { Button } from './button';
+import { LoadingButton } from './loading-button';
 
-const meta: Meta<typeof Button> = {
-  component: Button,
-  title: 'Components/Button',
+const meta: Meta<typeof LoadingButton> = {
+  component: LoadingButton,
+  title: 'Components/Loading Button',
 };
 
-type Story = StoryObj<typeof Button>;
+type Story = StoryObj<typeof LoadingButton>;
 
 const styles = theme.createStyles({
   button: {
@@ -19,6 +19,7 @@ const styles = theme.createStyles({
 export const Solid: Story = {
   args: {
     variant: 'solid',
+    loading: true,
     style: styles.button,
     children: 'Register Now',
     color: 'info',
@@ -30,6 +31,7 @@ export const Fancy: Story = {
     style: styles.button,
     children: 'Register Now',
     variant: 'fancy',
+    loading: true,
   },
 };
 
@@ -38,6 +40,7 @@ export const Outline: Story = {
     style: styles.button,
     children: 'Register Now',
     variant: 'outline',
+    loading: true,
   },
 };
 
@@ -46,6 +49,7 @@ export const Light: Story = {
     style: styles.button,
     children: 'Register Now',
     variant: 'light',
+    loading: true,
   },
 };
 
@@ -54,6 +58,7 @@ export const Ghost: Story = {
     style: styles.button,
     children: 'Register Now',
     variant: 'ghost',
+    loading: true,
   },
 };
 
