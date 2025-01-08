@@ -32,7 +32,7 @@ const InputCSS = css.resolve`
   }
 
   .rekorder-input::placeholder {
-    color: ${theme.colors.accent.dark};
+    color: ${theme.colors.text.muted};
   }
 
   .rekorder-input:hover {

@@ -1,51 +1,90 @@
-import { Button, Divider, Input } from '@rekorder.io/ui';
+import { z } from 'zod';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { Button, Divider, Hint, Input, Label } from '@rekorder.io/ui';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { GoogleIcon } from '../../components/icons/google';
-import { PasswordInput } from '../../components/ui/password-input';
+import { PasswordInput, PasswordRegex } from '../../components/ui/password-input';
 
 export const Route = createFileRoute('/(auth)/_layout/register')({
   component: RegisterPage,
 });
 
+const RegisterSchema = z.object({
+  email: z.string().nonempty('Please enter your email address').email('Please enter a valid email address'),
+  password: z.string().nonempty('Please enter your password').regex(PasswordRegex, "Password doesn't meet the requirements"),
+});
+
+type IRegisterSchema = z.infer<typeof RegisterSchema>;
+
 function RegisterPage() {
+  const { handleSubmit, control } = useForm<IRegisterSchema>({
+    resolver: zodResolver(RegisterSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const onSubmit: SubmitHandler<IRegisterSchema> = (data) => {
+    console.log(data);
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center pt-24 pb-8 px-8">
       <div className="w-full max-w-sm flex flex-col items-center">
         <h3 className="text-xl font-semibold">Create your account</h3>
-
         <Button className="w-full !mt-6" color="accent" variant="outline">
           <GoogleIcon />
           <span>Sign up with Google</span>
         </Button>
-        <p className="mt-3 text-xs font-medium text-accent-dark">
-          By clicking “Sign up with Google” I agree to the Terms of Service, acknowledge Screech's Privacy Policy.
-        </p>
-
-        <Divider className="w-full mt-8 mb-6">or continue with email</Divider>
-
-        <form className="w-full flex flex-col">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input id="email" />
-          </div>
-          <div className="flex flex-col gap-1 mt-4">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <PasswordInput id="password" indicator value="" onChange={console.log} />
-          </div>
+        <Divider className="w-full mt-7 mb-5">or continue with email</Divider>
+        <form className="w-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field, fieldState: { error, invalid } }) => {
+              return (
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" placeholder="john@doe.com" {...field} />
+                  <Hint invalid={invalid} error={error?.message}>
+                    Enter your email address
+                  </Hint>
+                </div>
+              );
+            }}
+          />
+          <Controller
+            name="password"
+            control={control}
+            render={({ field, fieldState: { error, invalid } }) => {
+              return (
+                <div className="flex flex-col gap-1 mt-4">
+                  <Label htmlFor="password">Password</Label>
+                  <PasswordInput
+                    id="password"
+                    placeholder="••••••••"
+                    indicator
+                    hint={
+                      <Hint invalid={invalid} error={error?.message}>
+                        Enter your password
+                      </Hint>
+                    }
+                    {...field}
+                  />
+                </div>
+              );
+            }}
+          />
           <Button className="w-full !mt-6" color="primary" variant="solid">
             Sign up
           </Button>
-          <p className="mt-3 text-xs font-medium text-accent-dark">
-            By clicking “Sign up” I agree to the Terms of Service, acknowledge Screech's Privacy Policy.
-          </p>
+          <p className="mt-3 text-xs font-medium text-accent-dark">By signing up, I agree to the Terms of Service, acknowledge Screech's Privacy Policy.</p>
         </form>
-
-        <p className="text-sm text-center mt-6">
+        <p className="text-sm text-center mt-8">
           Already have an account?&nbsp;
           <Link className="text-primary-main hover:underline" to="/login">
             Log in

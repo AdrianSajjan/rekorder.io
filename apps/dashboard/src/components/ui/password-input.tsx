@@ -8,8 +8,10 @@ import { cn } from '@rekorder.io/utils';
 
 interface PasswordInputProps extends Omit<InputProps, 'value' | 'onChange'> {
   value: string;
-  indicator?: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+
+  indicator?: boolean;
+  hint?: React.ReactNode;
 }
 
 const PasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -36,7 +38,7 @@ function checkStrengthText(score: number) {
   return 'Strong password';
 }
 
-const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ indicator, value, className, onChange, ...props }, ref) => {
+const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ indicator, hint, value, className, onChange, ...props }, ref) => {
   const [visible, setVisible] = useState<boolean>(false);
 
   const handleToggleVisibility = () => {
@@ -51,7 +53,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ indica
   const score = strength.filter((requirement) => requirement.met).length;
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col gap-1 w-full">
       <div className="relative w-full">
         <Input
           ref={ref}
@@ -71,9 +73,10 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ indica
           aria-pressed={visible}
           aria-controls="password"
         >
-          {visible ? <EyeSlash size={16} weight="bold" aria-hidden="true" /> : <Eye size={16} weight="bold" aria-hidden="true" />}
+          {visible ? <EyeSlash size={16} weight="fill" aria-hidden="true" /> : <Eye size={16} weight="fill" aria-hidden="true" />}
         </button>
       </div>
+      {hint}
       {indicator ? (
         <Fragment>
           <div
@@ -82,7 +85,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ indica
             role="progressbar"
             aria-valuenow={score}
             aria-label="Password strength"
-            className="mb-4 mt-3 h-1 w-full overflow-hidden rounded-full bg-borders-input"
+            className="my-3 h-1 w-full overflow-hidden rounded-full bg-borders-input"
           >
             <div className={cn('h-full transition-all duration-500 ease-out', checkStrengthColor(score))} style={{ width: (score / 4) * 100 + '%' }} />
           </div>
@@ -91,9 +94,9 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(({ indica
             {strength.map((request, index) => (
               <li key={index} className="flex items-center gap-2">
                 {request.met ? (
-                  <Check weight="bold" size={16} className="text-emerald-500" aria-hidden="true" />
+                  <Check weight="bold" size={14} className="text-emerald-500" aria-hidden="true" />
                 ) : (
-                  <X weight="bold" size={16} className="text-accent-dark/80" aria-hidden="true" />
+                  <X weight="bold" size={14} className="text-accent-dark/80" aria-hidden="true" />
                 )}
                 <span className={cn('text-xs', request.met ? 'text-emerald-600' : 'text-accent-dark')}>
                   {request.text}

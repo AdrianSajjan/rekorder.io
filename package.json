@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "@erase2d/fabric": "^1.1.7",
+    "@hookform/resolvers": "^3.10.0",
     "@mediapipe/selfie_segmentation": "^0.1.1675465747",
     "@phosphor-icons/react": "^2.1.7",
     "@radix-ui/react-alert-dialog": "^1.1.4",
@@ -39,10 +40,12 @@
     "react-dom": "18.3.1",
     "react-draggable": "^4.4.6",
     "react-helmet-async": "^2.0.5",
+    "react-hook-form": "^7.54.2",
     "sonner": "^1.7.1",
     "styled-jsx": "5.1.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.1",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

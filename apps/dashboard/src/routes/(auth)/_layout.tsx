@@ -11,7 +11,7 @@ function AuthenticationLayout() {
   return (
     <main className="grid grid-cols-11">
       <div className="col-span-5 relative">
-        <div className="absolute top-8 left-8">
+        <div className="absolute top-6 left-6">
           <Brand mode="expanded" height={36} className="" />
         </div>
         <Outlet />
