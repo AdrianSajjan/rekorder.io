@@ -1,7 +1,6 @@
 import { Brand, Button, Divider, Input } from '@rekorder.io/ui';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
-import { AppleIcon } from '../../components/icons/apple';
 import { GoogleIcon } from '../../components/icons/google';
 
 export const Route = createFileRoute('/(auth)/_layout/register')({
@@ -21,10 +20,6 @@ function RegisterPage() {
           <GoogleIcon />
           <span>Sign up with Google</span>
         </Button>
-        <Button className="w-full !mt-3" color="secondary">
-          <AppleIcon fill="#ffffff" />
-          <span>Sign up with Apple</span>
-        </Button>
 
         <Divider className="w-full mt-8 mb-6">or continue with email</Divider>
 
@@ -34,12 +29,7 @@ function RegisterPage() {
             <Input />
           </div>
           <div className="flex flex-col gap-1 mt-4">
-            <div className="flex justify-between items-end">
-              <label className="text-sm font-medium">Password</label>
-              <Link className="text-xs font-medium hover:underline" to="/register">
-                Forgot password?
-              </Link>
-            </div>
+            <label className="text-sm font-medium">Password</label>
             <Input />
           </div>
           <Button className="w-full !mt-6" color="primary" variant="solid">

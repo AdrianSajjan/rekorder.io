@@ -26,6 +26,7 @@ const SwitchCSS = css.resolve`
 
   .root {
     display: block;
+    flex-shrink: 0;
     border-radius: 999px;
     padding: ${theme.space(0.75)};
 
