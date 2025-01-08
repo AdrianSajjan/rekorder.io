@@ -4,18 +4,13 @@ import { forwardRef, Fragment, InputHTMLAttributes } from 'react';
 import { cn } from '@rekorder.io/utils';
 
 const InputCSS = css.resolve`
-  *,
-  *::before,
-  *::after {
+  * {
+    margin: 0;
     box-sizing: border-box;
   }
 
-  * {
-    margin: 0;
-  }
-
   input {
-    all: unset;
+    box-sizing: border-box;
   }
 
   .rekorder-input {
@@ -89,4 +84,4 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({ className, size = 'med
 });
 Input.displayName = 'Input';
 
-export { Input, InputCSS };
+export { Input, InputCSS, type InputProps };

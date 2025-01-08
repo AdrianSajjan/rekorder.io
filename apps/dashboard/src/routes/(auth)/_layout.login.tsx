@@ -1,4 +1,4 @@
-import { Brand, Button, Divider, Input } from '@rekorder.io/ui';
+import { Button, Divider, Input } from '@rekorder.io/ui';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { AppleIcon } from '../../components/icons/apple';
@@ -10,10 +10,7 @@ export const Route = createFileRoute('/(auth)/_layout/login')({
 
 function LoginPage() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-8">
-      <div className="absolute top-8 left-8">
-        <Brand mode="expanded" height={36} className="" />
-      </div>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center pt-24 pb-8 px-8">
       <div className="w-full max-w-sm flex flex-col items-center">
         <h3 className="text-xl font-semibold">Log in to your account</h3>
 
@@ -36,7 +33,7 @@ function LoginPage() {
           <div className="flex flex-col gap-1 mt-4">
             <div className="flex justify-between items-end">
               <label className="text-sm font-medium">Password</label>
-              <Link className="text-xs font-medium hover:underline" to="/login">
+              <Link className="text-xs font-medium hover:underline" to="/forgot-password">
                 Forgot password?
               </Link>
             </div>
