@@ -7,6 +7,8 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 
 import { GoogleIcon } from '../../components/icons/google';
 import { PasswordInput, PasswordRegex } from '../../components/ui/password-input';
+import { useState } from 'react';
+import { supabase } from '@rekorder.io/database';
 
 export const Route = createFileRoute('/(auth)/_layout/register')({
   component: RegisterPage,
@@ -20,6 +22,8 @@ const RegisterSchema = z.object({
 type IRegisterSchema = z.infer<typeof RegisterSchema>;
 
 function RegisterPage() {
+  const [isSubmitting, setSubmitting] = useState(false);
+
   const { handleSubmit, control } = useForm<IRegisterSchema>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -28,8 +32,21 @@ function RegisterPage() {
     },
   });
 
-  const onSubmit: SubmitHandler<IRegisterSchema> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
+    if (isSubmitting) return;
+
+    setSubmitting(true);
+
+    try {
+      const { error, data } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        console.error(error);
+      } else {
+        console.log(data);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -79,7 +96,7 @@ function RegisterPage() {
               );
             }}
           />
-          <Button className="w-full !mt-6" color="primary" variant="solid">
+          <Button disabled={isSubmitting} className="w-full !mt-6" color="primary" variant="solid" type="submit">
             Sign up
           </Button>
           <p className="mt-3 text-xs font-medium text-accent-dark">By signing up, I agree to the Terms of Service, acknowledge Screech's Privacy Policy.</p>

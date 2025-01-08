@@ -44,10 +44,12 @@ const ButtonCSS = css.resolve`
     cursor: pointer;
     font-weight: 400;
     font-family: ${theme.fonts.default};
+    transition: background-color 200ms ease-in-out;
   }
 
-  .rekorder-button {
-    transition: background-color 200ms ease-in-out;
+  .rekorder-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
   .rekorder-button.rekorder-ghost,
   .rekorder-button.rekorder-outline {
