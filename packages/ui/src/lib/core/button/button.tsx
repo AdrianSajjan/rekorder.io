@@ -9,7 +9,7 @@ import { theme } from '../../theme';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   variant?: 'solid' | 'light' | 'outline' | 'ghost' | 'fancy';
-  color?: 'primary' | 'error' | 'accent' | 'success' | 'warning' | 'info';
+  color?: 'primary' | 'secondary' | 'error' | 'accent' | 'success' | 'warning' | 'info';
   size?: 'medium' | 'small' | 'large' | 'icon';
 }
 
@@ -68,6 +68,10 @@ const ButtonCSS = css.resolve`
   .rekorder-button.rekorder-solid.rekorder-error {
     color: ${theme.colors.destructive.text};
     background-color: ${theme.colors.destructive.main};
+  }
+  .rekorder-button.rekorder-solid.rekorder-secondary {
+    color: ${theme.colors.core.white};
+    background-color: ${theme.colors.core.black};
   }
   .rekorder-button.rekorder-solid.rekorder-accent {
     color: ${theme.colors.accent.text};
@@ -153,6 +157,11 @@ const ButtonCSS = css.resolve`
     color: ${theme.colors.primary.text};
     background-color: ${theme.colors.primary.main};
     --fancy-shadow-color: ${theme.colors.primary.main};
+  }
+  .rekorder-button.rekorder-fancy.rekorder-secondary {
+    color: ${theme.colors.core.white};
+    background-color: ${theme.colors.core.black};
+    --fancy-shadow-color: ${theme.colors.core.black};
   }
   .rekorder-button.rekorder-fancy.rekorder-error {
     color: ${theme.colors.destructive.text};
