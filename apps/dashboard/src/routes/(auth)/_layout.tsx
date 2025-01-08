@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { Brand } from '@rekorder.io/ui';
 
 import Background from '../../assets/images/authentication/background-2.png';
-import { Brand } from '@rekorder.io/ui';
 
 export const Route = createFileRoute('/(auth)/_layout')({
   component: AuthenticationLayout,
