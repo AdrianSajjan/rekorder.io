@@ -1,12 +1,12 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
+import { Toaster } from 'sonner';
 
 export const Route = createRootRoute({
   component: () => {
     return (
       <section className="h-full w-full flex bg-card-background">
         <Outlet />
-        <TanStackRouterDevtools />
+        <Toaster richColors />
       </section>
     );
   },

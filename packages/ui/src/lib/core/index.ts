@@ -1,6 +1,8 @@
 export * from './brand/brand';
 
 export * from './button/button';
+export * from './button/loading-button';
+
 export * from './select/select';
 export * from './switch/switch';
 export * from './input/input';

@@ -1,14 +1,18 @@
 import { z } from 'zod';
+import { toast } from 'sonner';
+import { useState } from 'react';
+
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-import { Button, Divider, Hint, Input, Label } from '@rekorder.io/ui';
 import { createFileRoute, Link } from '@tanstack/react-router';
+
+import { supabase } from '@rekorder.io/database';
+import { unwrapError } from '@rekorder.io/utils';
+import { ErrorMessages } from '@rekorder.io/constants';
+import { LoadingButton, Button, Divider, Hint, Input, Label } from '@rekorder.io/ui';
 
 import { GoogleIcon } from '../../components/icons/google';
 import { PasswordInput, PasswordRegex } from '../../components/ui/password-input';
-import { useState } from 'react';
-import { supabase } from '@rekorder.io/database';
 
 export const Route = createFileRoute('/(auth)/_layout/register')({
   component: RegisterPage,
@@ -32,18 +36,13 @@ function RegisterPage() {
     },
   });
 
-  const onSubmit: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
-    if (isSubmitting) return;
-
-    setSubmitting(true);
-
+  const handleLogin: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
     try {
-      const { error, data } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        console.error(error);
-      } else {
-        console.log(data);
-      }
+      setSubmitting(true);
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
+    } catch (error) {
+      toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
       setSubmitting(false);
     }
@@ -58,7 +57,7 @@ function RegisterPage() {
           <span>Sign up with Google</span>
         </Button>
         <Divider className="w-full mt-7 mb-5">or continue with email</Divider>
-        <form className="w-full flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+        <form className="w-full flex flex-col" onSubmit={handleSubmit(handleLogin)}>
           <Controller
             name="email"
             control={control}
@@ -66,7 +65,7 @@ function RegisterPage() {
               return (
                 <div className="flex flex-col gap-1">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" placeholder="john@doe.com" {...field} />
+                  <Input id="email" autoComplete="email" placeholder="john@doe.com" {...field} />
                   <Hint invalid={invalid} error={error?.message}>
                     Enter your email address
                   </Hint>
@@ -83,6 +82,7 @@ function RegisterPage() {
                   <Label htmlFor="password">Password</Label>
                   <PasswordInput
                     id="password"
+                    autoComplete="current-password"
                     placeholder="••••••••"
                     indicator
                     hint={
@@ -96,9 +96,9 @@ function RegisterPage() {
               );
             }}
           />
-          <Button disabled={isSubmitting} className="w-full !mt-6" color="primary" variant="solid" type="submit">
+          <LoadingButton loading={isSubmitting} className="w-full !mt-6" color="primary" variant="solid" type="submit">
             Sign up
-          </Button>
+          </LoadingButton>
           <p className="mt-3 text-xs font-medium text-accent-dark">By signing up, I agree to the Terms of Service, acknowledge Screech's Privacy Policy.</p>
         </form>
         <p className="text-sm text-center mt-8">
