@@ -14,4 +14,6 @@ export const StorageConfig = {
   RecorderTimestamp: 'recorder-timestamp',
   RecorderUserAudioEnabled: 'recorder-user-audio-enabled',
   RecorderDesktopAudioEnabled: 'recorder-desktop-audio-enabled',
+
+  Authentication: 'authentication',
 };

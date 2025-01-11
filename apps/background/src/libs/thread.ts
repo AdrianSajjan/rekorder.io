@@ -1,4 +1,4 @@
-import { EventConfig } from '@rekorder.io/constants';
+import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { checkBrowserName } from '@rekorder.io/utils';
 
@@ -8,11 +8,12 @@ class Thread {
   enabled: boolean;
   offscreenPromise: Promise<void> | null;
   editorResolvers: PromiseWithResolvers<void> | null;
+  injectedTabs: Set<chrome.tabs.Tab>;
 
   editorTab: chrome.tabs.Tab | null;
   currentTab: chrome.tabs.Tab | null;
   originalTab: chrome.tabs.Tab | null;
-  injectedTabs: Set<chrome.tabs.Tab>;
+  authenticationTab: chrome.tabs.Tab | null;
 
   handleTabChangeListener = this.__handleTabChangeListener.bind(this);
   handleActionClickListener = this.__handleActionClickListener.bind(this);
@@ -26,11 +27,12 @@ class Thread {
     this.enabled = false;
     this.editorResolvers = null;
     this.offscreenPromise = null;
+    this.injectedTabs = new Set();
 
     this.editorTab = null;
     this.currentTab = null;
     this.originalTab = null;
-    this.injectedTabs = new Set();
+    this.authenticationTab = null;
   }
 
   private async __handleCloseExtension() {
@@ -95,22 +97,32 @@ class Thread {
     );
   }
 
-  private __handleActionClickListener(tab: chrome.tabs.Tab) {
-    if (this.enabled) {
+  private __handleInitializeExtension(tab: chrome.tabs.Tab) {
+    this.enabled = true;
+    this.currentTab = tab;
+    this.originalTab = tab;
+    this.injectedTabs.add(tab);
+    this.__injectContentScript();
+  }
+
+  private async __handleAuthenticateUser(tab: chrome.tabs.Tab) {
+    this.currentTab = tab;
+    this.authenticationTab = await chrome.tabs.create({ url: 'http://localhost:4200/extension/login', active: true });
+  }
+
+  private async __handleActionClickListener(tab: chrome.tabs.Tab) {
+    const authentication = await chrome.storage.local.get(StorageConfig.Authentication);
+
+    if (!authentication || !authentication.user || !authentication.session) {
+      this.__handleAuthenticateUser(tab);
+    } else if (this.enabled) {
       this.__handleCloseExtension();
     } else if (this.__preventContentInjection(tab)) {
-      // TODO: Tab is in the extension, we need to handle this case
-      console.log('Tab is in the extension, we need to handle this case');
+      console.log('Tab is in the extension, maybe handle this case');
     } else if (!tab.id) {
-      // TODO: Tab id is not present, we need to handle this case
-      console.log('Tab id is not present, we need to handle this case');
+      console.log('Tab id is not present, will not happen, optionally handle this case');
     } else {
-      this.currentTab = tab;
-      this.originalTab = tab;
-      this.injectedTabs.add(tab);
-
-      this.enabled = true;
-      this.__injectContentScript();
+      this.__handleInitializeExtension(tab);
     }
   }
 
@@ -150,6 +162,17 @@ class Thread {
 
   private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
     switch (message.type) {
+      case EventConfig.AuthenticateSuccess: {
+        if (!this.authenticationTab || !this.authenticationTab.id) {
+          if (this.currentTab) chrome.tabs.highlight({ tabs: [this.currentTab.id!] }, () => this.__handleInitializeExtension(this.currentTab!));
+        } else {
+          chrome.tabs.remove(this.authenticationTab.id, () => {
+            if (this.currentTab) chrome.tabs.highlight({ tabs: [this.currentTab.id!] }, () => this.__handleInitializeExtension(this.currentTab!));
+          });
+        }
+        return false;
+      }
+
       /**
        * Close the extension
        */
