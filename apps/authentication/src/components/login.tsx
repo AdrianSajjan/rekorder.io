@@ -3,20 +3,15 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { ErrorMessages } from '@rekorder.io/constants';
+import { ErrorMessages, EventConfig } from '@rekorder.io/constants';
 import { supabase } from '@rekorder.io/database';
-import { Button, Divider, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
-import { AppleIcon, GoogleIcon } from '@rekorder.io/ui';
+import { AppleIcon, Brand, Button, Divider, GoogleIcon, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
 import { unwrapError } from '@rekorder.io/utils';
 
-import { PasswordInput } from '../../components/ui/password-input';
-
-export const Route = createFileRoute('/(auth)/login')({
-  component: LoginPage,
-});
+import { useAuthenticationStore } from '../store/authentication';
+import { PasswordInput } from './ui/password-input';
 
 const LoginSchema = z.object({
   email: z.string().nonempty('Please enter your email address').email('Please enter a valid email address'),
@@ -25,9 +20,8 @@ const LoginSchema = z.object({
 
 type ILoginSchema = z.infer<typeof LoginSchema>;
 
-function LoginPage() {
-  const navigate = useNavigate();
-
+export function LoginPage() {
+  const authentication = useAuthenticationStore();
   const [isSubmitting, setSubmitting] = useState(false);
 
   const { handleSubmit, control } = useForm<ILoginSchema>({
@@ -41,12 +35,10 @@ function LoginPage() {
   const handleLoginWithPassword: SubmitHandler<ILoginSchema> = async ({ email, password }) => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate({ to: '/editor' });
+      await chrome.storage.local.set({ session: data.session, user: data.user });
+      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -57,10 +49,11 @@ function LoginPage() {
   const handleLoginWithGoogle = async () => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-      });
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
       if (error) throw error;
+      const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
+      await chrome.storage.local.set({ session: session.data.session, user: user.data.user });
+      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -71,10 +64,11 @@ function LoginPage() {
   const handleLoginWithApple = async () => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-      });
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'apple' });
       if (error) throw error;
+      const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
+      await chrome.storage.local.set({ session: session.data.session, user: user.data.user });
+      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -83,10 +77,12 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center pt-24 pb-8 px-8">
-      <div className="w-full max-w-sm flex flex-col items-center">
-        <h3 className="text-xl font-semibold">Log in to your account</h3>
-        <Button className="w-full !mt-6" color="accent" variant="outline" onClick={handleLoginWithGoogle}>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-10">
+      <div className="w-full max-w-md flex flex-col items-center bg-card-background px-10 py-10 rounded-2xl shadow-sm">
+        <Brand mode="collapsed" className="h-10 w-auto" />
+        <h3 className="text-xl mt-4 font-semibold">Log in to Screech</h3>
+        <p className="text-sm text-center mt-1 text-text-muted">Welcome back, let's get you back to work.</p>
+        <Button className="w-full !mt-10" color="accent" variant="outline" onClick={handleLoginWithGoogle}>
           <GoogleIcon />
           <span>Log in with Google</span>
         </Button>
@@ -144,9 +140,9 @@ function LoginPage() {
         </form>
         <p className="text-sm text-center mt-4">
           Don't have an account?&nbsp;
-          <Link className="text-primary-main hover:underline" to="/register">
+          <button className="text-primary-main hover:underline" onClick={() => authentication.setMode('register')}>
             Sign up
-          </Link>
+          </button>
         </p>
       </div>
     </div>

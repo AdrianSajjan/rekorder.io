@@ -1,22 +1,17 @@
-import { z } from 'zod';
-import { toast } from 'sonner';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
+import { ErrorMessages, EventConfig } from '@rekorder.io/constants';
 import { supabase } from '@rekorder.io/database';
+import { Brand, Button, Divider, GoogleIcon, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
 import { unwrapError } from '@rekorder.io/utils';
-import { ErrorMessages } from '@rekorder.io/constants';
-import { LoadingButton, Button, Divider, Hint, Input, Label } from '@rekorder.io/ui';
-import { GoogleIcon } from '@rekorder.io/ui';
 
-import { PasswordInput, PasswordRegex } from '../../components/ui/password-input';
-
-export const Route = createFileRoute('/(auth)/register')({
-  component: RegisterPage,
-});
+import { useAuthenticationStore } from '../store/authentication';
+import { PasswordInput, PasswordRegex } from './ui/password-input';
 
 const RegisterSchema = z.object({
   email: z.string().nonempty('Please enter your email address').email('Please enter a valid email address'),
@@ -25,9 +20,8 @@ const RegisterSchema = z.object({
 
 type IRegisterSchema = z.infer<typeof RegisterSchema>;
 
-function RegisterPage() {
-  const navigate = useNavigate();
-
+export function RegisterPage() {
+  const authentication = useAuthenticationStore();
   const [isSubmitting, setSubmitting] = useState(false);
 
   const { handleSubmit, control } = useForm<IRegisterSchema>({
@@ -38,12 +32,13 @@ function RegisterPage() {
     },
   });
 
-  const handleLogin: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
+  const handleRegister: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error, data } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
-      navigate({ to: '/editor' });
+      await chrome.storage.local.set({ session: data.session, user: data.user });
+      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -51,16 +46,30 @@ function RegisterPage() {
     }
   };
 
+  const handleRegisterWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      if (error) throw error;
+      const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
+      await chrome.storage.local.set({ session: session.data.session, user: user.data.user });
+      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
+    } catch (error) {
+      toast.error(unwrapError(error, ErrorMessages.GenericError));
+    }
+  };
+
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center pt-24 pb-8 px-8">
-      <div className="w-full max-w-sm flex flex-col items-center">
-        <h3 className="text-xl font-semibold">Create your account</h3>
-        <Button className="w-full !mt-6" color="accent" variant="outline">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-10">
+      <div className="w-full max-w-md flex flex-col items-center bg-card-background px-10 py-10 rounded-2xl shadow-sm">
+        <Brand mode="collapsed" className="h-10 w-auto" />
+        <h3 className="text-xl mt-4 font-semibold">Create your account</h3>
+        <p className="text-sm text-center mt-1 text-text-muted">Welcome, please fill in the details to get started.</p>
+        <Button className="w-full !mt-6" color="accent" variant="outline" onClick={handleRegisterWithGoogle}>
           <GoogleIcon />
           <span>Sign up with Google</span>
         </Button>
         <Divider className="w-full mt-7 mb-5">or continue with email</Divider>
-        <form className="w-full flex flex-col" onSubmit={handleSubmit(handleLogin)}>
+        <form className="w-full flex flex-col" onSubmit={handleSubmit(handleRegister)}>
           <Controller
             name="email"
             control={control}
@@ -104,11 +113,11 @@ function RegisterPage() {
           </LoadingButton>
           <p className="mt-3 text-xs font-medium text-accent-dark">By signing up, I agree to the Terms of Service, acknowledge Screech's Privacy Policy.</p>
         </form>
-        <p className="text-sm text-center mt-8">
+        <p className="text-sm text-center mt-6">
           Already have an account?&nbsp;
-          <Link className="text-primary-main hover:underline" to="/login">
+          <button className="text-primary-main hover:underline" onClick={() => authentication.setMode('login')}>
             Log in
-          </Link>
+          </button>
         </p>
       </div>
     </div>

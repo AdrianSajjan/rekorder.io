@@ -9,7 +9,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 export default defineConfig({
   root: __dirname,
   base: '/build/',
-  cacheDir: '../../node_modules/.vite/apps/editor',
+  cacheDir: '../../node_modules/.vite/apps/authentication',
   server: {
     port: 4200,
     host: 'localhost',
@@ -31,16 +31,16 @@ export default defineConfig({
     'process.env': {},
   },
   build: {
-    outDir: '../../dist/apps/editor',
+    outDir: '../../dist/apps/authentication',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
       transformMixedEsModules: true,
     },
     rollupOptions: {
-      input: 'editor.html',
+      input: 'authentication.html',
       output: {
-        entryFileNames: `editor.js`,
+        entryFileNames: `authentication.js`,
       },
     },
   },
@@ -51,7 +51,7 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     reporters: ['default'],
     coverage: {
-      reportsDirectory: '../../coverage/apps/editor',
+      reportsDirectory: '../../coverage/apps/authentication',
       provider: 'v8',
     },
   },

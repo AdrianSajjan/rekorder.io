@@ -47,6 +47,10 @@ export const EventConfig = {
   GetSessionStorageSuccess: 'get.session.storage.success',
   GetSessionStorageError: 'get.session.storage.error',
 
+  Authenticate: 'authenticate',
+  AuthenticateSuccess: 'authenticate.success',
+  AuthenticateError: 'authenticate.error',
+
   InitializeEditor: 'initialize.editor',
   InitializeEditorSuccess: 'initialize.editor.success',
   InitializeEditorError: 'initialize.editor.error',
