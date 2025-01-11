@@ -55,7 +55,8 @@ function RegisterPage() {
     <div className="min-h-screen w-full flex flex-col items-center justify-center pt-24 pb-8 px-8">
       <div className="w-full max-w-sm flex flex-col items-center">
         <h3 className="text-xl font-semibold">Create your account</h3>
-        <Button className="w-full !mt-6" color="accent" variant="outline">
+        <p className="text-sm text-center mt-1 text-text-muted">Welcome, please fill in the details to get started.</p>
+        <Button className="w-full !mt-8" color="accent" variant="outline">
           <GoogleIcon />
           <span>Sign up with Google</span>
         </Button>
@@ -104,7 +105,7 @@ function RegisterPage() {
           </LoadingButton>
           <p className="mt-3 text-xs font-medium text-accent-dark">By signing up, I agree to the Terms of Service, acknowledge Screech's Privacy Policy.</p>
         </form>
-        <p className="text-sm text-center mt-8">
+        <p className="text-sm text-center mt-6">
           Already have an account?&nbsp;
           <Link className="text-primary-main hover:underline" to="/login">
             Log in

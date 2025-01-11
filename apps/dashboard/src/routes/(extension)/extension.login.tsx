@@ -2,16 +2,17 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { Session, User } from '@supabase/supabase-js';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { ErrorMessages, EventConfig } from '@rekorder.io/constants';
+import { ErrorMessages, EventConfig, ExtensionConfig } from '@rekorder.io/constants';
 import { supabase } from '@rekorder.io/database';
 import { AppleIcon, Brand, Button, Divider, GoogleIcon, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
 import { unwrapError } from '@rekorder.io/utils';
 
-import { useAuthenticationStore } from '../store/authentication';
-import { PasswordInput } from './ui/password-input';
+import { PasswordInput } from '../../components/ui/password-input';
 
 const LoginSchema = z.object({
   email: z.string().nonempty('Please enter your email address').email('Please enter a valid email address'),
@@ -20,8 +21,11 @@ const LoginSchema = z.object({
 
 type ILoginSchema = z.infer<typeof LoginSchema>;
 
-export function LoginPage() {
-  const authentication = useAuthenticationStore();
+export const Route = createFileRoute('/(extension)/extension/login')({
+  component: LoginPage,
+});
+
+function LoginPage() {
   const [isSubmitting, setSubmitting] = useState(false);
 
   const { handleSubmit, control } = useForm<ILoginSchema>({
@@ -32,13 +36,18 @@ export function LoginPage() {
     },
   });
 
+  const handleSendAuthenticationEvent = (user: User | null, session: Session | null) => {
+    if (!user || !session) return toast.error('User or session not found');
+    window.chrome.runtime.sendMessage(ExtensionConfig.ExtensionId, { type: EventConfig.AuthenticateSuccess, payload: { user, session } });
+    toast.success('You have been logged in to Screech extension, you will be redirected automatically');
+  };
+
   const handleLoginWithPassword: SubmitHandler<ILoginSchema> = async ({ email, password }) => {
     try {
       setSubmitting(true);
       const { error, data } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      await chrome.storage.local.set({ session: data.session, user: data.user });
-      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
+      handleSendAuthenticationEvent(data.user, data.session);
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -52,8 +61,7 @@ export function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
       if (error) throw error;
       const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
-      await chrome.storage.local.set({ session: session.data.session, user: user.data.user });
-      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
+      handleSendAuthenticationEvent(user.data.user, session.data.session);
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -67,8 +75,7 @@ export function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'apple' });
       if (error) throw error;
       const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
-      await chrome.storage.local.set({ session: session.data.session, user: user.data.user });
-      chrome.runtime.sendMessage({ type: EventConfig.AuthenticateSuccess });
+      handleSendAuthenticationEvent(user.data.user, session.data.session);
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -77,7 +84,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-10">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-10 bg-background-light overscroll-none">
       <div className="w-full max-w-md flex flex-col items-center bg-card-background px-10 py-10 rounded-2xl shadow-sm">
         <Brand mode="collapsed" className="h-10 w-auto" />
         <h3 className="text-xl mt-4 font-semibold">Log in to Screech</h3>
@@ -99,7 +106,7 @@ export function LoginPage() {
               return (
                 <div className="flex flex-col gap-1">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" placeholder="john@doe.com" {...field} />
+                  <Input id="email" placeholder="john@doe.com" autoComplete="email" {...field} />
                   <Hint invalid={invalid} error={error?.message}>
                     Enter your registered email address
                   </Hint>
@@ -140,9 +147,9 @@ export function LoginPage() {
         </form>
         <p className="text-sm text-center mt-4">
           Don't have an account?&nbsp;
-          <button className="text-primary-main hover:underline" onClick={() => authentication.setMode('register')}>
+          <Link className="text-primary-main hover:underline" to="/extension/register">
             Sign up
-          </button>
+          </Link>
         </p>
       </div>
     </div>

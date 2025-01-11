@@ -79,7 +79,8 @@ function LoginPage() {
     <div className="min-h-screen w-full flex flex-col items-center justify-center pt-24 pb-8 px-8">
       <div className="w-full max-w-sm flex flex-col items-center">
         <h3 className="text-xl font-semibold">Log in to your account</h3>
-        <Button className="w-full !mt-6" color="accent" variant="outline" onClick={handleLoginWithGoogle}>
+        <p className="text-sm text-center mt-1 text-text-muted">Welcome back, let's get you back to work.</p>
+        <Button className="w-full !mt-8" color="accent" variant="outline" onClick={handleLoginWithGoogle}>
           <GoogleIcon />
           <span>Log in with Google</span>
         </Button>
@@ -96,7 +97,7 @@ function LoginPage() {
               return (
                 <div className="flex flex-col gap-1">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" placeholder="john@doe.com" {...field} />
+                  <Input id="email" autoComplete="email" placeholder="john@doe.com" {...field} />
                   <Hint invalid={invalid} error={error?.message}>
                     Enter your registered email address
                   </Hint>

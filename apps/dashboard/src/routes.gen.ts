@@ -16,6 +16,8 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as authLayoutImport } from './routes/(auth)/_layout'
 import { Route as appLayoutImport } from './routes/(app)/_layout'
+import { Route as extensionExtensionRegisterImport } from './routes/(extension)/extension.register'
+import { Route as extensionExtensionLoginImport } from './routes/(extension)/extension.login'
 import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout.register'
 import { Route as authLayoutLoginImport } from './routes/(auth)/_layout.login'
 import { Route as authLayoutForgotPasswordImport } from './routes/(auth)/_layout.forgot-password'
@@ -53,6 +55,20 @@ const authLayoutRoute = authLayoutImport.update({
 const appLayoutRoute = appLayoutImport.update({
   id: '/_layout',
   getParentRoute: () => appRoute,
+} as any)
+
+const extensionExtensionRegisterRoute = extensionExtensionRegisterImport.update(
+  {
+    id: '/(extension)/extension/register',
+    path: '/extension/register',
+    getParentRoute: () => rootRoute,
+  } as any,
+)
+
+const extensionExtensionLoginRoute = extensionExtensionLoginImport.update({
+  id: '/(extension)/extension/login',
+  path: '/extension/login',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const authLayoutRegisterRoute = authLayoutRegisterImport.update({
@@ -146,6 +162,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLayoutRegisterImport
       parentRoute: typeof authLayoutImport
     }
+    '/(extension)/extension/login': {
+      id: '/(extension)/extension/login'
+      path: '/extension/login'
+      fullPath: '/extension/login'
+      preLoaderRoute: typeof extensionExtensionLoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/(extension)/extension/register': {
+      id: '/(extension)/extension/register'
+      path: '/extension/register'
+      fullPath: '/extension/register'
+      preLoaderRoute: typeof extensionExtensionRegisterImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -205,6 +235,8 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof authLayoutForgotPasswordRoute
   '/login': typeof authLayoutLoginRoute
   '/register': typeof authLayoutRegisterRoute
+  '/extension/login': typeof extensionExtensionLoginRoute
+  '/extension/register': typeof extensionExtensionRegisterRoute
 }
 
 export interface FileRoutesByTo {
@@ -213,6 +245,8 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof authLayoutForgotPasswordRoute
   '/login': typeof authLayoutLoginRoute
   '/register': typeof authLayoutRegisterRoute
+  '/extension/login': typeof extensionExtensionLoginRoute
+  '/extension/register': typeof extensionExtensionRegisterRoute
 }
 
 export interface FileRoutesById {
@@ -226,13 +260,29 @@ export interface FileRoutesById {
   '/(auth)/_layout/forgot-password': typeof authLayoutForgotPasswordRoute
   '/(auth)/_layout/login': typeof authLayoutLoginRoute
   '/(auth)/_layout/register': typeof authLayoutRegisterRoute
+  '/(extension)/extension/login': typeof extensionExtensionLoginRoute
+  '/(extension)/extension/register': typeof extensionExtensionRegisterRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/forgot-password' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/extension/login'
+    | '/extension/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/forgot-password' | '/login' | '/register'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/extension/login'
+    | '/extension/register'
   id:
     | '__root__'
     | '/'
@@ -244,6 +294,8 @@ export interface FileRouteTypes {
     | '/(auth)/_layout/forgot-password'
     | '/(auth)/_layout/login'
     | '/(auth)/_layout/register'
+    | '/(extension)/extension/login'
+    | '/(extension)/extension/register'
   fileRoutesById: FileRoutesById
 }
 
@@ -251,12 +303,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   appRoute: typeof appRouteWithChildren
   authRoute: typeof authRouteWithChildren
+  extensionExtensionLoginRoute: typeof extensionExtensionLoginRoute
+  extensionExtensionRegisterRoute: typeof extensionExtensionRegisterRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   appRoute: appRouteWithChildren,
   authRoute: authRouteWithChildren,
+  extensionExtensionLoginRoute: extensionExtensionLoginRoute,
+  extensionExtensionRegisterRoute: extensionExtensionRegisterRoute,
 }
 
 export const routeTree = rootRoute
@@ -271,7 +327,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/(app)",
-        "/(auth)"
+        "/(auth)",
+        "/(extension)/extension/login",
+        "/(extension)/extension/register"
       ]
     },
     "/": {
@@ -320,6 +378,12 @@ export const routeTree = rootRoute
     "/(auth)/_layout/register": {
       "filePath": "(auth)/_layout.register.tsx",
       "parent": "/(auth)/_layout"
+    },
+    "/(extension)/extension/login": {
+      "filePath": "(extension)/extension.login.tsx"
+    },
+    "/(extension)/extension/register": {
+      "filePath": "(extension)/extension.register.tsx"
     }
   }
 }
