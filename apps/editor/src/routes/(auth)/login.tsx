@@ -1,20 +1,20 @@
-import { z } from 'zod';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { unwrapError } from '@rekorder.io/utils';
 import { ErrorMessages } from '@rekorder.io/constants';
 import { supabase } from '@rekorder.io/database';
-import { Button, Divider, Input, Label, Hint, LoadingButton } from '@rekorder.io/ui';
+import { Button, Divider, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
 import { AppleIcon, GoogleIcon } from '@rekorder.io/ui';
+import { unwrapError } from '@rekorder.io/utils';
 
 import { PasswordInput } from '../../components/ui/password-input';
 
-export const Route = createFileRoute('/(auth)/_layout/login')({
+export const Route = createFileRoute('/(auth)/login')({
   component: LoginPage,
 });
 
@@ -41,9 +41,12 @@ function LoginPage() {
   const handleLoginWithPassword: SubmitHandler<ILoginSchema> = async ({ email, password }) => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) throw error;
-      navigate({ to: '/dashboard' });
+      navigate({ to: '/editor' });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -54,7 +57,9 @@ function LoginPage() {
   const handleLoginWithGoogle = async () => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+      });
       if (error) throw error;
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
@@ -66,7 +71,9 @@ function LoginPage() {
   const handleLoginWithApple = async () => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'apple' });
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+      });
       if (error) throw error;
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
@@ -112,9 +119,9 @@ function LoginPage() {
                 <div className="flex flex-col gap-1 mt-4">
                   <div className="flex justify-between items-end">
                     <Label htmlFor="password">Password</Label>
-                    <Link className="text-xs font-medium hover:underline" to="/forgot-password">
+                    <a href="/" className="text-xs font-medium hover:underline">
                       Forgot password?
-                    </Link>
+                    </a>
                   </div>
                   <PasswordInput
                     id="password"

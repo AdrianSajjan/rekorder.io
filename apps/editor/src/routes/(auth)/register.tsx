@@ -14,7 +14,7 @@ import { GoogleIcon } from '@rekorder.io/ui';
 
 import { PasswordInput, PasswordRegex } from '../../components/ui/password-input';
 
-export const Route = createFileRoute('/(auth)/_layout/register')({
+export const Route = createFileRoute('/(auth)/register')({
   component: RegisterPage,
 });
 
@@ -43,7 +43,7 @@ function RegisterPage() {
       setSubmitting(true);
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
-      navigate({ to: '/dashboard' });
+      navigate({ to: '/editor' });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {

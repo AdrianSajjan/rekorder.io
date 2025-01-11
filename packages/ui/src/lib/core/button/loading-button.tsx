@@ -27,6 +27,7 @@ const LoadingButtonCSS = css.resolve`
     left: 50%;
     transform: translate(-50%, -50%);
 
+    z-index: 10;
     position: absolute;
     display: flex;
   }
@@ -48,11 +49,11 @@ const LoadingButtonCSS = css.resolve`
   }
 `;
 
-const LoadingButton = ({ loading, children, ...props }: LoadingButtonProps) => {
+const LoadingButton = ({ loading, children, className, ...props }: LoadingButtonProps) => {
   return (
     <Fragment>
       {LoadingButtonCSS.styles}
-      <Button className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button')} {...props} data-loading={loading}>
+      <Button className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button', className)} {...props} data-loading={loading}>
         <span className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button-content')}>{children}</span>
         {loading ? (
           <span className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button-spinner-container')}>

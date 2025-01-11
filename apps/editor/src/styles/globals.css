@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    * {
+        @apply box-border;
+        @apply focus-visible:ring-2 focus-visible:ring-accent-light/50 focus-visible:outline-none;
+    }
+
+    body {
+        @apply bg-card-background;
+    }
+}
