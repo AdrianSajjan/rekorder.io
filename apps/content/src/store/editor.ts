@@ -161,7 +161,7 @@ class Editor {
       case 'text': {
         const uuid = nanoid();
         const pointer = this.canvas.getScenePoint(event.e);
-        const props = { id: uuid, left: pointer.x, top: pointer.y, color: this.color, erasable: true, fontSize: 36, fontFamily: theme.fonts.default };
+        const props = { id: uuid, left: pointer.x, top: pointer.y, fill: this.color, erasable: true, fontSize: 36, fontFamily: theme.fonts.default };
         const text = new fabric.Textbox('Text', props);
 
         this.canvas.add(text);

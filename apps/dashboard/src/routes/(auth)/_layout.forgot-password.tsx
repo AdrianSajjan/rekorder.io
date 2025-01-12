@@ -1,4 +1,4 @@
-import { Brand, Button, Input } from '@rekorder.io/ui';
+import { Button, Input } from '@rekorder.io/ui';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(auth)/_layout/forgot-password')({
@@ -8,9 +8,6 @@ export const Route = createFileRoute('/(auth)/_layout/forgot-password')({
 function ForgotPasswordPage() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-8">
-      <div className="absolute top-8 left-8">
-        <Brand mode="expanded" height={36} className="" />
-      </div>
       <div className="w-full max-w-sm flex flex-col items-center">
         <h3 className="text-xl font-semibold">Forgot your password?</h3>
         <p className="text-sm text-center mt-2 text-text-muted">
