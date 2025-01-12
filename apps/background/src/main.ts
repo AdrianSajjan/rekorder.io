@@ -7,3 +7,4 @@ chrome.storage.session.setAccessLevel({
 chrome.tabs.onUpdated.addListener(thread.handleTabChangeListener);
 chrome.action.onClicked.addListener(thread.handleActionClickListener);
 chrome.runtime.onMessage.addListener(thread.handleRuntimeMessageListener);
+chrome.runtime.onMessageExternal.addListener(thread.handleRuntimeExternalMessageListener);

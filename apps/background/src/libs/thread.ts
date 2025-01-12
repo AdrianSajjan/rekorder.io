@@ -18,6 +18,7 @@ class Thread {
   handleTabChangeListener = this.__handleTabChangeListener.bind(this);
   handleActionClickListener = this.__handleActionClickListener.bind(this);
   handleRuntimeMessageListener = this.__handleRuntimeMessageListener.bind(this);
+  handleRuntimeExternalMessageListener = this.__handleRuntimeExternalMessageListener.bind(this);
 
   static createInstance() {
     return new Thread();
@@ -107,11 +108,14 @@ class Thread {
 
   private async __handleAuthenticateUser(tab: chrome.tabs.Tab) {
     this.currentTab = tab;
-    this.authenticationTab = await chrome.tabs.create({ url: 'http://localhost:4200/extension/login', active: true });
+    this.authenticationTab = await chrome.tabs.create({ url: 'http://192.168.10.157:4200/extension/login', active: true });
   }
 
   private async __handleActionClickListener(tab: chrome.tabs.Tab) {
-    const authentication = await chrome.storage.local.get(StorageConfig.Authentication);
+    const result = await chrome.storage.local.get(StorageConfig.Authentication);
+    const authentication = result[StorageConfig.Authentication];
+
+    console.log(authentication, result);
 
     if (!authentication || !authentication.user || !authentication.session) {
       this.__handleAuthenticateUser(tab);
@@ -127,17 +131,15 @@ class Thread {
   }
 
   private __handleTabChangeListener(tabId: number, change: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
+    if (!this.enabled || change.status !== 'complete') return;
+
     if (tabId === this.editorTab?.id) {
-      if (change.status === 'complete') {
-        this.editorResolvers?.resolve();
-        this.editorResolvers = null;
-      }
+      this.editorResolvers?.resolve();
+      this.editorResolvers = null;
     } else {
-      if (change.status === 'complete') {
-        this.currentTab = tab;
-        this.injectedTabs.add(tab);
-        this.__injectContentScript();
-      }
+      this.currentTab = tab;
+      this.injectedTabs.add(tab);
+      this.__injectContentScript();
     }
   }
 
@@ -162,18 +164,6 @@ class Thread {
 
   private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
     switch (message.type) {
-      case EventConfig.AuthenticateSuccess: {
-        console.log('Authenticate success', this.authenticationTab, this.currentTab, message.payload);
-        if (!this.authenticationTab || !this.authenticationTab.id) {
-          if (this.currentTab) chrome.tabs.highlight({ tabs: [this.currentTab.id!] }, () => this.__handleInitializeExtension(this.currentTab!));
-        } else {
-          chrome.tabs.remove(this.authenticationTab.id, () => {
-            if (this.currentTab) chrome.tabs.highlight({ tabs: [this.currentTab.id!] }, () => this.__handleInitializeExtension(this.currentTab!));
-          });
-        }
-        return false;
-      }
-
       /**
        * Close the extension
        */
@@ -351,6 +341,40 @@ class Thread {
         if (name !== 'unknown') {
           const url = name + '://settings/content/siteDetails?site=chrome-extension://' + encodeURIComponent(chrome.runtime.id);
           chrome.tabs.create({ url });
+        }
+        return false;
+      }
+
+      default: {
+        console.log('Unhandled message type:', message.type);
+        return false;
+      }
+    }
+  }
+
+  private __handleRuntimeExternalMessageListener(message: RuntimeMessage) {
+    switch (message.type) {
+      /**
+       * Successfully authenticated user, set the session storage and close the authentication tab
+       */
+      case EventConfig.AuthenticateSuccess: {
+        if (message.payload) {
+          chrome.storage.local.set({ [StorageConfig.Authentication]: message.payload }, () => {
+            console.log('User has been authenticated, closing authentication tab and initializing extension in the active tab');
+            if (!this.authenticationTab || !this.authenticationTab.id) {
+              if (this.currentTab)
+                chrome.tabs.highlight({ tabs: this.currentTab.index, windowId: this.currentTab.windowId }, () =>
+                  this.__handleInitializeExtension(this.currentTab!)
+                );
+            } else {
+              chrome.tabs.remove(this.authenticationTab.id, () => {
+                if (this.currentTab)
+                  chrome.tabs.highlight({ tabs: this.currentTab.index, windowId: this.currentTab.windowId }, () =>
+                    this.__handleInitializeExtension(this.currentTab!)
+                  );
+              });
+            }
+          });
         }
         return false;
       }

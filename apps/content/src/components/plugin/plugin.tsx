@@ -108,8 +108,8 @@ const PluginCard = observer(() => {
   const handleCloseExtension = () => {
     handleDisposeEvents();
     chrome.runtime.sendMessage({ type: EventConfig.CloseExtension });
-    const node = document.getElementById(RECORDER_ROOT);
-    if (node) node.remove();
+    window.__rekorder__ = false;
+    document.getElementById(RECORDER_ROOT)?.remove();
   };
 
   return (

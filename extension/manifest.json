@@ -41,8 +41,7 @@
     "externally_connectable": {
         "matches": [
             "https://*.screech.ai/*",
-            "http://localhost:4200/*",
-            "http://192.168.10.124:4200/*"
+            "http://192.168.10.157:4200/*"
         ],
         "accept_tls_channel_id": true
     }
