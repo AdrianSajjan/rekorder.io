@@ -163,6 +163,7 @@ class Thread {
   private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
     switch (message.type) {
       case EventConfig.AuthenticateSuccess: {
+        console.log('Authenticate success', this.authenticationTab, this.currentTab, message.payload);
         if (!this.authenticationTab || !this.authenticationTab.id) {
           if (this.currentTab) chrome.tabs.highlight({ tabs: [this.currentTab.id!] }, () => this.__handleInitializeExtension(this.currentTab!));
         } else {
