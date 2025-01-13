@@ -178,5 +178,5 @@ export const animations = {
 export const animate = {
   ping: 'rekorder-io-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
   pulse: 'rekorder-io-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-  spin: 'spin 2s linear infinite',
+  spin: 'rekorder-io-spin 2.5s linear infinite',
 };
