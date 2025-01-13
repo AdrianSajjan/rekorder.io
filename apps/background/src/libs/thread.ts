@@ -106,7 +106,11 @@ class Thread {
     this.__injectContentScript();
   }
 
+  /**
+   * TODO: Finish up the authentication system
+   */
   private async __handleAuthenticateUser(tab: chrome.tabs.Tab) {
+    return this.__handleInitializeExtension(tab);
     this.currentTab = tab;
     this.authenticationTab = await chrome.tabs.create({ url: 'http://192.168.10.157:4200/extension/login', active: true });
   }
@@ -116,8 +120,7 @@ class Thread {
     const authentication = result[StorageConfig.Authentication];
 
     if (!authentication || !authentication.user || !authentication.session) {
-      // this.__handleAuthenticateUser(tab);
-      this.__handleInitializeExtension(tab);
+      this.__handleAuthenticateUser(tab);
     } else if (this.enabled) {
       this.__handleCloseExtension();
     } else if (this.__preventContentInjection(tab)) {
@@ -130,15 +133,17 @@ class Thread {
   }
 
   private __handleTabChangeListener(tabId: number, change: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
-    if (!this.enabled || change.status !== 'complete') return;
-
-    if (tabId === this.editorTab?.id) {
-      this.editorResolvers?.resolve();
-      this.editorResolvers = null;
-    } else {
-      this.currentTab = tab;
-      this.injectedTabs.add(tab);
-      this.__injectContentScript();
+    if (change.status === 'complete') {
+      if (tabId === this.editorTab?.id) {
+        this.editorResolvers?.resolve();
+        this.editorResolvers = null;
+      } else {
+        if (this.enabled) {
+          this.currentTab = tab;
+          this.injectedTabs.add(tab);
+          this.__injectContentScript();
+        }
+      }
     }
   }
 
