@@ -2,8 +2,9 @@ import './styles/globals.css';
 
 import * as ReactDOM from 'react-dom/client';
 
-import { AnimationsProvider } from '@rekorder.io/ui';
 import { StrictMode } from 'react';
+import { AnimationsProvider } from '@rekorder.io/ui';
+
 import { OfflineEditor } from './components/editor';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
