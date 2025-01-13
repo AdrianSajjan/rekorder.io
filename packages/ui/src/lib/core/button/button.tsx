@@ -313,6 +313,7 @@ const ButtonCSS = css.resolve`
 
   .rekorder-button.rekorder-icon {
     padding: 0;
+    flex-shrink: 0;
     width: ${theme.space(10)};
     height: ${theme.space(10)};
     border-radius: ${theme.space(2.5)};

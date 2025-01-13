@@ -129,6 +129,9 @@ class Recorder {
     chrome.runtime.onMessage.addListener(this._runtimeEvents);
   }
 
+  /**
+   * Comment out during development - chrome.runtime.onMessage.removeListener(this._runtimeEvents);
+   */
   private __resetEvents() {
     chrome.runtime.onMessage.removeListener(this._runtimeEvents);
   }
