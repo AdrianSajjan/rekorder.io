@@ -115,10 +115,9 @@ class Thread {
     const result = await chrome.storage.local.get(StorageConfig.Authentication);
     const authentication = result[StorageConfig.Authentication];
 
-    console.log(authentication, result);
-
     if (!authentication || !authentication.user || !authentication.session) {
-      this.__handleAuthenticateUser(tab);
+      // this.__handleAuthenticateUser(tab);
+      this.__handleInitializeExtension(tab);
     } else if (this.enabled) {
       this.__handleCloseExtension();
     } else if (this.__preventContentInjection(tab)) {

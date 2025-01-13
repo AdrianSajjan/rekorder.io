@@ -56,7 +56,7 @@ export function ColorPicker({ children, color, onChange, ...props }: ColorPicker
       <PopoverTrigger asChild>
         <div id="color-picker-trigger">{children}</div>
       </PopoverTrigger>
-      <PopoverPortal>
+      <PopoverPortal container={document.getElementById('rekorder-area')}>
         <PopoverContent onOpenAutoFocus={(e) => e.preventDefault()} className="rekorder-color-picker" sideOffset={14} side="top">
           <HexColorPicker color={color} onChange={onChange} />
         </PopoverContent>

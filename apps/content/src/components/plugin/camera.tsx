@@ -79,7 +79,7 @@ const CameraPlugin = observer(() => {
               ) : null}
             </div>
           </Select.Input>
-          <Select.Content>
+          <Select.Content portal={document.getElementById('rekorder-area')}>
             <Select.Item value="n/a">No Camera</Select.Item>
             {cameras.length ? <Select.Separator /> : null}
             {cameras.map((camera, index) => (

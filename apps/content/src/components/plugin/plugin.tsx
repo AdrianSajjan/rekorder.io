@@ -70,6 +70,7 @@ const PluginCardCSS = css.resolve`
     width: ${theme.space(7)};
     height: ${theme.space(7)};
     border-radius: ${theme.space(7)};
+    color: ${theme.colors.card.text};
   }
 
   .rekorder-action-button:hover {

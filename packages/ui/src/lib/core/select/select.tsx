@@ -3,6 +3,8 @@ import css from 'styled-jsx/css';
 
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
+
+import { isBoolean, isNil } from 'lodash';
 import { CaretDown, Check } from '@phosphor-icons/react';
 
 import { theme } from '../../theme';
@@ -142,6 +144,7 @@ type SelectOption = ISelectGroup | ISelectOption;
 interface SelectContentProps extends SelectPrimitive.SelectContentProps {
   viewport?: React.RefObject<HTMLDivElement>;
   options?: Array<SelectOption>;
+  portal?: boolean | null | HTMLElement | DocumentFragment;
 }
 
 function isGroup(option: SelectOption): option is ISelectGroup {
@@ -226,7 +229,7 @@ const SelectContentCSS = css.resolve`
 `;
 
 const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
-  ({ viewport, options, children, sideOffset = 8, position = 'popper', ...props }, ref) => {
+  ({ viewport, options, children, sideOffset = 8, position = 'popper', portal = true, ...props }, ref) => {
     const { size } = useSelectContext();
 
     const renderOption = React.useCallback(
@@ -252,10 +255,13 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
       [options]
     );
 
+    const Portal = portal ? SelectPrimitive.Portal : React.Fragment;
+    const container = isBoolean(portal) || isNil(portal) ? null : portal;
+
     return (
       <React.Fragment>
         {SelectContentCSS.styles}
-        <SelectPrimitive.Portal>
+        <Portal container={container}>
           <SelectPrimitive.Content
             className={clsx(SelectContentCSS.className, 'rekorder-content', theme.createClassName(size))}
             position={position}
@@ -267,7 +273,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
             <SelectPrimitive.Viewport ref={viewport}>{options ? options.map(renderOption) : children}</SelectPrimitive.Viewport>
             <SelectPrimitive.ScrollDownButton />
           </SelectPrimitive.Content>
-        </SelectPrimitive.Portal>
+        </Portal>
       </React.Fragment>
     );
   }

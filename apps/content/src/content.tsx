@@ -50,7 +50,7 @@ const Content = observer(() => {
   return (
     <AnimationsProvider>
       {RecorderCSS.styles}
-      <section className={clsx(RecorderCSS.className, 'rekorder-area')}>
+      <section id="rekorder-area" className={clsx(RecorderCSS.className, 'rekorder-area')}>
         <Overlay />
         <EditorArea />
         <Cursors />

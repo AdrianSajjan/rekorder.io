@@ -98,7 +98,7 @@ const AudioPlugin = observer(() => {
               ) : null}
             </div>
           </Select.Input>
-          <Select.Content>
+          <Select.Content portal={document.getElementById('rekorder-area')}>
             <Select.Item value="n/a">No Microphone</Select.Item>
             {microphones.length ? <Select.Separator /> : null}
             {microphones.map((microphone, index) => (
