@@ -4,7 +4,7 @@ interface BrandProps extends SVGProps<SVGSVGElement> {
   mode: 'expanded' | 'collapsed';
 }
 
-export function Brand({ mode, height = '100%', width = 'auto', ...props }: BrandProps) {
+export function Brand({ mode, height = '100%', width = '100%', ...props }: BrandProps) {
   switch (mode) {
     case 'collapsed':
       return (

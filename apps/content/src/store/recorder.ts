@@ -165,7 +165,7 @@ class Recorder {
 
   cancelScreenCapture() {
     this.status = 'idle';
-    chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCapture });
+    chrome.runtime.sendMessage({ type: EventConfig.CancelStreamCapture });
     if (this._timeout) clearTimeout(this._timeout);
     this._timeout = null;
   }

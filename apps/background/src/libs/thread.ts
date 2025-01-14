@@ -218,6 +218,14 @@ class Thread {
       }
 
       /**
+       * Start recording the stream in the offscreen document, sent from the content script
+       */
+      case EventConfig.StartStreamRecording: {
+        chrome.runtime.sendMessage(message);
+        return false;
+      }
+
+      /**
        * Successfully started capturing stream in the offscreen document, forward the message to the content script
        */
       case EventConfig.StartStreamCaptureSuccess: {

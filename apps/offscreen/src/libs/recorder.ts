@@ -136,21 +136,16 @@ class OffscreenRecorder {
   private async __exportWebmBlob(blob: Blob) {
     try {
       const uuid = nanoid();
-      const id = await this.offlineDatabase.blobs.add({
-        uuid: uuid,
-        name: 'Untitled Recording - ' + new Date().toLocaleString().split(',')[0],
-        duration: this.timestamp,
-        original: blob,
-        modified: null,
-        created_at: Date.now(),
-        updated_at: null,
-      });
+      const name = 'Untitled Recording - ' + new Date().toLocaleString().split(',')[0];
+      const duration = this.timestamp;
+
+      this.__resetState();
+      const id = await this.offlineDatabase.blobs.add({ uuid, name, duration, original: blob, modified: null, created_at: Date.now(), updated_at: null });
       chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
     } catch (error) {
+      this.__resetState();
       console.warn('Error in offscreen recorder while saving captured stream to offline database', error);
       chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamError, payload: { error } });
-    } finally {
-      this.__resetState();
     }
   }
 
@@ -208,12 +203,16 @@ class OffscreenRecorder {
 
     this.__preventTabSilence(this.video);
     chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureSuccess, payload: null });
-
-    const combined = [...this.video.getTracks(), ...(this.audio ? this.audio.getTracks() : [])];
     const mimeType = MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type)) ?? DEFAULT_MIME_TYPE;
 
+    const combined = [
+      ...this.video.getVideoTracks(),
+      ...(this.audio ? this.audio.getAudioTracks() : []),
+      ...(this.captureDeviceAudio ? this.video.getAudioTracks() : []),
+    ];
+
     this.stream = new MediaStream(combined);
-    this.recorder = new MediaRecorder(this.stream, { mimeType, videoBitsPerSecond: 2500000, audioBitsPerSecond: 128000 });
+    this.recorder = new MediaRecorder(this.stream, { mimeType });
 
     this.recorder.addEventListener('stop', this.__recorderStopEvent.bind(this));
     this.recorder.addEventListener('error', this.__recorderErrorEvent.bind(this));
@@ -255,6 +254,8 @@ class OffscreenRecorder {
       audio: { deviceId: this.microphoneId },
     });
 
+    console.log('Capturing user microphone audio', this.microphoneId, this.muted, this.audio);
+
     if (!this.audio.getAudioTracks().length) {
       throw new Error(`No audio tracks found in the created audio media stream: ${this.microphoneId}`);
     }
@@ -279,7 +280,7 @@ class OffscreenRecorder {
   }
 
   start() {
-    if (!this.recorder) return;
+    if (!this.recorder || this.recorder.state !== 'inactive') return;
     this.__recorderStartEvent();
     this.recorder.start(100);
   }
@@ -291,8 +292,11 @@ class OffscreenRecorder {
 
   delete() {
     this.discard = true;
-    this.__resetState();
     this.stop();
+  }
+
+  cancel() {
+    this.__resetState();
   }
 
   pause() {
