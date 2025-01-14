@@ -261,6 +261,14 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
     );
 
     video$.current.addEventListener(
+      'durationchange',
+      () => {
+        setControls((state) => ({ ...state, duration: video$.current.duration }));
+      },
+      { signal: controller.signal }
+    );
+
+    video$.current.addEventListener(
       'timeupdate',
       () => {
         setControls((state) => ({ ...state, seek: video$.current.currentTime }));
