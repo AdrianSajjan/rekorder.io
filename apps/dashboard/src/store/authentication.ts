@@ -1,22 +1,21 @@
 import { create } from 'zustand';
 import type { User, Session } from '@supabase/supabase-js';
 
-interface AuthState {
+type AuthenticationStatus = 'authenticated' | 'unauthenticated' | 'pending';
+
+interface AuthenticationState {
+  status: AuthenticationStatus;
   user: User | null;
   session: Session | null;
-  isAuthenticated: boolean;
   logout: () => void;
   login: (user: User, session: Session) => void;
-  setUser: (user: User | null) => void;
-  setSession: (session: Session | null) => void;
+  
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthenticationStore = create<AuthenticationState>((set) => ({
   user: null,
   session: null,
-  isAuthenticated: false,
-  setUser: (user) => set({ user }),
-  setSession: (session) => set({ session }),
-  login: (user, session) => set({ user, session, isAuthenticated: true }),
-  logout: () => set({ user: null, session: null, isAuthenticated: false }),
+  status: 'unauthenticated',
+  login: (user, session) => set({ user, session, status: 'authenticated' }),
+  logout: () => set({ user: null, session: null, status: 'unauthenticated' }),
 }));

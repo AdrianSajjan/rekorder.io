@@ -1,18 +1,19 @@
-import { z } from 'zod';
 import { useState } from 'react';
+import { z } from 'zod';
 import { toast } from 'sonner';
 
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
+import { supabase } from '@rekorder.io/database';
 import { unwrapError } from '@rekorder.io/utils';
 import { ErrorMessages } from '@rekorder.io/constants';
-import { supabase } from '@rekorder.io/database';
-import { Button, Divider, Input, Label, Hint, LoadingButton } from '@rekorder.io/ui';
-import { AppleIcon, GoogleIcon } from '@rekorder.io/ui';
+import { AppleIcon, Button, Divider, GoogleIcon, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
 
+import { authRedirectBaseURL } from '../../config/api';
 import { PasswordInput } from '../../components/ui/password-input';
+import { useAuthenticationStore } from '../../store/authentication';
 
 export const Route = createFileRoute('/(auth)/_layout/login')({
   component: LoginPage,
@@ -27,6 +28,7 @@ type ILoginSchema = z.infer<typeof LoginSchema>;
 
 function LoginPage() {
   const navigate = useNavigate();
+  const authentication = useAuthenticationStore();
 
   const [isSubmitting, setSubmitting] = useState(false);
 
@@ -41,8 +43,10 @@ function LoginPage() {
   const handleLoginWithPassword: SubmitHandler<ILoginSchema> = async ({ email, password }) => {
     try {
       setSubmitting(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+
+      authentication.login(data.user, data.session);
       navigate({ to: '/dashboard' });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
@@ -53,25 +57,27 @@ function LoginPage() {
 
   const handleLoginWithGoogle = async () => {
     try {
-      setSubmitting(true);
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-      if (error) throw error;
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: authRedirectBaseURL,
+        },
+      });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleLoginWithApple = async () => {
     try {
-      setSubmitting(true);
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'apple' });
-      if (error) throw error;
+      await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: authRedirectBaseURL,
+        },
+      });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
-    } finally {
-      setSubmitting(false);
     }
   };
 

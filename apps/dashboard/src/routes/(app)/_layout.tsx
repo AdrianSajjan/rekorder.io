@@ -12,7 +12,7 @@ function DashboardLayout() {
   return (
     <Fragment>
       <Sidebar />
-      <section className="flex flex-col flex-1 px-2.5">
+      <section className="flex flex-col flex-1 pl-5 pr-6">
         <Header />
         <main className="w-full pb-2.5">
           <Outlet />

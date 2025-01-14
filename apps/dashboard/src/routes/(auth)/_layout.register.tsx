@@ -51,12 +51,24 @@ function RegisterPage() {
     }
   };
 
+  const handleRegisterWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      if (error) throw error;
+      const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
+      console.log(user, session);
+      navigate({ to: '/dashboard' });
+    } catch (error) {
+      toast.error(unwrapError(error, ErrorMessages.GenericError));
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm flex flex-col items-center">
         <h3 className="text-xl font-semibold">Create your account</h3>
         <p className="text-sm text-center mt-1 text-text-muted">Welcome, please fill in the details to get started.</p>
-        <Button className="w-full !mt-8" color="accent" variant="outline">
+        <Button className="w-full !mt-8" color="accent" variant="outline" onClick={handleRegisterWithGoogle}>
           <GoogleIcon />
           <span>Sign up with Google</span>
         </Button>

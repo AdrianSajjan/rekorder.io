@@ -9,6 +9,6 @@
   }
 
   body {
-    @apply bg-card-background;
+    @apply bg-card-background font-sans;
   }
 }

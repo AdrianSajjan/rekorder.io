@@ -22,6 +22,8 @@ import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout.regis
 import { Route as authLayoutLoginImport } from './routes/(auth)/_layout.login'
 import { Route as authLayoutForgotPasswordImport } from './routes/(auth)/_layout.forgot-password'
 import { Route as appLayoutDashboardImport } from './routes/(app)/_layout.dashboard'
+import { Route as extensionExtensionAuthCallbackImport } from './routes/(extension)/extension.auth.callback'
+import { Route as authLayoutAuthCallbackImport } from './routes/(auth)/_layout.auth.callback'
 
 // Create Virtual Routes
 
@@ -93,6 +95,19 @@ const appLayoutDashboardRoute = appLayoutDashboardImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => appLayoutRoute,
+} as any)
+
+const extensionExtensionAuthCallbackRoute =
+  extensionExtensionAuthCallbackImport.update({
+    id: '/(extension)/extension/auth/callback',
+    path: '/extension/auth/callback',
+    getParentRoute: () => rootRoute,
+  } as any)
+
+const authLayoutAuthCallbackRoute = authLayoutAuthCallbackImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => authLayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -176,6 +191,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof extensionExtensionRegisterImport
       parentRoute: typeof rootRoute
     }
+    '/(auth)/_layout/auth/callback': {
+      id: '/(auth)/_layout/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof authLayoutAuthCallbackImport
+      parentRoute: typeof authLayoutImport
+    }
+    '/(extension)/extension/auth/callback': {
+      id: '/(extension)/extension/auth/callback'
+      path: '/extension/auth/callback'
+      fullPath: '/extension/auth/callback'
+      preLoaderRoute: typeof extensionExtensionAuthCallbackImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -207,12 +236,14 @@ interface authLayoutRouteChildren {
   authLayoutForgotPasswordRoute: typeof authLayoutForgotPasswordRoute
   authLayoutLoginRoute: typeof authLayoutLoginRoute
   authLayoutRegisterRoute: typeof authLayoutRegisterRoute
+  authLayoutAuthCallbackRoute: typeof authLayoutAuthCallbackRoute
 }
 
 const authLayoutRouteChildren: authLayoutRouteChildren = {
   authLayoutForgotPasswordRoute: authLayoutForgotPasswordRoute,
   authLayoutLoginRoute: authLayoutLoginRoute,
   authLayoutRegisterRoute: authLayoutRegisterRoute,
+  authLayoutAuthCallbackRoute: authLayoutAuthCallbackRoute,
 }
 
 const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
@@ -237,6 +268,8 @@ export interface FileRoutesByFullPath {
   '/register': typeof authLayoutRegisterRoute
   '/extension/login': typeof extensionExtensionLoginRoute
   '/extension/register': typeof extensionExtensionRegisterRoute
+  '/auth/callback': typeof authLayoutAuthCallbackRoute
+  '/extension/auth/callback': typeof extensionExtensionAuthCallbackRoute
 }
 
 export interface FileRoutesByTo {
@@ -247,6 +280,8 @@ export interface FileRoutesByTo {
   '/register': typeof authLayoutRegisterRoute
   '/extension/login': typeof extensionExtensionLoginRoute
   '/extension/register': typeof extensionExtensionRegisterRoute
+  '/auth/callback': typeof authLayoutAuthCallbackRoute
+  '/extension/auth/callback': typeof extensionExtensionAuthCallbackRoute
 }
 
 export interface FileRoutesById {
@@ -262,6 +297,8 @@ export interface FileRoutesById {
   '/(auth)/_layout/register': typeof authLayoutRegisterRoute
   '/(extension)/extension/login': typeof extensionExtensionLoginRoute
   '/(extension)/extension/register': typeof extensionExtensionRegisterRoute
+  '/(auth)/_layout/auth/callback': typeof authLayoutAuthCallbackRoute
+  '/(extension)/extension/auth/callback': typeof extensionExtensionAuthCallbackRoute
 }
 
 export interface FileRouteTypes {
@@ -274,6 +311,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/extension/login'
     | '/extension/register'
+    | '/auth/callback'
+    | '/extension/auth/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -283,6 +322,8 @@ export interface FileRouteTypes {
     | '/register'
     | '/extension/login'
     | '/extension/register'
+    | '/auth/callback'
+    | '/extension/auth/callback'
   id:
     | '__root__'
     | '/'
@@ -296,6 +337,8 @@ export interface FileRouteTypes {
     | '/(auth)/_layout/register'
     | '/(extension)/extension/login'
     | '/(extension)/extension/register'
+    | '/(auth)/_layout/auth/callback'
+    | '/(extension)/extension/auth/callback'
   fileRoutesById: FileRoutesById
 }
 
@@ -305,6 +348,7 @@ export interface RootRouteChildren {
   authRoute: typeof authRouteWithChildren
   extensionExtensionLoginRoute: typeof extensionExtensionLoginRoute
   extensionExtensionRegisterRoute: typeof extensionExtensionRegisterRoute
+  extensionExtensionAuthCallbackRoute: typeof extensionExtensionAuthCallbackRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -313,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   authRoute: authRouteWithChildren,
   extensionExtensionLoginRoute: extensionExtensionLoginRoute,
   extensionExtensionRegisterRoute: extensionExtensionRegisterRoute,
+  extensionExtensionAuthCallbackRoute: extensionExtensionAuthCallbackRoute,
 }
 
 export const routeTree = rootRoute
@@ -329,7 +374,8 @@ export const routeTree = rootRoute
         "/(app)",
         "/(auth)",
         "/(extension)/extension/login",
-        "/(extension)/extension/register"
+        "/(extension)/extension/register",
+        "/(extension)/extension/auth/callback"
       ]
     },
     "/": {
@@ -360,7 +406,8 @@ export const routeTree = rootRoute
       "children": [
         "/(auth)/_layout/forgot-password",
         "/(auth)/_layout/login",
-        "/(auth)/_layout/register"
+        "/(auth)/_layout/register",
+        "/(auth)/_layout/auth/callback"
       ]
     },
     "/(app)/_layout/dashboard": {
@@ -384,6 +431,13 @@ export const routeTree = rootRoute
     },
     "/(extension)/extension/register": {
       "filePath": "(extension)/extension.register.tsx"
+    },
+    "/(auth)/_layout/auth/callback": {
+      "filePath": "(auth)/_layout.auth.callback.tsx",
+      "parent": "/(auth)/_layout"
+    },
+    "/(extension)/extension/auth/callback": {
+      "filePath": "(extension)/extension.auth.callback.tsx"
     }
   }
 }

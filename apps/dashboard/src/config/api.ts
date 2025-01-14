@@ -1,0 +1,1 @@
+export const authRedirectBaseURL = "http://localhost:4200/auth/callback"
