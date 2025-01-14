@@ -122,7 +122,7 @@ export const theme = {
     `,
 
   fonts: {
-    default: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'].join(', '),
+    default: ['Inter', 'sans-serif'].join(', '),
   },
 
   screens: {

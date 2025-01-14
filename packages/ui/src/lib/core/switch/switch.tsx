@@ -133,7 +133,7 @@ const SwitchCSS = css.resolve`
   }
 `;
 
-const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({ thumb, size = 'medium', className, ...props }, ref) => (
+const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({ thumb, size = 'small', className, ...props }, ref) => (
   <Fragment>
     {SwitchCSS.styles}
     <SwitchPrimitive.Root className={clsx(SwitchCSS.className, 'root', size, className)} ref={ref} {...props}>

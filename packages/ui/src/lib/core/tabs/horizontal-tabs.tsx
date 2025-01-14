@@ -67,15 +67,16 @@ const HorizontalTabsCSS = css.resolve`
 
   .rekorder-horizontal-tabs-trigger-content {
     position: relative;
-    color: ${theme.colors.accent.dark};
-    padding: ${theme.space(3)};
     transition: color 300ms ease;
     z-index: 10;
 
     display: flex;
     align-items: center;
-    gap: ${theme.space(1.5)};
     justify-content: center;
+
+    gap: ${theme.space(1.5)};
+    color: ${theme.colors.accent.dark};
+    padding: ${theme.space(3)} ${theme.space(3.5)};
   }
 
   .rekorder-horizontal-tabs-trigger[data-state='active'] .rekorder-horizontal-tabs-trigger-content {

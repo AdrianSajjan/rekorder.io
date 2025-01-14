@@ -2,15 +2,15 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import { AlertDialog } from './alert-dialog';
 import { Button } from '../button/button';
-import { AnimationsProvider } from '../animations/provider';
+import { ThemeProvider } from '../theme/provider';
 
 const meta: Meta<typeof AlertDialog> = {
   component: AlertDialog,
   title: 'Components/Alert Dialog',
   render: (props) => (
-    <AnimationsProvider>
+    <ThemeProvider>
       <AlertDialog {...props} />
-    </AnimationsProvider>
+    </ThemeProvider>
   ),
 };
 

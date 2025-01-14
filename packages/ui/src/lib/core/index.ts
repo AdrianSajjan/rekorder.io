@@ -17,7 +17,9 @@ export * from './tabs/horizontal-tabs';
 export * from './alert-dialog/alert-dialog';
 export * from './segmented-control/segmented-control';
 
+export * from './fonts/provider';
+export * from './theme/provider';
 export * from './animations/provider';
-export * from './animations/height';
 
+export * from './animations/height';
 export * from './player/video-player';

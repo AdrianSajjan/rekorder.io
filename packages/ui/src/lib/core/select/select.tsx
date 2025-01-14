@@ -5,7 +5,7 @@ import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 
 import { isBoolean, isNil } from 'lodash';
-import { CaretDown, Check } from '@phosphor-icons/react';
+import { CaretDown, CheckCircle } from '@phosphor-icons/react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
@@ -36,7 +36,7 @@ interface SelectTriggerProps extends SelectPrimitive.SelectTriggerProps {
   placeholder?: string;
 }
 
-const SelectInputCSS = css.resolve`
+const SelectCSS = css.resolve`
   *,
   *::before,
   *::after {
@@ -110,57 +110,6 @@ const SelectInputCSS = css.resolve`
     display: inline-flex;
     color: ${theme.colors.accent.main};
   }
-`;
-
-const SelectInput = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(({ className, children, placeholder, ...props }, ref) => {
-  const { size } = useSelectContext();
-
-  return (
-    <React.Fragment>
-      {SelectInputCSS.styles}
-      <SelectPrimitive.Trigger ref={ref} className={clsx(SelectInputCSS.className, 'rekorder-trigger', theme.createClassName(size), className)} {...props}>
-        <SelectPrimitive.Value placeholder={placeholder}>{children}</SelectPrimitive.Value>
-        <SelectPrimitive.Icon className={clsx(SelectInputCSS.className, 'rekorder-icon')}>
-          <CaretDown size={14} weight="bold" />
-        </SelectPrimitive.Icon>
-      </SelectPrimitive.Trigger>
-    </React.Fragment>
-  );
-});
-
-interface ISelectGroup {
-  title: string;
-  options: ISelectOption[];
-}
-
-interface ISelectOption {
-  value: string;
-  disabled?: boolean;
-  label: React.ReactNode;
-}
-
-type SelectOption = ISelectGroup | ISelectOption;
-
-interface SelectContentProps extends SelectPrimitive.SelectContentProps {
-  viewport?: React.RefObject<HTMLDivElement>;
-  options?: Array<SelectOption>;
-  portal?: boolean | null | HTMLElement | DocumentFragment;
-}
-
-function isGroup(option: SelectOption): option is ISelectGroup {
-  return 'options' in option;
-}
-
-const SelectContentCSS = css.resolve`
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  * {
-    margin: 0;
-  }
 
   .rekorder-content {
     box-shadow: ${theme.shadow().md};
@@ -194,14 +143,18 @@ const SelectContentCSS = css.resolve`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 14px;
-    transition: background-color 200ms ease-in-out;
+
+    line-height: 1;
     cursor: pointer;
+    font-size: 14px;
 
     gap: ${theme.space(3)};
-    color: ${theme.colors.background.text};
+    height: ${theme.space(9.5)};
+    padding: 0 ${theme.space(3.5)};
     border-radius: ${theme.space(1.5)};
-    padding: ${theme.space(2.25)} ${theme.space(3.25)};
+
+    color: ${theme.colors.background.text};
+    transition: background-color 200ms ease-in-out;
   }
 
   .rekorder-content .rekorder-item:focus-visible {
@@ -226,7 +179,52 @@ const SelectContentCSS = css.resolve`
     background-color: ${theme.colors.borders.input};
     margin: ${theme.space(1.5)} 0;
   }
+
+  .rekorder-content .rekorder-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 `;
+
+const SelectInput = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(({ className, children, placeholder, ...props }, ref) => {
+  const { size } = useSelectContext();
+
+  return (
+    <React.Fragment>
+      {SelectCSS.styles}
+      <SelectPrimitive.Trigger ref={ref} className={clsx(SelectCSS.className, 'rekorder-trigger', theme.createClassName(size), className)} {...props}>
+        <SelectPrimitive.Value placeholder={placeholder}>{children}</SelectPrimitive.Value>
+        <SelectPrimitive.Icon className={clsx(SelectCSS.className, 'rekorder-icon')}>
+          <CaretDown size={14} weight="bold" />
+        </SelectPrimitive.Icon>
+      </SelectPrimitive.Trigger>
+    </React.Fragment>
+  );
+});
+
+interface ISelectGroup {
+  title: string;
+  options: ISelectOption[];
+}
+
+interface ISelectOption {
+  value: string;
+  disabled?: boolean;
+  label: React.ReactNode;
+}
+
+type SelectOption = ISelectGroup | ISelectOption;
+
+interface SelectContentProps extends SelectPrimitive.SelectContentProps {
+  viewport?: React.RefObject<HTMLDivElement>;
+  options?: Array<SelectOption>;
+  portal?: boolean | null | HTMLElement | DocumentFragment;
+}
+
+function isGroup(option: SelectOption): option is ISelectGroup {
+  return 'options' in option;
+}
 
 const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
   ({ viewport, options, children, sideOffset = 8, position = 'popper', portal = true, ...props }, ref) => {
@@ -260,10 +258,10 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
 
     return (
       <React.Fragment>
-        {SelectContentCSS.styles}
+        {SelectCSS.styles}
         <Portal container={container}>
           <SelectPrimitive.Content
-            className={clsx(SelectContentCSS.className, 'rekorder-content', theme.createClassName(size))}
+            className={clsx(SelectCSS.className, 'rekorder-content', theme.createClassName(size))}
             position={position}
             sideOffset={sideOffset}
             ref={ref}
@@ -280,23 +278,23 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
 );
 
 const SelectGroup = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectGroupProps>(({ className, ...props }, ref) => {
-  return <SelectPrimitive.Group className={clsx(SelectContentCSS.className, 'rekorder-group', className)} ref={ref} {...props} />;
+  return <SelectPrimitive.Group className={clsx(SelectCSS.className, 'rekorder-group', className)} ref={ref} {...props} />;
 });
 
 const SelectSeparator = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectSeparatorProps>(({ className, ...props }, ref) => {
-  return <SelectPrimitive.Separator ref={ref} className={clsx(SelectContentCSS.className, 'rekorder-separator', className)} {...props} />;
+  return <SelectPrimitive.Separator ref={ref} className={clsx(SelectCSS.className, 'rekorder-separator', className)} {...props} />;
 });
 
 const SelectLabel = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectLabelProps>(({ className, ...props }, ref) => {
-  return <SelectPrimitive.Label ref={ref} className={clsx(SelectContentCSS.className, 'rekorder-label', className)} {...props} />;
+  return <SelectPrimitive.Label ref={ref} className={clsx(SelectCSS.className, 'rekorder-label', className)} {...props} />;
 });
 
 const SelectItem = React.forwardRef<HTMLDivElement, SelectPrimitive.SelectItemProps>(({ children, className, ...props }, ref) => {
   return (
-    <SelectPrimitive.Item className={clsx(SelectContentCSS.className, 'rekorder-item', className)} ref={ref} {...props}>
-      <SelectPrimitive.ItemText className={clsx(SelectContentCSS.className, 'rekorder-text')}>{children}</SelectPrimitive.ItemText>
-      <SelectPrimitive.ItemIndicator className={clsx(SelectContentCSS.className, 'rekorder-indicator')}>
-        <Check size={16} weight="bold" color={theme.colors.accent.dark} />
+    <SelectPrimitive.Item className={clsx(SelectCSS.className, 'rekorder-item', className)} ref={ref} {...props}>
+      <SelectPrimitive.ItemText className={clsx(SelectCSS.className, 'rekorder-text')}>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemIndicator className={clsx(SelectCSS.className, 'rekorder-indicator')}>
+        <CheckCircle size={20} weight="fill" color={theme.colors.primary.main} />
       </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>
   );

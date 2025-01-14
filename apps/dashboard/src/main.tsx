@@ -3,7 +3,7 @@ import './styles/globals.css';
 import * as ReactDOM from 'react-dom/client';
 
 import { StrictMode } from 'react';
-import { AnimationsProvider } from '@rekorder.io/ui';
+import { ThemeProvider } from '@rekorder.io/ui';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 
 import { routeTree } from './routes.gen';
@@ -21,9 +21,9 @@ root.render(
 
 function RootApplication() {
   return (
-    <AnimationsProvider>
+    <ThemeProvider>
       <RouterProvider router={router} />
-    </AnimationsProvider>
+    </ThemeProvider>
   );
 }
 

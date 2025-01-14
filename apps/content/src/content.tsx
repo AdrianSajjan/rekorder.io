@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { animations, AnimationsProvider, theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { Toaster } from 'sonner';
+import { animations, theme, ThemeProvider } from '@rekorder.io/ui';
 
 import { CameraPreview } from './components/camera';
 import { Cursors } from './components/cursor';
@@ -48,7 +48,7 @@ const Content = observer(() => {
   }
 
   return (
-    <AnimationsProvider>
+    <ThemeProvider>
       {RecorderCSS.styles}
       <section id="rekorder-area" className={clsx(RecorderCSS.className, 'rekorder-area')}>
         <Overlay />
@@ -63,7 +63,7 @@ const Content = observer(() => {
         <Permission />
         <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
       </section>
-    </AnimationsProvider>
+    </ThemeProvider>
   );
 });
 

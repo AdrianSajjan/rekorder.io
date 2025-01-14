@@ -3,7 +3,7 @@ import './styles/globals.css';
 import * as ReactDOM from 'react-dom/client';
 
 import { StrictMode } from 'react';
-import { AnimationsProvider } from '@rekorder.io/ui';
+import { ThemeProvider } from '@rekorder.io/ui';
 
 import { OfflineEditor } from './components/editor';
 
@@ -17,8 +17,8 @@ root.render(
 
 function RootApplication() {
   return (
-    <AnimationsProvider>
+    <ThemeProvider>
       <OfflineEditor />
-    </AnimationsProvider>
+    </ThemeProvider>
   );
 }

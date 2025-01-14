@@ -6,7 +6,6 @@ import * as React from 'react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
-import { AnimationsProvider } from '../animations/provider';
 
 interface Tooltip extends React.ForwardRefExoticComponent<TooltipProps & React.RefAttributes<HTMLDivElement>> {
   Provider: typeof TooltipPrimitive.TooltipProvider;
@@ -100,7 +99,7 @@ const TooltipCSS = css.resolve`
 const TooltipRoot = React.forwardRef<HTMLDivElement, TooltipProps>(
   ({ content, arrow, portal, side, sideOffset = 4, align, alignOffset, colorScheme, ...props }, ref) => {
     return (
-      <AnimationsProvider>
+      <React.Fragment>
         {TooltipCSS.styles}
         <TooltipPrimitive.Root {...props}>
           <TooltipPrimitive.Trigger asChild>{props.children}</TooltipPrimitive.Trigger>
@@ -108,7 +107,7 @@ const TooltipRoot = React.forwardRef<HTMLDivElement, TooltipProps>(
             {content}
           </TooltipContent>
         </TooltipPrimitive.Root>
-      </AnimationsProvider>
+      </React.Fragment>
     );
   }
 ) as Tooltip;

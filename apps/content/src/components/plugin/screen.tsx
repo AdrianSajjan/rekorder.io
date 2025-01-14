@@ -63,7 +63,7 @@ const ScreenPlugin = observer(() => {
         ) : null}
         <div className={clsx('rekorder-toggle-control', ScreenPluginCSS.className)}>
           <label className={clsx(ScreenPluginCSS.className, 'rekorder-toggle-control-label')}>Zoom on Click</label>
-          <Switch disabled />
+          <Switch />
         </div>
       </div>
     </Tooltip.Provider>

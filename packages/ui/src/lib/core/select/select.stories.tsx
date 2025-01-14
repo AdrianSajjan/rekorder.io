@@ -2,7 +2,7 @@ import { Fragment } from 'react/jsx-runtime';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Select, SelectOption } from './select';
-import { AnimationsProvider } from '../animations/provider';
+import { ThemeProvider } from '../theme/provider';
 import { theme } from '../../theme';
 
 const meta: Meta<typeof Select> = {
@@ -10,9 +10,9 @@ const meta: Meta<typeof Select> = {
   title: 'Components/Select',
   decorators: [
     (Story) => (
-      <AnimationsProvider>
+      <ThemeProvider>
         <Story />
-      </AnimationsProvider>
+      </ThemeProvider>
     ),
   ],
 };

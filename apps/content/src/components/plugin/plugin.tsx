@@ -23,7 +23,7 @@ const PluginCardCSS = css.resolve`
   .rekorder-plugin-container {
     position: absolute;
     pointer-events: all;
-    width: ${theme.space(95)};
+    width: ${theme.space(85)};
   }
 
   .rekorder-plugin-card {
@@ -88,7 +88,7 @@ const PluginCardCSS = css.resolve`
 
   .rekorder-horizontal-panel-content {
     padding: ${theme.space(6)};
-    max-height: ${theme.space(60)};
+    max-height: ${theme.space(50)};
     overflow-y: auto;
   }
 
@@ -172,9 +172,7 @@ const PluginCard = observer(() => {
                 <HorizontalTabs.Trigger value="screen">Screen</HorizontalTabs.Trigger>
                 <HorizontalTabs.Trigger value="camera">Camera</HorizontalTabs.Trigger>
                 <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
-                <HorizontalTabs.Trigger disabled value="toolbar">
-                  Toolbar
-                </HorizontalTabs.Trigger>
+                <HorizontalTabs.Trigger value="toolbar">Toolbar</HorizontalTabs.Trigger>
               </HorizontalTabs.List>
               <AnimateHeight className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel')}>
                 <div className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel-content')}>
