@@ -1,16 +1,19 @@
 import exportWebmBlob from 'fix-webm-duration';
 
-import { nanoid } from 'nanoid';
-import { RecorderSurface } from '@rekorder.io/types';
-import { ExtensionOfflineDatabase } from '@rekorder.io/database';
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
+import { ExtensionOfflineDatabase } from '@rekorder.io/database';
+import { RecorderSurface } from '@rekorder.io/types';
+import { nanoid } from 'nanoid';
 
 import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';
 
 interface OffscreenRecorderStart {
   streamId?: string;
   microphoneId: string;
+
+  countdownEnabled: boolean;
   captureDeviceAudio: boolean;
+
   pushToTalk: boolean;
   surface: RecorderSurface;
 }
@@ -23,8 +26,10 @@ class OffscreenRecorder {
 
   streamId: string;
   microphoneId: string;
-  captureDeviceAudio: boolean;
   displaySurface: RecorderSurface;
+
+  captureDeviceAudio: boolean;
+  countdownEnabled: boolean;
 
   audio: MediaStream | null;
   video: MediaStream | null;
@@ -33,7 +38,6 @@ class OffscreenRecorder {
 
   recordingState: RecordingState;
   timerInterval: NodeJS.Timer | null;
-  timerCountdown: NodeJS.Timeout | null;
   helperAudioContext: AudioContext | null;
   offlineDatabase: ExtensionOfflineDatabase;
 
@@ -46,7 +50,9 @@ class OffscreenRecorder {
     this.streamId = '';
     this.microphoneId = 'n/a';
     this.displaySurface = 'tab';
+
     this.captureDeviceAudio = false;
+    this.countdownEnabled = false;
 
     this.video = null;
     this.audio = null;
@@ -54,7 +60,6 @@ class OffscreenRecorder {
     this.recorder = null;
 
     this.timerInterval = null;
-    this.timerCountdown = null;
     this.helperAudioContext = null;
     this.recordingState = 'inactive';
     this.offlineDatabase = ExtensionOfflineDatabase.createInstance();
@@ -168,7 +173,7 @@ class OffscreenRecorder {
   private __recorderStartEvent() {
     this.__startTimer();
     this.recordingState = 'recording';
-    chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureSuccess, payload: null });
+    chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecordingSuccess, payload: null });
     this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState });
   }
 
@@ -188,7 +193,7 @@ class OffscreenRecorder {
 
   private __recorderErrorEvent(error: unknown) {
     this.__resetState();
-    chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureError, payload: { error } });
+    chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecordingError, payload: { error } });
     console.warn('Error in recorder while recording stream', error);
   }
 
@@ -201,6 +206,9 @@ class OffscreenRecorder {
   private __captureStreamSuccess() {
     if (!this.video) return;
 
+    this.__preventTabSilence(this.video);
+    chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureSuccess, payload: null });
+
     const combined = [...this.video.getTracks(), ...(this.audio ? this.audio.getTracks() : [])];
     const mimeType = MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type)) ?? DEFAULT_MIME_TYPE;
 
@@ -212,13 +220,6 @@ class OffscreenRecorder {
     this.recorder.addEventListener('pause', this.__recorderPauseEvent.bind(this));
     this.recorder.addEventListener('resume', this.__recorderResumeEvent.bind(this));
     this.recorder.addEventListener('dataavailable', this.__recorderDataAvailableEvent.bind(this));
-
-    this.__preventTabSilence(this.video);
-    this.timerCountdown = setTimeout(() => {
-      this.__recorderStartEvent();
-      this.recorder!.start(100);
-      this.timerCountdown = null;
-    }, 300); // Start the recorder after a short time to prevent screen jerk from the "Screen Capture banner"
   }
 
   private async __captureDisplayVideoStream() {
@@ -263,58 +264,50 @@ class OffscreenRecorder {
     }
   }
 
-  async start({ captureDeviceAudio, microphoneId, pushToTalk, surface, streamId = '' }: OffscreenRecorderStart) {
-    this.muted = pushToTalk;
+  capture({ captureDeviceAudio, microphoneId, pushToTalk, surface, countdownEnabled, streamId = '' }: OffscreenRecorderStart) {
     this.streamId = streamId;
-    this.displaySurface = surface;
     this.microphoneId = microphoneId;
+
+    this.muted = pushToTalk;
+    this.displaySurface = surface;
+
+    this.countdownEnabled = countdownEnabled;
     this.captureDeviceAudio = captureDeviceAudio;
 
     const promises = [this.__captureDisplayVideoStream(), this.__captureUserMicrophoneAudio()];
-    const results = await Promise.allSettled(promises);
-    const index = results.findIndex((result) => result.status === 'rejected');
+    Promise.all(promises).then(this.__captureStreamSuccess.bind(this)).catch(this.__captureStreamError.bind(this));
+  }
 
-    if (index === -1) {
-      this.__captureStreamSuccess();
-    } else {
-      const error = results[index] as PromiseRejectedResult;
-      this.__captureStreamError(error.reason);
-    }
+  start() {
+    if (!this.recorder) return;
+    this.__recorderStartEvent();
+    this.recorder.start(100);
   }
 
   stop() {
-    this.recorder?.stop();
+    if (!this.recorder) return;
+    this.recorder.stop();
   }
 
   delete() {
     this.discard = true;
+    this.__resetState();
     this.stop();
   }
 
-  cancel() {
-    if (this.timerCountdown) {
-      clearTimeout(this.timerCountdown);
-      this.timerCountdown = null;
-    } else {
-      this.delete();
-    }
-  }
-
   pause() {
-    if (this.recorder?.state === 'recording') {
-      this.recorder.pause();
-    }
+    if (!this.recorder || this.recorder.state !== 'recording') return;
+    this.recorder.pause();
   }
 
   resume() {
-    if (this.recorder?.state === 'paused') {
-      this.recorder.resume();
-    }
+    if (!this.recorder || this.recorder.state !== 'paused') return;
+    this.recorder.resume();
   }
 
   mute(muted: boolean) {
     this.muted = muted;
-    this.audio?.getTracks().forEach((track) => (track.enabled = !muted));
+    if (this.audio) this.audio.getTracks().forEach((track) => (track.enabled = !muted));
   }
 }
 

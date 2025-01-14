@@ -14,13 +14,13 @@ export function useCloseExtensionListener() {
   const handleRuntimeMessage = useCallback(
     (message: RuntimeMessage) => {
       if (message.type === EventConfig.CloseExtension) {
+        window.__rekorder__ = false;
         console.log('Closing extension: Disposing events');
         handleDispose();
         console.log('Closing extension: Current listener removed');
         chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
         console.log('Closing extension: Removing root element');
-        const node = document.getElementById(RECORDER_ROOT);
-        if (node) node.remove();
+        document.getElementById(RECORDER_ROOT)?.remove();
       }
     },
     [handleDispose]

@@ -226,9 +226,25 @@ class Thread {
       }
 
       /**
-       * Failed to start capturing stream in the offscreen document, forward the message to the content script
+       * Successfully started recording the stream in the offscreen document, forward the message to the content script
+       */
+      case EventConfig.StartStreamRecordingSuccess: {
+        this.__sendMessageToContentScript(message);
+        return false;
+      }
+
+      /**
+       * Failed to start recording the stream in the offscreen document, forward the message to the content script
        */
       case EventConfig.StartStreamCaptureError: {
+        this.__sendMessageToContentScript(message);
+        return false;
+      }
+
+      /**
+       * Successfully started recording the stream in the offscreen document, forward the message to the content script
+       */
+      case EventConfig.StartStreamRecordingError: {
         this.__sendMessageToContentScript(message);
         return false;
       }

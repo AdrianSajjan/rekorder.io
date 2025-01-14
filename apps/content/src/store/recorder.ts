@@ -2,12 +2,10 @@ import { toast } from 'sonner';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { isUndefined } from 'lodash';
 
-import { EventConfig, StorageConfig } from '@rekorder.io/constants';
+import { EventConfig, RecorderConfig, StorageConfig } from '@rekorder.io/constants';
 import { RecorderSurface, RuntimeMessage } from '@rekorder.io/types';
 import { unwrapError } from '@rekorder.io/utils';
-
 import { microphone } from './microphone';
-import { RECORD_TIMEOUT } from '../constants/recorder';
 
 type RecorderStatus = 'idle' | 'countdown' | 'pending' | 'active' | 'paused' | 'saving' | 'error';
 
@@ -96,14 +94,24 @@ class Recorder {
   private __runtimeEvents(message: RuntimeMessage) {
     switch (message.type) {
       case EventConfig.StartStreamCaptureSuccess: {
-        runInAction(() => (this.status = 'active'));
-        this.__startTimer();
+        runInAction(() => (this.status = 'countdown'));
+        setTimeout(() => {
+          runInAction(() => (this.status = 'pending'));
+          setTimeout(() => chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecording }), RecorderConfig.TimerOffsetMs);
+        }, RecorderConfig.TimerCountdownMs);
         break;
       }
 
-      case EventConfig.StartStreamCaptureError: {
-        runInAction(() => (this.status = 'error'));
+      case EventConfig.StartStreamRecordingSuccess: {
+        this.__startTimer();
+        runInAction(() => (this.status = 'active'));
+        break;
+      }
+
+      case EventConfig.StartStreamCaptureError:
+      case EventConfig.StartStreamRecordingError: {
         this.__stopTimer(true);
+        runInAction(() => (this.status = 'error'));
         toast.error(unwrapError(message.payload.error, 'Something went wrong while starting your recording.'));
         break;
       }
@@ -137,27 +145,16 @@ class Recorder {
   }
 
   startScreenCapture() {
-    this.status = 'countdown';
-
-    this._timeout = setTimeout(() => {
-      runInAction(() => {
-        this.status = 'pending';
-      });
-
-      setTimeout(() => {
-        if (this.surface !== 'tab') {
-          chrome.runtime.sendMessage({
-            type: EventConfig.StartDisplayStreamCapture,
-            payload: { surface: this.surface, microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
-          });
-        } else {
-          chrome.runtime.sendMessage({
-            type: EventConfig.StartTabStreamCapture,
-            payload: { surface: this.surface, microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
-          });
-        }
-      }, 0);
-    }, RECORD_TIMEOUT * 1000);
+    chrome.runtime.sendMessage({
+      type: this.surface !== 'tab' ? EventConfig.StartDisplayStreamCapture : EventConfig.StartTabStreamCapture,
+      payload: {
+        surface: this.surface,
+        countdownEnabled: true,
+        microphoneId: microphone.device,
+        captureDeviceAudio: this.audio,
+        pushToTalk: microphone.pushToTalk,
+      },
+    });
   }
 
   saveScreenCapture() {
@@ -170,6 +167,14 @@ class Recorder {
     this.status = 'idle';
     chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCapture });
     if (this._timeout) clearTimeout(this._timeout);
+    this._timeout = null;
+  }
+
+  skipCaptureCountdown() {
+    this.status = 'pending';
+    setTimeout(() => chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecording }), RecorderConfig.TimerOffsetMs);
+    if (this._timeout) clearTimeout(this._timeout);
+    this._timeout = null;
   }
 
   discardScreenCapture() {

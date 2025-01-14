@@ -4,3 +4,4 @@ export * from './lib/errors';
 export * from './lib/storage';
 export * from './lib/database';
 export * from './lib/extension';
+export * from './lib/recorder';

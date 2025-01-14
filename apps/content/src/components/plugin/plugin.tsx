@@ -195,7 +195,7 @@ const PluginCard = observer(() => {
             </HorizontalTabs>
             <div className={clsx(PluginCardCSS.className, 'rekorder-footer')}>
               <Button variant="fancy" onClick={handleScreenCapture} className={clsx(PluginCardCSS.className, 'rekorder-record-button')}>
-                <span>{recorder.status === 'pending' ? 'Cancel Recording' : 'Start Recording'}</span>
+                <span>{recorder.status === 'countdown' ? 'Cancel Recording' : 'Start Recording'}</span>
                 <span className={clsx(PluginCardCSS.className, 'rekorder-record-button-command')}>⌥⇧D</span>
               </Button>
             </div>

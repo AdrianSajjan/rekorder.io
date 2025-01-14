@@ -6,8 +6,8 @@ import { Fragment } from 'react/jsx-runtime';
 
 import { useCountdown } from '@rekorder.io/hooks';
 import { animations, theme } from '@rekorder.io/ui';
+import { RecorderConfig } from '@rekorder.io/constants';
 
-import { RECORD_TIMEOUT } from '../constants/recorder';
 import { recorder } from '../store/recorder';
 
 const TimerCSS = css.resolve`
@@ -74,7 +74,7 @@ const TimerCountdownHOC = observer(() => {
 });
 
 const TimerCountdown = observer(() => {
-  const { time } = useCountdown(RECORD_TIMEOUT, 1, true);
+  const { time } = useCountdown(RecorderConfig.TimerCountdownSeconds, 1, true);
 
   return (
     <Fragment>

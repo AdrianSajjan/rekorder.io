@@ -11,6 +11,10 @@ export const EventConfig = {
   ChangeAudioPushToTalkActivity: 'change.audio.push-to-talk.activity',
   ChangeAudioMutedState: 'change.audio.muted.state',
 
+  StartStreamRecording: 'start.stream.recording',
+  StartStreamRecordingSuccess: 'start.stream.recording.success',
+  StartStreamRecordingError: 'start.stream.recording.error',
+
   StartTabStreamCapture: 'start.tab.stream.capture',
   StartDisplayStreamCapture: 'start.display.stream.capture',
   StartStreamCaptureSuccess: 'start.stream.capture.success',

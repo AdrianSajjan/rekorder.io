@@ -9,7 +9,7 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
      * If stream id is present, the tab stream will be captured without prompting the user to select a display
      */
     case EventConfig.StartTabStreamCapture: {
-      recorder.start(message.payload);
+      recorder.capture(message.payload);
       return false;
     }
 
@@ -18,7 +18,15 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
      * If streamId is empty, the user will be prompted to select a display to capture
      */
     case EventConfig.StartDisplayStreamCapture: {
-      recorder.start(message.payload);
+      recorder.capture(message.payload);
+      return false;
+    }
+
+    /**
+     * Message received from the content script relayed by background worker to start recording the capturedstream
+     */
+    case EventConfig.StartStreamRecording: {
+      recorder.start();
       return false;
     }
 
@@ -54,8 +62,11 @@ export function handleRuntimeMessageListener(message: RuntimeMessage) {
       return false;
     }
 
+    /**
+     * Message received from the content script relayed by background worker to cancel the stream capture
+     */
     case EventConfig.CancelStreamCapture: {
-      recorder.cancel();
+      recorder.delete();
       return false;
     }
 
