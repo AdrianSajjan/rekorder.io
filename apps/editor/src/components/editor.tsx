@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from '@radix-ui/react-dialog';
 
-import { animate, Brand, Button, CrownIcon } from '@rekorder.io/ui';
+import { animate, Brand, Button, CrownIcon, VideoPlayer } from '@rekorder.io/ui';
 import { cn } from '@rekorder.io/utils';
 
 import { editor } from '../store/editor';
@@ -73,7 +73,7 @@ const OfflineEditor = observer(() => {
         <main className="flex-1 grid place-items-center">
           <div className="h-auto w-full max-w-4xl relative">
             {editor.blobURL ? (
-              <video src={editor.blobURL} className="h-auto w-full max-w-4xl" controls />
+              <VideoPlayer src={editor.blobURL} container="h-auto! w-full! max-w-4xl!" className="h-auto! w-full! max-w-4xl!" />
             ) : (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <Spinner size={32} weight="bold" color="black" className="mx-auto" style={spin} />

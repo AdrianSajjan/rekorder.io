@@ -19,3 +19,5 @@ export * from './segmented-control/segmented-control';
 
 export * from './animations/provider';
 export * from './animations/height';
+
+export * from './player/video-player';

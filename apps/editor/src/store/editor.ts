@@ -12,7 +12,7 @@ class Editor {
 
   constructor() {
     this.video = null;
-    this.blobURL = null;
+    this.blobURL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4#t=1';
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
     this.__setupEvents();
@@ -38,7 +38,7 @@ class Editor {
    * Comment out the runtime event listener during development
    */
   private __setupEvents() {
-    chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
+    // chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
   }
 
   static createInstance() {
@@ -49,7 +49,7 @@ class Editor {
    * Comment out the runtime event listener during development
    */
   dispose() {
-    chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
+    // chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
     this.video = null;

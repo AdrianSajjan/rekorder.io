@@ -1,4 +1,5 @@
 export * from './lib/cn';
+export * from './lib/time';
 export * from './lib/user-agent';
 export * from './lib/deserialize';
 export * from './lib/unwrap-error';

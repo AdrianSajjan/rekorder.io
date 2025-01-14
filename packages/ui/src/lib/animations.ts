@@ -92,7 +92,7 @@ export const AnimationCSS = css.global`
     }
     to {
       opacity: 0;
-      transform: translateY(-4px);
+      transform: translateY(4px);
     }
   }
 
@@ -103,7 +103,7 @@ export const AnimationCSS = css.global`
     }
     to {
       opacity: 0;
-      transform: translateY(4px);
+      transform: translateY(-4px);
     }
   }
 
