@@ -4,15 +4,17 @@ import { RuntimeMessage } from '@rekorder.io/types';
 import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
 
 class Editor {
-  video: BlobStorage | null;
+  name: string;
   blobURL: string | null;
+  video: BlobStorage | null;
 
   private _offlineDatabase: ExtensionOfflineDatabase;
   private _runtimeEventHandler = this.__runtimeEventHandler.bind(this);
 
   constructor() {
+    this.name = '';
     this.video = null;
-    this.blobURL = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4#t=1';
+    this.blobURL = null;
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
     this.__setupEvents();
@@ -26,7 +28,8 @@ class Editor {
         if (blob) {
           runInAction(() => {
             this.video = blob;
-            this.blobURL = URL.createObjectURL(this.video.blob);
+            this.name = blob.name;
+            this.blobURL = URL.createObjectURL(blob.original);
           });
         }
         break;
@@ -38,18 +41,22 @@ class Editor {
    * Comment out the runtime event listener during development
    */
   private __setupEvents() {
-    // chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
+    chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
   }
 
   static createInstance() {
     return new Editor();
   }
 
+  updateName(name: string) {
+    this.name = name;
+  }
+
   /**
    * Comment out the runtime event listener during development
    */
   dispose() {
-    // chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
+    chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
 
     this.video = null;

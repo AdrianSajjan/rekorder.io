@@ -131,7 +131,15 @@ class OffscreenRecorder {
   private async __exportWebmBlob(blob: Blob) {
     try {
       const uuid = nanoid();
-      const id = await this.offlineDatabase.blobs.add({ uuid, blob, duration: this.timestamp, created_at: Date.now() });
+      const id = await this.offlineDatabase.blobs.add({
+        uuid: uuid,
+        name: 'Untitled Recording - ' + new Date().toLocaleString().split(',')[0],
+        duration: this.timestamp,
+        original: blob,
+        modified: null,
+        created_at: Date.now(),
+        updated_at: null,
+      });
       chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
     } catch (error) {
       console.warn('Error in offscreen recorder while saving captured stream to offline database', error);

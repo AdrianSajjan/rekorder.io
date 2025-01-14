@@ -68,9 +68,9 @@ const OfflineEditor = observer(() => {
       </aside>
       <section className="flex-1 flex flex-col">
         <header className="h-16 bg-card-background shrink-0 border-b border-borders-input flex items-center justify-center">
-          <input defaultValue="Untitled Project 1" className="text-center w-96" />
+          <input value={editor.name} onChange={(event) => editor.updateName(event.target.value)} className="text-center w-96" />
         </header>
-        <main className="flex-1 grid place-items-center">
+        <main className="flex-1 grid place-items-center p-10">
           <div className="h-auto w-full max-w-4xl relative">
             {editor.blobURL ? (
               <VideoPlayer src={editor.blobURL} container="h-auto! w-full! max-w-4xl!" className="h-auto! w-full! max-w-4xl!" />
