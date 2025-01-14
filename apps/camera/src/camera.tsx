@@ -20,6 +20,7 @@ const styles = theme.createStyles({
     left: '50%',
     position: 'absolute',
     transform: 'translate(-50%, -50%)',
+    backgroundColor: theme.colors.core.black,
   },
 });
 

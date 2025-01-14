@@ -73,6 +73,7 @@ class AudioWaveform {
   private __startDrawing(): void {
     if (!this.analyserNode || !this.context) return;
 
+    this.canvas.style.backgroundColor = theme.colors.background.light;
     this.bufferLength = this.analyserNode.fftSize;
     this.dataArray = new Uint8Array(this.bufferLength);
     this.__drawWaveform();

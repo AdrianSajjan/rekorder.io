@@ -70,8 +70,8 @@ const CameraPreviewCSS = css.resolve`
     position: relative;
     border-radius: 100%;
 
-    animation: ${animations['zoom-in-fade-in']} 0.5s;
-    box-shadow: ${theme.shadow(theme.alpha(theme.colors.accent.main, 0.1)).xl};
+    animation: ${animations['zoom-in-fade-in']} 300ms;
+    box-shadow: ${theme.shadow(theme.alpha(theme.colors.core.black, 0.05)).xl};
   }
 
   .rekorder-camera-controls {
