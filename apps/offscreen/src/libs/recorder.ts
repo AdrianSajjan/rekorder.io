@@ -209,13 +209,13 @@ class OffscreenRecorder {
 
     this.recorder.addEventListener('stop', this.__recorderStopEvent.bind(this));
     this.recorder.addEventListener('error', this.__recorderErrorEvent.bind(this));
-    this.recorder.addEventListener('start', this.__recorderStartEvent.bind(this));
     this.recorder.addEventListener('pause', this.__recorderPauseEvent.bind(this));
     this.recorder.addEventListener('resume', this.__recorderResumeEvent.bind(this));
     this.recorder.addEventListener('dataavailable', this.__recorderDataAvailableEvent.bind(this));
 
     this.__preventTabSilence(this.video);
     this.timerCountdown = setTimeout(() => {
+      this.__recorderStartEvent();
       this.recorder!.start(100);
       this.timerCountdown = null;
     }, 300); // Start the recorder after a short time to prevent screen jerk from the "Screen Capture banner"
