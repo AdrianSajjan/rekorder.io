@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
 export const SupabaseWebConfig = {
-  projectUrl: 'https://ksqlsjjechcuqkmycczf.supabase.co',
+  projectUrl: 'http://127.0.0.1:54321',
   publicKey:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzcWxzamplY2hjdXFrbXljY3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYzNTg3NDUsImV4cCI6MjA1MTkzNDc0NX0.IguRVKtyRvBADmTqs3RUVcm75BvfbAUM8hdxd59zeaI',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
 };
 
 export const supabase = createClient(SupabaseWebConfig.projectUrl, SupabaseWebConfig.publicKey);

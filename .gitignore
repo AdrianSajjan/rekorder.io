@@ -6,6 +6,12 @@ tmp
 out-tsc
 extension/build
 
+# supabase
+**/.branches
+**/.temp
+**/.env
+
+
 # dependencies
 node_modules
 
