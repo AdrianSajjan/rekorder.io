@@ -9,10 +9,10 @@ import { DotsThree, QuestionMark, X } from '@phosphor-icons/react';
 import { EventConfig } from '@rekorder.io/constants';
 import { AnimateHeight, Brand, Button, HorizontalTabs, theme } from '@rekorder.io/ui';
 
+import { recorder } from '../../store/recorder';
 import { RECORDER_ROOT } from '../../constants/layout';
 import { useDisposeEvents } from '../../hooks/use-dispose-events';
 import { useDragControls } from '../../hooks/use-drag-controls';
-import { recorder } from '../../store/recorder';
 
 import { AudioPlugin } from './audio';
 import { CameraPlugin } from './camera';
@@ -22,8 +22,8 @@ import { ToolbarPlugin } from './toolbar';
 const PluginCardCSS = css.resolve`
   .rekorder-plugin-container {
     position: absolute;
-    width: fit-content;
     pointer-events: all;
+    width: ${theme.space(95)};
   }
 
   .rekorder-plugin-card {
