@@ -1,6 +1,6 @@
-import exportWebmBlob from 'fix-webm-duration';
-import { nanoid } from 'nanoid';
+import exportWebmBlob from 'webm-duration-fix';
 
+import { nanoid } from 'nanoid';
 import { RecorderSurface } from '@rekorder.io/types';
 import { ExtensionOfflineDatabase } from '@rekorder.io/database';
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
@@ -155,7 +155,7 @@ class OffscreenRecorder {
       chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCaptureSuccess, payload: null });
     } else {
       const blob = new Blob(this.chunks, { type: 'video/webm' });
-      exportWebmBlob(blob, this.timestamp, (blob) => this.__exportWebmBlob(blob), { logger: false });
+      exportWebmBlob(blob).then((blob) => this.__exportWebmBlob(blob));
     }
   }
 

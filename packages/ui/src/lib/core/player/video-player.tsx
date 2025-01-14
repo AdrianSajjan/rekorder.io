@@ -268,6 +268,14 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
       { signal: controller.signal }
     );
 
+    video$.current.addEventListener(
+      'ended',
+      () => {
+        setControls((state) => ({ ...state, playing: false }));
+      },
+      { signal: controller.signal }
+    );
+
     return () => {
       controller.abort();
     };
