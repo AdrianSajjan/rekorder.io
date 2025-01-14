@@ -199,9 +199,9 @@ const SelectContentCSS = css.resolve`
     cursor: pointer;
 
     gap: ${theme.space(3)};
-    padding: ${theme.space(2.5)} ${theme.space(3.5)};
     color: ${theme.colors.background.text};
     border-radius: ${theme.space(1.5)};
+    padding: ${theme.space(2.25)} ${theme.space(3.25)};
   }
 
   .rekorder-content .rekorder-item:focus-visible {
