@@ -10,10 +10,12 @@ const styles = theme.createStyles({
     height: '100%',
     width: '100%',
     position: 'relative',
+    backgroundColor: theme.colors.core.black,
   },
   video: {
     objectFit: 'cover',
     display: 'none',
+    backgroundColor: theme.colors.core.black,
   },
   canvas: {
     top: '50%',
