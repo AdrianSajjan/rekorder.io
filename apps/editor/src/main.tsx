@@ -8,8 +8,9 @@ import { ThemeProvider } from '@rekorder.io/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { queryClient } from './config/api';
-import { OfflineEditor } from './components/editor';
 import { AuthenticationProvider, useAuthenticationContext } from './context/authentication';
+import { OfflineEditor } from './components/editor';
+import { Authenticate } from './components/authenticate';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -31,7 +32,7 @@ function ApplicationEntry() {
 
   switch (status) {
     case 'unauthenticated':
-      return <button>Login</button>;
+      return <Authenticate />;
 
     case 'authenticated':
       return <OfflineEditor />;

@@ -1,4 +1,6 @@
+import { debounce } from 'lodash';
 import { makeAutoObservable, runInAction } from 'mobx';
+
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
@@ -10,6 +12,7 @@ class Editor {
 
   private _offlineDatabase: ExtensionOfflineDatabase;
   private _runtimeEventHandler = this.__runtimeEventHandler.bind(this);
+  private _saveNameOfflineDatabaseDebounced = debounce(this.__saveNameOfflineDatabase, 500);
 
   constructor() {
     this.name = '';
@@ -19,6 +22,13 @@ class Editor {
 
     this.__setupEvents();
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  private __saveNameOfflineDatabase(name: string) {
+    if (this.video) {
+      console.log('Saving name to offline database', name);
+      this._offlineDatabase.blobs.update(this.video.id, { name });
+    }
   }
 
   private async __runtimeEventHandler(message: RuntimeMessage) {
@@ -50,6 +60,7 @@ class Editor {
 
   updateName(name: string) {
     this.name = name;
+    this._saveNameOfflineDatabaseDebounced(name);
   }
 
   /**

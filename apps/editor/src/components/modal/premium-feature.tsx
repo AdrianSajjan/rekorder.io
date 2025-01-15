@@ -10,7 +10,7 @@ const steps = [
   },
   {
     title: 'Subscribe to our plans',
-    description: 'The local editor will always remain free of cost, premium cloud features are offered at affordable rates and plans',
+    description: 'The local editor will always remain free, premium cloud features are offered at affordable plans including a free tier',
   },
   {
     title: 'Get access to premium features',
