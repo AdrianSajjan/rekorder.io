@@ -42,6 +42,10 @@
     "src/**/*.js",
     "src/**/*.jsx",
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "../utils/**/*.ts",
+    "../hooks/**/*.ts",
+    "../types/**/*.ts",
+    "../constants/**/*.ts"
   ]
 }

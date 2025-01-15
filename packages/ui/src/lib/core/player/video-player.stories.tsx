@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { theme } from '../../theme';
+import { ThemeProvider } from '../theme/provider';
 import { VideoPlayer } from './video-player';
 
 const meta: Meta<typeof VideoPlayer> = {
@@ -18,7 +19,11 @@ const styles = theme.createStyles({
 });
 
 export const MP4Player: Story = {
-  render: (props) => <VideoPlayer src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4#t=1" style={styles.root} {...props} />,
+  render: (props) => (
+    <ThemeProvider>
+      <VideoPlayer src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4#t=1" style={styles.root} {...props} />
+    </ThemeProvider>
+  ),
 };
 
 MP4Player.storyName = 'MP4 Player';

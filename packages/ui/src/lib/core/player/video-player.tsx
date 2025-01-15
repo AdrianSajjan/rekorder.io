@@ -46,7 +46,7 @@ const VideoPlayerCSS = css.resolve`
     display: grid;
     cursor: pointer;
     place-items: center;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(6px);
 
     width: ${theme.space(15)};
     height: ${theme.space(15)};
@@ -62,7 +62,7 @@ const VideoPlayerCSS = css.resolve`
     align-items: center;
 
     overflow: hidden;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(6px);
 
     gap: ${theme.space(1)};
     transform: translateY(calc(100% + ${theme.space(3)}));
@@ -116,7 +116,7 @@ const VideoPlayerCSS = css.resolve`
     touch-action: none;
 
     width: 100%;
-    height: ${theme.space(5)};
+    height: ${theme.space(4)};
     max-width: ${theme.screens.xxs}px;
   }
 
@@ -125,7 +125,7 @@ const VideoPlayerCSS = css.resolve`
     max-width: unset;
 
     height: ${theme.space(30)};
-    width: ${theme.space(5)};
+    width: ${theme.space(6)};
   }
 
   .rekorder-video-player-slider-track {
@@ -140,9 +140,7 @@ const VideoPlayerCSS = css.resolve`
 
   .rekorder-video-player-slider-track[data-orientation='vertical'] {
     height: unset;
-    width: ${theme.space(8)};
-    backdrop-filter: blur(12px);
-    background-color: ${theme.alpha(theme.colors.card.text, 0.5)};
+    width: ${theme.space(6)};
   }
 
   .rekorder-video-player-slider-range {
@@ -157,10 +155,10 @@ const VideoPlayerCSS = css.resolve`
   }
 
   .rekorder-video-player-slider-thumb {
-    display: block;
+    display: none;
 
     width: ${theme.space(2)};
-    height: ${theme.space(5)};
+    height: ${theme.space(4)};
     border-radius: ${theme.space(1)};
 
     box-shadow: ${theme.shadow().sm};
@@ -169,25 +167,13 @@ const VideoPlayerCSS = css.resolve`
   }
 
   .rekorder-video-player-slider-thumb[data-orientation='vertical'] {
-    width: ${theme.space(9)};
+    width: ${theme.space(7)};
     height: ${theme.space(2)};
   }
 
   .rekorder-video-player-slider-thumb:focus-visible {
     outline: none;
     box-shadow: ${theme.ring()};
-  }
-
-  .rekorder-video-player-slider-value {
-    font-size: 11px;
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-
-    left: 50%;
-    z-index: 100;
-    position: absolute;
-    bottom: ${theme.space(1)};
-    transform: translateX(-50%);
   }
 
   .rekorder-video-player-time {
@@ -201,7 +187,16 @@ const VideoPlayerCSS = css.resolve`
   }
 
   .rekorder-video-player-audio-control {
-    padding-bottom: ${theme.space(2.5)};
+    padding-bottom: ${theme.space(1)};
+  }
+
+  .rekorder-video-player-audio-control-container {
+    padding: ${theme.space(2)};
+    border-top-left-radius: ${theme.space(2)};
+    border-top-right-radius: ${theme.space(2)};
+
+    backdrop-filter: blur(6px);
+    background-color: ${theme.alpha(theme.colors.card.text, 0.5)};
   }
 
   .rekorder-video-player-audio-control[data-state='open'] {
@@ -397,7 +392,7 @@ function VideoTimelineSeeker(props: SliderProps) {
   return (
     <Fragment>
       {VideoPlayerCSS.styles}
-      <Slider {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
+      <Slider step={0.1} {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
         <SliderTrack className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-track')}>
           <SliderRange className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-range')} />
         </SliderTrack>
@@ -408,21 +403,16 @@ function VideoTimelineSeeker(props: SliderProps) {
 }
 
 function VideoSoundControl({ children, ...props }: SliderProps) {
-  const value = props.value?.at(0) || 0;
-  const max = props.max || 100;
-  const percentage = (value / max) * 100;
-
   return (
-    <Fragment>
+    <div className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-audio-control-container')}>
       {VideoPlayerCSS.styles}
-      <Slider orientation="vertical" {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
+      <Slider step={1} orientation="vertical" {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
         <SliderTrack className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-track')}>
           <SliderRange className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-range')} />
-          <span className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-value')}>{Math.round(percentage)}</span>
         </SliderTrack>
         <SliderThumb className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-thumb')} />
       </Slider>
-    </Fragment>
+    </div>
   );
 }
 

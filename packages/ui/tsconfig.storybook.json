@@ -17,15 +17,19 @@
     "src/**/*.test.js",
   ],
   "include": [
+    "src/**/*",
+    ".storybook/*.js",
+    ".storybook/*.ts",
+    ".storybook/**/*",
     "src/**/*.stories.ts",
     "src/**/*.stories.js",
     "src/**/*.stories.jsx",
     "src/**/*.stories.tsx",
     "src/**/*.stories.mdx",
-    ".storybook/*.js",
-    ".storybook/*.ts",
-    "src/**/*",
-    ".storybook/**/*"
+    "../utils/**/*.ts",
+    "../hooks/**/*.ts",
+    "../types/**/*.ts",
+    "../constants/**/*.ts"
   ],
   "files": [
     "../../node_modules/@nx/react/typings/styled-jsx.d.ts",
