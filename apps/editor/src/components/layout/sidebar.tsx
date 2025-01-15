@@ -11,6 +11,7 @@ import { cn, createFilePath, unwrapError } from '@rekorder.io/utils';
 import { editor } from '../../store/editor';
 import { useAuthenticatedSession } from '../../context/authentication';
 import { PremiumFeatureDialog } from '../modal/premium-feature';
+import { omit } from 'lodash';
 
 export function Sidebar() {
   const { user } = useAuthenticatedSession();
@@ -34,11 +35,21 @@ export function Sidebar() {
 
       const { error, data } = await supabase
         .from('recordings')
-        .insert({ name: editor.video.name, original_file: response.original.id, modified_file: response.modified ? response.modified.id : null })
-        .select(`*, original_file (*), modified_file (*)`);
+        .insert({
+          name: editor.video.name,
+          original_file: response.original.id,
+          modified_file: response.modified ? response.modified.id : null,
+        })
+        .select();
       if (error) throw error;
 
-      return data[0];
+      return Object.assign(
+        {
+          original_file: response.original,
+          modified_file: response.modified,
+        },
+        omit(data[0], ['original_file', 'modified_file'])
+      );
     },
     onSuccess: (response) => {
       console.log(response);
