@@ -12,6 +12,7 @@
     "host_permissions": [
         "<all_urls>"
     ],
+    "action": {},
     "background": {
         "service_worker": "build/background.js"
     },
