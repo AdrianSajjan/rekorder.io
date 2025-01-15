@@ -137,13 +137,9 @@ class OffscreenRecorder {
     try {
       const uuid = nanoid();
       const name = 'Untitled Recording - ' + new Date().toLocaleString().split(',')[0];
-      const duration = this.timestamp;
-
-      this.__resetState();
-      const id = await this.offlineDatabase.blobs.add({ uuid, name, duration, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null });
+      const id = await this.offlineDatabase.blobs.add({ uuid, name, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null });
       chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
     } catch (error) {
-      this.__resetState();
       console.warn('Error in offscreen recorder while saving captured stream to offline database', error);
       chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamError, payload: { error } });
     }
@@ -156,6 +152,7 @@ class OffscreenRecorder {
     } else {
       const blob = new Blob(this.chunks, { type: 'video/webm' });
       exportWebmBlob(blob, this.timestamp * 1000, (blob) => this.__exportWebmBlob(blob), { logger: false });
+      this.__resetState();
     }
   }
 

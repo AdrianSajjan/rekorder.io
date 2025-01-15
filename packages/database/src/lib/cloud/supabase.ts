@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { Database } from './supabase.types';
 
 export const SupabaseWebConfig = {
   projectUrl: 'http://127.0.0.1:54321',
@@ -6,4 +7,4 @@ export const SupabaseWebConfig = {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0',
 };
 
-export const supabase = createClient(SupabaseWebConfig.projectUrl, SupabaseWebConfig.publicKey);
+export const supabase = createClient<Database>(SupabaseWebConfig.projectUrl, SupabaseWebConfig.publicKey);

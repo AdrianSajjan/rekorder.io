@@ -19,22 +19,29 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     try {
-      chrome.storage.local.get(StorageConfig.Authentication, async (result) => {
-        const authentication = result[StorageConfig.Authentication] as Session | null;
-        if (!authentication) throw new Error('Unable to retrieve authenticated session');
-
-        const { data, error } = await supabase.auth.setSession({ access_token: authentication.access_token, refresh_token: authentication.refresh_token });
-        if (error) throw error;
-
-        console.log(data);
-        setStatus('authenticated');
-        setSession(data.session);
+      chrome.storage.local.get(StorageConfig.Authentication, (result) => {
+        const session = result[StorageConfig.Authentication] as Session | null;
+        if (!session) throw new Error('Unable to retrieve authenticated session');
+        supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token });
       });
-    } catch (error) {
-      console.warn(error);
+    } catch {
       setStatus('unauthenticated');
       setSession(null);
     }
+
+    const listener = supabase.auth.onAuthStateChange((_, session) => {
+      if (session) {
+        setStatus('authenticated');
+        setSession(session);
+      } else {
+        setStatus('unauthenticated');
+        setSession(null);
+      }
+    });
+
+    return () => {
+      listener.data.subscription.unsubscribe();
+    };
   }, []);
 
   switch (status) {

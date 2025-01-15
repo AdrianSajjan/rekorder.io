@@ -2,8 +2,9 @@ import './styles/globals.css';
 
 import * as ReactDOM from 'react-dom/client';
 
-import { ThemeProvider } from '@rekorder.io/ui';
+import { Toaster } from 'sonner';
 import { StrictMode } from 'react';
+import { ThemeProvider } from '@rekorder.io/ui';
 
 import { OfflineEditor } from './components/editor';
 import { AuthenticationProvider, useAuthenticationContext } from './context/authentication';
@@ -15,6 +16,7 @@ root.render(
     <ThemeProvider>
       <AuthenticationProvider>
         <ApplicationEntry />
+        <Toaster richColors />
       </AuthenticationProvider>
     </ThemeProvider>
   </StrictMode>
