@@ -12,7 +12,7 @@ export function Header() {
           <span>Search for videos or stuffs</span>
           <span className="text-muted-foreground ml-auto">⌘K</span>
         </Button>
-        <Button variant="fancy" className="shrink-0 !ml-8 !mr-4" onClick={() => supabase.auth.signOut()}>
+        <Button variant="light" className="shrink-0 !ml-8 !mr-4" onClick={() => supabase.auth.signOut()}>
           <Lightning size={16} weight="fill" />
           <span>Upgrade plan</span>
         </Button>

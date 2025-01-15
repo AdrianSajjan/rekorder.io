@@ -1,6 +1,7 @@
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { checkBrowserName } from '@rekorder.io/utils';
+import type { Session } from '@supabase/supabase-js';
 
 const OFFSCREEN_PATH = 'build/offscreen.html';
 
@@ -117,9 +118,9 @@ class Thread {
 
   private async __handleActionClickListener(tab: chrome.tabs.Tab) {
     const result = await chrome.storage.local.get(StorageConfig.Authentication);
-    const authentication = result[StorageConfig.Authentication];
+    const authentication = result[StorageConfig.Authentication] as Session | null;
 
-    if (!authentication || !authentication.user || !authentication.session) {
+    if (!authentication) {
       this.__handleAuthenticateUser(tab);
     } else if (this.enabled) {
       this.__handleCloseExtension();

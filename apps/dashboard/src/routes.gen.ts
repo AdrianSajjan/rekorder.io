@@ -14,32 +14,41 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as authLayoutImport } from './routes/(auth)/_layout'
-import { Route as appLayoutImport } from './routes/(app)/_layout'
-import { Route as extensionExtensionRegisterImport } from './routes/(extension)/extension.register'
-import { Route as extensionExtensionLoginImport } from './routes/(extension)/extension.login'
-import { Route as authLayoutRegisterImport } from './routes/(auth)/_layout.register'
-import { Route as authLayoutLoginImport } from './routes/(auth)/_layout.login'
-import { Route as authLayoutForgotPasswordImport } from './routes/(auth)/_layout.forgot-password'
-import { Route as appLayoutDashboardImport } from './routes/(app)/_layout.dashboard'
-import { Route as extensionExtensionAuthCallbackImport } from './routes/(extension)/extension.auth.callback'
-import { Route as authLayoutAuthCallbackImport } from './routes/(auth)/_layout.auth.callback'
+import { Route as ExtensionLayoutImport } from './routes/extension/_layout'
+import { Route as DashboardLayoutImport } from './routes/dashboard/_layout'
+import { Route as AuthLayoutImport } from './routes/auth/_layout'
+import { Route as ExtensionLayoutRegisterImport } from './routes/extension/_layout.register'
+import { Route as ExtensionLayoutLoginImport } from './routes/extension/_layout.login'
+import { Route as ExtensionLayoutCallbackImport } from './routes/extension/_layout.callback'
+import { Route as DashboardLayoutHomeImport } from './routes/dashboard/_layout.home'
+import { Route as AuthLayoutRegisterImport } from './routes/auth/_layout.register'
+import { Route as AuthLayoutLoginImport } from './routes/auth/_layout.login'
+import { Route as AuthLayoutCallbackImport } from './routes/auth/_layout.callback'
+import { Route as AuthLayoutPasswordForgotImport } from './routes/auth/_layout.password.forgot'
 
 // Create Virtual Routes
 
-const authImport = createFileRoute('/(auth)')()
-const appImport = createFileRoute('/(app)')()
+const ExtensionImport = createFileRoute('/extension')()
+const DashboardImport = createFileRoute('/dashboard')()
+const AuthImport = createFileRoute('/auth')()
 
 // Create/Update Routes
 
-const authRoute = authImport.update({
-  id: '/(auth)',
-  path: '/',
+const ExtensionRoute = ExtensionImport.update({
+  id: '/extension',
+  path: '/extension',
   getParentRoute: () => rootRoute,
 } as any)
 
-const appRoute = appImport.update({
-  id: '/(app)',
+const DashboardRoute = DashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthRoute = AuthImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -49,65 +58,67 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const authLayoutRoute = authLayoutImport.update({
+const ExtensionLayoutRoute = ExtensionLayoutImport.update({
   id: '/_layout',
-  getParentRoute: () => authRoute,
+  getParentRoute: () => ExtensionRoute,
 } as any)
 
-const appLayoutRoute = appLayoutImport.update({
+const DashboardLayoutRoute = DashboardLayoutImport.update({
   id: '/_layout',
-  getParentRoute: () => appRoute,
+  getParentRoute: () => DashboardRoute,
 } as any)
 
-const extensionExtensionRegisterRoute = extensionExtensionRegisterImport.update(
-  {
-    id: '/(extension)/extension/register',
-    path: '/extension/register',
-    getParentRoute: () => rootRoute,
-  } as any,
-)
-
-const extensionExtensionLoginRoute = extensionExtensionLoginImport.update({
-  id: '/(extension)/extension/login',
-  path: '/extension/login',
-  getParentRoute: () => rootRoute,
+const AuthLayoutRoute = AuthLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const authLayoutRegisterRoute = authLayoutRegisterImport.update({
+const ExtensionLayoutRegisterRoute = ExtensionLayoutRegisterImport.update({
   id: '/register',
   path: '/register',
-  getParentRoute: () => authLayoutRoute,
+  getParentRoute: () => ExtensionLayoutRoute,
 } as any)
 
-const authLayoutLoginRoute = authLayoutLoginImport.update({
+const ExtensionLayoutLoginRoute = ExtensionLayoutLoginImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => authLayoutRoute,
+  getParentRoute: () => ExtensionLayoutRoute,
 } as any)
 
-const authLayoutForgotPasswordRoute = authLayoutForgotPasswordImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => authLayoutRoute,
+const ExtensionLayoutCallbackRoute = ExtensionLayoutCallbackImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => ExtensionLayoutRoute,
 } as any)
 
-const appLayoutDashboardRoute = appLayoutDashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => appLayoutRoute,
+const DashboardLayoutHomeRoute = DashboardLayoutHomeImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => DashboardLayoutRoute,
 } as any)
 
-const extensionExtensionAuthCallbackRoute =
-  extensionExtensionAuthCallbackImport.update({
-    id: '/(extension)/extension/auth/callback',
-    path: '/extension/auth/callback',
-    getParentRoute: () => rootRoute,
-  } as any)
+const AuthLayoutRegisterRoute = AuthLayoutRegisterImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
 
-const authLayoutAuthCallbackRoute = authLayoutAuthCallbackImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => authLayoutRoute,
+const AuthLayoutLoginRoute = AuthLayoutLoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+
+const AuthLayoutCallbackRoute = AuthLayoutCallbackImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthLayoutRoute,
+} as any)
+
+const AuthLayoutPasswordForgotRoute = AuthLayoutPasswordForgotImport.update({
+  id: '/password/forgot',
+  path: '/password/forgot',
+  getParentRoute: () => AuthLayoutRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -121,243 +132,299 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/(app)': {
-      id: '/(app)'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof appImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/(app)/_layout': {
-      id: '/(app)/_layout'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof appLayoutImport
-      parentRoute: typeof appRoute
+    '/auth/_layout': {
+      id: '/auth/_layout'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthLayoutImport
+      parentRoute: typeof AuthRoute
     }
-    '/(auth)': {
-      id: '/(auth)'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof authImport
-      parentRoute: typeof rootRoute
-    }
-    '/(auth)/_layout': {
-      id: '/(auth)/_layout'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof authLayoutImport
-      parentRoute: typeof authRoute
-    }
-    '/(app)/_layout/dashboard': {
-      id: '/(app)/_layout/dashboard'
+    '/dashboard': {
+      id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
-      preLoaderRoute: typeof appLayoutDashboardImport
-      parentRoute: typeof appLayoutImport
-    }
-    '/(auth)/_layout/forgot-password': {
-      id: '/(auth)/_layout/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof authLayoutForgotPasswordImport
-      parentRoute: typeof authLayoutImport
-    }
-    '/(auth)/_layout/login': {
-      id: '/(auth)/_layout/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof authLayoutLoginImport
-      parentRoute: typeof authLayoutImport
-    }
-    '/(auth)/_layout/register': {
-      id: '/(auth)/_layout/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof authLayoutRegisterImport
-      parentRoute: typeof authLayoutImport
-    }
-    '/(extension)/extension/login': {
-      id: '/(extension)/extension/login'
-      path: '/extension/login'
-      fullPath: '/extension/login'
-      preLoaderRoute: typeof extensionExtensionLoginImport
+      preLoaderRoute: typeof DashboardImport
       parentRoute: typeof rootRoute
     }
-    '/(extension)/extension/register': {
-      id: '/(extension)/extension/register'
-      path: '/extension/register'
-      fullPath: '/extension/register'
-      preLoaderRoute: typeof extensionExtensionRegisterImport
+    '/dashboard/_layout': {
+      id: '/dashboard/_layout'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardLayoutImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/extension': {
+      id: '/extension'
+      path: '/extension'
+      fullPath: '/extension'
+      preLoaderRoute: typeof ExtensionImport
       parentRoute: typeof rootRoute
     }
-    '/(auth)/_layout/auth/callback': {
-      id: '/(auth)/_layout/auth/callback'
-      path: '/auth/callback'
+    '/extension/_layout': {
+      id: '/extension/_layout'
+      path: '/extension'
+      fullPath: '/extension'
+      preLoaderRoute: typeof ExtensionLayoutImport
+      parentRoute: typeof ExtensionRoute
+    }
+    '/auth/_layout/callback': {
+      id: '/auth/_layout/callback'
+      path: '/callback'
       fullPath: '/auth/callback'
-      preLoaderRoute: typeof authLayoutAuthCallbackImport
-      parentRoute: typeof authLayoutImport
+      preLoaderRoute: typeof AuthLayoutCallbackImport
+      parentRoute: typeof AuthLayoutImport
     }
-    '/(extension)/extension/auth/callback': {
-      id: '/(extension)/extension/auth/callback'
-      path: '/extension/auth/callback'
-      fullPath: '/extension/auth/callback'
-      preLoaderRoute: typeof extensionExtensionAuthCallbackImport
-      parentRoute: typeof rootRoute
+    '/auth/_layout/login': {
+      id: '/auth/_layout/login'
+      path: '/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLayoutLoginImport
+      parentRoute: typeof AuthLayoutImport
+    }
+    '/auth/_layout/register': {
+      id: '/auth/_layout/register'
+      path: '/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthLayoutRegisterImport
+      parentRoute: typeof AuthLayoutImport
+    }
+    '/dashboard/_layout/home': {
+      id: '/dashboard/_layout/home'
+      path: '/home'
+      fullPath: '/dashboard/home'
+      preLoaderRoute: typeof DashboardLayoutHomeImport
+      parentRoute: typeof DashboardLayoutImport
+    }
+    '/extension/_layout/callback': {
+      id: '/extension/_layout/callback'
+      path: '/callback'
+      fullPath: '/extension/callback'
+      preLoaderRoute: typeof ExtensionLayoutCallbackImport
+      parentRoute: typeof ExtensionLayoutImport
+    }
+    '/extension/_layout/login': {
+      id: '/extension/_layout/login'
+      path: '/login'
+      fullPath: '/extension/login'
+      preLoaderRoute: typeof ExtensionLayoutLoginImport
+      parentRoute: typeof ExtensionLayoutImport
+    }
+    '/extension/_layout/register': {
+      id: '/extension/_layout/register'
+      path: '/register'
+      fullPath: '/extension/register'
+      preLoaderRoute: typeof ExtensionLayoutRegisterImport
+      parentRoute: typeof ExtensionLayoutImport
+    }
+    '/auth/_layout/password/forgot': {
+      id: '/auth/_layout/password/forgot'
+      path: '/password/forgot'
+      fullPath: '/auth/password/forgot'
+      preLoaderRoute: typeof AuthLayoutPasswordForgotImport
+      parentRoute: typeof AuthLayoutImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface appLayoutRouteChildren {
-  appLayoutDashboardRoute: typeof appLayoutDashboardRoute
+interface AuthLayoutRouteChildren {
+  AuthLayoutCallbackRoute: typeof AuthLayoutCallbackRoute
+  AuthLayoutLoginRoute: typeof AuthLayoutLoginRoute
+  AuthLayoutRegisterRoute: typeof AuthLayoutRegisterRoute
+  AuthLayoutPasswordForgotRoute: typeof AuthLayoutPasswordForgotRoute
 }
 
-const appLayoutRouteChildren: appLayoutRouteChildren = {
-  appLayoutDashboardRoute: appLayoutDashboardRoute,
+const AuthLayoutRouteChildren: AuthLayoutRouteChildren = {
+  AuthLayoutCallbackRoute: AuthLayoutCallbackRoute,
+  AuthLayoutLoginRoute: AuthLayoutLoginRoute,
+  AuthLayoutRegisterRoute: AuthLayoutRegisterRoute,
+  AuthLayoutPasswordForgotRoute: AuthLayoutPasswordForgotRoute,
 }
 
-const appLayoutRouteWithChildren = appLayoutRoute._addFileChildren(
-  appLayoutRouteChildren,
+const AuthLayoutRouteWithChildren = AuthLayoutRoute._addFileChildren(
+  AuthLayoutRouteChildren,
 )
 
-interface appRouteChildren {
-  appLayoutRoute: typeof appLayoutRouteWithChildren
+interface AuthRouteChildren {
+  AuthLayoutRoute: typeof AuthLayoutRouteWithChildren
 }
 
-const appRouteChildren: appRouteChildren = {
-  appLayoutRoute: appLayoutRouteWithChildren,
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthLayoutRoute: AuthLayoutRouteWithChildren,
 }
 
-const appRouteWithChildren = appRoute._addFileChildren(appRouteChildren)
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
-interface authLayoutRouteChildren {
-  authLayoutForgotPasswordRoute: typeof authLayoutForgotPasswordRoute
-  authLayoutLoginRoute: typeof authLayoutLoginRoute
-  authLayoutRegisterRoute: typeof authLayoutRegisterRoute
-  authLayoutAuthCallbackRoute: typeof authLayoutAuthCallbackRoute
+interface DashboardLayoutRouteChildren {
+  DashboardLayoutHomeRoute: typeof DashboardLayoutHomeRoute
 }
 
-const authLayoutRouteChildren: authLayoutRouteChildren = {
-  authLayoutForgotPasswordRoute: authLayoutForgotPasswordRoute,
-  authLayoutLoginRoute: authLayoutLoginRoute,
-  authLayoutRegisterRoute: authLayoutRegisterRoute,
-  authLayoutAuthCallbackRoute: authLayoutAuthCallbackRoute,
+const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
+  DashboardLayoutHomeRoute: DashboardLayoutHomeRoute,
 }
 
-const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
-  authLayoutRouteChildren,
+const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
+  DashboardLayoutRouteChildren,
 )
 
-interface authRouteChildren {
-  authLayoutRoute: typeof authLayoutRouteWithChildren
+interface DashboardRouteChildren {
+  DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
 }
 
-const authRouteChildren: authRouteChildren = {
-  authLayoutRoute: authLayoutRouteWithChildren,
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
 }
 
-const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+interface ExtensionLayoutRouteChildren {
+  ExtensionLayoutCallbackRoute: typeof ExtensionLayoutCallbackRoute
+  ExtensionLayoutLoginRoute: typeof ExtensionLayoutLoginRoute
+  ExtensionLayoutRegisterRoute: typeof ExtensionLayoutRegisterRoute
+}
+
+const ExtensionLayoutRouteChildren: ExtensionLayoutRouteChildren = {
+  ExtensionLayoutCallbackRoute: ExtensionLayoutCallbackRoute,
+  ExtensionLayoutLoginRoute: ExtensionLayoutLoginRoute,
+  ExtensionLayoutRegisterRoute: ExtensionLayoutRegisterRoute,
+}
+
+const ExtensionLayoutRouteWithChildren = ExtensionLayoutRoute._addFileChildren(
+  ExtensionLayoutRouteChildren,
+)
+
+interface ExtensionRouteChildren {
+  ExtensionLayoutRoute: typeof ExtensionLayoutRouteWithChildren
+}
+
+const ExtensionRouteChildren: ExtensionRouteChildren = {
+  ExtensionLayoutRoute: ExtensionLayoutRouteWithChildren,
+}
+
+const ExtensionRouteWithChildren = ExtensionRoute._addFileChildren(
+  ExtensionRouteChildren,
+)
 
 export interface FileRoutesByFullPath {
-  '/': typeof authLayoutRouteWithChildren
-  '/dashboard': typeof appLayoutDashboardRoute
-  '/forgot-password': typeof authLayoutForgotPasswordRoute
-  '/login': typeof authLayoutLoginRoute
-  '/register': typeof authLayoutRegisterRoute
-  '/extension/login': typeof extensionExtensionLoginRoute
-  '/extension/register': typeof extensionExtensionRegisterRoute
-  '/auth/callback': typeof authLayoutAuthCallbackRoute
-  '/extension/auth/callback': typeof extensionExtensionAuthCallbackRoute
+  '/': typeof IndexRoute
+  '/auth': typeof AuthLayoutRouteWithChildren
+  '/dashboard': typeof DashboardLayoutRouteWithChildren
+  '/extension': typeof ExtensionLayoutRouteWithChildren
+  '/auth/callback': typeof AuthLayoutCallbackRoute
+  '/auth/login': typeof AuthLayoutLoginRoute
+  '/auth/register': typeof AuthLayoutRegisterRoute
+  '/dashboard/home': typeof DashboardLayoutHomeRoute
+  '/extension/callback': typeof ExtensionLayoutCallbackRoute
+  '/extension/login': typeof ExtensionLayoutLoginRoute
+  '/extension/register': typeof ExtensionLayoutRegisterRoute
+  '/auth/password/forgot': typeof AuthLayoutPasswordForgotRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof authLayoutRouteWithChildren
-  '/dashboard': typeof appLayoutDashboardRoute
-  '/forgot-password': typeof authLayoutForgotPasswordRoute
-  '/login': typeof authLayoutLoginRoute
-  '/register': typeof authLayoutRegisterRoute
-  '/extension/login': typeof extensionExtensionLoginRoute
-  '/extension/register': typeof extensionExtensionRegisterRoute
-  '/auth/callback': typeof authLayoutAuthCallbackRoute
-  '/extension/auth/callback': typeof extensionExtensionAuthCallbackRoute
+  '/': typeof IndexRoute
+  '/auth': typeof AuthLayoutRouteWithChildren
+  '/dashboard': typeof DashboardLayoutRouteWithChildren
+  '/extension': typeof ExtensionLayoutRouteWithChildren
+  '/auth/callback': typeof AuthLayoutCallbackRoute
+  '/auth/login': typeof AuthLayoutLoginRoute
+  '/auth/register': typeof AuthLayoutRegisterRoute
+  '/dashboard/home': typeof DashboardLayoutHomeRoute
+  '/extension/callback': typeof ExtensionLayoutCallbackRoute
+  '/extension/login': typeof ExtensionLayoutLoginRoute
+  '/extension/register': typeof ExtensionLayoutRegisterRoute
+  '/auth/password/forgot': typeof AuthLayoutPasswordForgotRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/(app)': typeof appRouteWithChildren
-  '/(app)/_layout': typeof appLayoutRouteWithChildren
-  '/(auth)': typeof authRouteWithChildren
-  '/(auth)/_layout': typeof authLayoutRouteWithChildren
-  '/(app)/_layout/dashboard': typeof appLayoutDashboardRoute
-  '/(auth)/_layout/forgot-password': typeof authLayoutForgotPasswordRoute
-  '/(auth)/_layout/login': typeof authLayoutLoginRoute
-  '/(auth)/_layout/register': typeof authLayoutRegisterRoute
-  '/(extension)/extension/login': typeof extensionExtensionLoginRoute
-  '/(extension)/extension/register': typeof extensionExtensionRegisterRoute
-  '/(auth)/_layout/auth/callback': typeof authLayoutAuthCallbackRoute
-  '/(extension)/extension/auth/callback': typeof extensionExtensionAuthCallbackRoute
+  '/auth': typeof AuthRouteWithChildren
+  '/auth/_layout': typeof AuthLayoutRouteWithChildren
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/_layout': typeof DashboardLayoutRouteWithChildren
+  '/extension': typeof ExtensionRouteWithChildren
+  '/extension/_layout': typeof ExtensionLayoutRouteWithChildren
+  '/auth/_layout/callback': typeof AuthLayoutCallbackRoute
+  '/auth/_layout/login': typeof AuthLayoutLoginRoute
+  '/auth/_layout/register': typeof AuthLayoutRegisterRoute
+  '/dashboard/_layout/home': typeof DashboardLayoutHomeRoute
+  '/extension/_layout/callback': typeof ExtensionLayoutCallbackRoute
+  '/extension/_layout/login': typeof ExtensionLayoutLoginRoute
+  '/extension/_layout/register': typeof ExtensionLayoutRegisterRoute
+  '/auth/_layout/password/forgot': typeof AuthLayoutPasswordForgotRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/dashboard'
-    | '/forgot-password'
-    | '/login'
-    | '/register'
+    | '/extension'
+    | '/auth/callback'
+    | '/auth/login'
+    | '/auth/register'
+    | '/dashboard/home'
+    | '/extension/callback'
     | '/extension/login'
     | '/extension/register'
-    | '/auth/callback'
-    | '/extension/auth/callback'
+    | '/auth/password/forgot'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/dashboard'
-    | '/forgot-password'
-    | '/login'
-    | '/register'
+    | '/extension'
+    | '/auth/callback'
+    | '/auth/login'
+    | '/auth/register'
+    | '/dashboard/home'
+    | '/extension/callback'
     | '/extension/login'
     | '/extension/register'
-    | '/auth/callback'
-    | '/extension/auth/callback'
+    | '/auth/password/forgot'
   id:
     | '__root__'
     | '/'
-    | '/(app)'
-    | '/(app)/_layout'
-    | '/(auth)'
-    | '/(auth)/_layout'
-    | '/(app)/_layout/dashboard'
-    | '/(auth)/_layout/forgot-password'
-    | '/(auth)/_layout/login'
-    | '/(auth)/_layout/register'
-    | '/(extension)/extension/login'
-    | '/(extension)/extension/register'
-    | '/(auth)/_layout/auth/callback'
-    | '/(extension)/extension/auth/callback'
+    | '/auth'
+    | '/auth/_layout'
+    | '/dashboard'
+    | '/dashboard/_layout'
+    | '/extension'
+    | '/extension/_layout'
+    | '/auth/_layout/callback'
+    | '/auth/_layout/login'
+    | '/auth/_layout/register'
+    | '/dashboard/_layout/home'
+    | '/extension/_layout/callback'
+    | '/extension/_layout/login'
+    | '/extension/_layout/register'
+    | '/auth/_layout/password/forgot'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  appRoute: typeof appRouteWithChildren
-  authRoute: typeof authRouteWithChildren
-  extensionExtensionLoginRoute: typeof extensionExtensionLoginRoute
-  extensionExtensionRegisterRoute: typeof extensionExtensionRegisterRoute
-  extensionExtensionAuthCallbackRoute: typeof extensionExtensionAuthCallbackRoute
+  AuthRoute: typeof AuthRouteWithChildren
+  DashboardRoute: typeof DashboardRouteWithChildren
+  ExtensionRoute: typeof ExtensionRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  appRoute: appRouteWithChildren,
-  authRoute: authRouteWithChildren,
-  extensionExtensionLoginRoute: extensionExtensionLoginRoute,
-  extensionExtensionRegisterRoute: extensionExtensionRegisterRoute,
-  extensionExtensionAuthCallbackRoute: extensionExtensionAuthCallbackRoute,
+  AuthRoute: AuthRouteWithChildren,
+  DashboardRoute: DashboardRouteWithChildren,
+  ExtensionRoute: ExtensionRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -371,73 +438,89 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/(app)",
-        "/(auth)",
-        "/(extension)/extension/login",
-        "/(extension)/extension/register",
-        "/(extension)/extension/auth/callback"
+        "/auth",
+        "/dashboard",
+        "/extension"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/(app)": {
-      "filePath": "(app)",
+    "/auth": {
+      "filePath": "auth",
       "children": [
-        "/(app)/_layout"
+        "/auth/_layout"
       ]
     },
-    "/(app)/_layout": {
-      "filePath": "(app)/_layout.tsx",
-      "parent": "/(app)",
+    "/auth/_layout": {
+      "filePath": "auth/_layout.tsx",
+      "parent": "/auth",
       "children": [
-        "/(app)/_layout/dashboard"
+        "/auth/_layout/callback",
+        "/auth/_layout/login",
+        "/auth/_layout/register",
+        "/auth/_layout/password/forgot"
       ]
     },
-    "/(auth)": {
-      "filePath": "(auth)",
+    "/dashboard": {
+      "filePath": "dashboard",
       "children": [
-        "/(auth)/_layout"
+        "/dashboard/_layout"
       ]
     },
-    "/(auth)/_layout": {
-      "filePath": "(auth)/_layout.tsx",
-      "parent": "/(auth)",
+    "/dashboard/_layout": {
+      "filePath": "dashboard/_layout.tsx",
+      "parent": "/dashboard",
       "children": [
-        "/(auth)/_layout/forgot-password",
-        "/(auth)/_layout/login",
-        "/(auth)/_layout/register",
-        "/(auth)/_layout/auth/callback"
+        "/dashboard/_layout/home"
       ]
     },
-    "/(app)/_layout/dashboard": {
-      "filePath": "(app)/_layout.dashboard.tsx",
-      "parent": "/(app)/_layout"
+    "/extension": {
+      "filePath": "extension",
+      "children": [
+        "/extension/_layout"
+      ]
     },
-    "/(auth)/_layout/forgot-password": {
-      "filePath": "(auth)/_layout.forgot-password.tsx",
-      "parent": "/(auth)/_layout"
+    "/extension/_layout": {
+      "filePath": "extension/_layout.tsx",
+      "parent": "/extension",
+      "children": [
+        "/extension/_layout/callback",
+        "/extension/_layout/login",
+        "/extension/_layout/register"
+      ]
     },
-    "/(auth)/_layout/login": {
-      "filePath": "(auth)/_layout.login.tsx",
-      "parent": "/(auth)/_layout"
+    "/auth/_layout/callback": {
+      "filePath": "auth/_layout.callback.tsx",
+      "parent": "/auth/_layout"
     },
-    "/(auth)/_layout/register": {
-      "filePath": "(auth)/_layout.register.tsx",
-      "parent": "/(auth)/_layout"
+    "/auth/_layout/login": {
+      "filePath": "auth/_layout.login.tsx",
+      "parent": "/auth/_layout"
     },
-    "/(extension)/extension/login": {
-      "filePath": "(extension)/extension.login.tsx"
+    "/auth/_layout/register": {
+      "filePath": "auth/_layout.register.tsx",
+      "parent": "/auth/_layout"
     },
-    "/(extension)/extension/register": {
-      "filePath": "(extension)/extension.register.tsx"
+    "/dashboard/_layout/home": {
+      "filePath": "dashboard/_layout.home.tsx",
+      "parent": "/dashboard/_layout"
     },
-    "/(auth)/_layout/auth/callback": {
-      "filePath": "(auth)/_layout.auth.callback.tsx",
-      "parent": "/(auth)/_layout"
+    "/extension/_layout/callback": {
+      "filePath": "extension/_layout.callback.tsx",
+      "parent": "/extension/_layout"
     },
-    "/(extension)/extension/auth/callback": {
-      "filePath": "(extension)/extension.auth.callback.tsx"
+    "/extension/_layout/login": {
+      "filePath": "extension/_layout.login.tsx",
+      "parent": "/extension/_layout"
+    },
+    "/extension/_layout/register": {
+      "filePath": "extension/_layout.register.tsx",
+      "parent": "/extension/_layout"
+    },
+    "/auth/_layout/password/forgot": {
+      "filePath": "auth/_layout.password.forgot.tsx",
+      "parent": "/auth/_layout"
     }
   }
 }

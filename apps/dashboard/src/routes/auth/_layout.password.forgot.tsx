@@ -1,7 +1,7 @@
 import { Button, Input } from '@rekorder.io/ui';
 import { createFileRoute, Link } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/(auth)/_layout/forgot-password')({
+export const Route = createFileRoute('/auth/_layout/password/forgot')({
   component: ForgotPasswordPage,
 });
 
@@ -26,7 +26,7 @@ function ForgotPasswordPage() {
 
         <p className="text-sm text-center mt-4">
           Don't need to reset you password?&nbsp;
-          <Link className="text-primary-main hover:underline" to="/login">
+          <Link className="text-primary-main hover:underline" to="/auth/login">
             Sign in
           </Link>
         </p>

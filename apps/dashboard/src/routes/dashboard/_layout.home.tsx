@@ -2,15 +2,11 @@ import { VideoCamera } from '@phosphor-icons/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Button, SegmentedControl } from '@rekorder.io/ui';
 
-import { useAuthenticatedSession } from '../../store/authentication';
-
-export const Route = createFileRoute('/(app)/_layout/dashboard')({
+export const Route = createFileRoute('/dashboard/_layout/home')({
   component: HomePage,
 });
 
 function HomePage() {
-  const session = useAuthenticatedSession();
-
   return (
     <div className="container w-full max-w-screen-xl mx-auto h-full">
       <div className="flex items-center w-full pt-10 gap-5">
@@ -27,7 +23,6 @@ function HomePage() {
           <SegmentedControl.Trigger value="archived">Archived</SegmentedControl.Trigger>
         </SegmentedControl.List>
       </SegmentedControl>
-      <div className="mt-10">{JSON.stringify(session.user, null, 4)}</div>
     </div>
   );
 }
