@@ -126,7 +126,7 @@ const PluginCardHOC = observer(() => {
 
 const PluginCard = observer(() => {
   const handleDisposeEvents = useDisposeEvents();
-  const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 350, width: 340 } });
+  const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 380, width: 350 } });
 
   const handleScreenCapture = () => {
     switch (recorder.status) {

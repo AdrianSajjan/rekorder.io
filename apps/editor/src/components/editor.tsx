@@ -15,6 +15,7 @@ import {
 } from '@radix-ui/react-dialog';
 
 import { animate, Brand, Button, CrownIcon, VideoPlayer } from '@rekorder.io/ui';
+import { supabase } from '@rekorder.io/database';
 import { cn } from '@rekorder.io/utils';
 
 import { editor } from '../store/editor';
