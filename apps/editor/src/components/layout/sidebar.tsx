@@ -38,50 +38,35 @@ interface CloudUploadProps {
 export function Sidebar() {
   const { user } = useAuthenticatedSession();
 
+  const handleUploadVideo = async (blob: Blob) => {
+    const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(user, blob), blob);
+    if (error) throw error;
+    return data;
+  };
+
+  const handleUploadThumbnail = async (blob: Blob) => {
+    const thumbnail = await extractVideoFileThumbnail(blob);
+    const { data, error } = await supabase.storage.from('thumbnails').upload(createFilePath(user, thumbnail), thumbnail);
+    if (error) throw error;
+    return data;
+  };
+
   const handleCloudUpload = useMutation({
     mutationFn: async () => {
       if (!editor.video) throw new Error('Unable to retrieve video file from storage');
       const response = {} as CloudUploadProps;
 
       if (editor.video.original_blob) {
-        Promise.all([
-          supabase.storage
-            .from('recordings')
-            .upload(createFilePath(user, editor.video.original_blob), editor.video.original_blob)
-            .then(({ data, error }) => {
-              if (error) throw error;
-              response.original_file = data;
-            }),
-          extractVideoFileThumbnail(editor.video.original_blob).then((thumbnail) => {
-            supabase.storage
-              .from('thumbnails')
-              .upload(createFilePath(user, thumbnail), thumbnail)
-              .then(({ data, error }) => {
-                if (error) throw error;
-                response.original_thumbnail = data;
-              });
-          }),
+        await Promise.all([
+          handleUploadVideo(editor.video.original_blob).then((data) => (response.original_file = data)),
+          handleUploadThumbnail(editor.video.original_blob).then((data) => (response.original_thumbnail = data)),
         ]);
       }
 
       if (editor.video.modified_blob) {
-        Promise.all([
-          supabase.storage
-            .from('recordings')
-            .upload(createFilePath(user, editor.video.modified_blob), editor.video.modified_blob)
-            .then(({ data, error }) => {
-              if (error) throw error;
-              response.modified_file = data;
-            }),
-          extractVideoFileThumbnail(editor.video.modified_blob).then((thumbnail) => {
-            supabase.storage
-              .from('thumbnails')
-              .upload(createFilePath(user, thumbnail), thumbnail)
-              .then(({ data, error }) => {
-                if (error) throw error;
-                response.modified_thumbnail = data;
-              });
-          }),
+        await Promise.all([
+          handleUploadVideo(editor.video.modified_blob).then((data) => (response.modified_file = data)),
+          handleUploadThumbnail(editor.video.modified_blob).then((data) => (response.modified_thumbnail = data)),
         ]);
       }
 
