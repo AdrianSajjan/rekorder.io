@@ -5,7 +5,9 @@ import * as ReactDOM from 'react-dom/client';
 import { Toaster } from 'sonner';
 import { StrictMode } from 'react';
 import { ThemeProvider } from '@rekorder.io/ui';
+import { QueryClientProvider } from '@tanstack/react-query';
 
+import { queryClient } from './config/api';
 import { OfflineEditor } from './components/editor';
 import { AuthenticationProvider, useAuthenticationContext } from './context/authentication';
 
@@ -13,12 +15,14 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 
 root.render(
   <StrictMode>
-    <ThemeProvider>
-      <AuthenticationProvider>
-        <ApplicationEntry />
-        <Toaster richColors />
-      </AuthenticationProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthenticationProvider>
+          <ApplicationEntry />
+          <Toaster richColors />
+        </AuthenticationProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   </StrictMode>
 );
 

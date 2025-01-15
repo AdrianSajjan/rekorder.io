@@ -18,7 +18,7 @@ export function Sidebar() {
   const handleCloudUpload = useMutation({
     mutationFn: async () => {
       if (!editor.video) throw new Error('Unable to retrieve video file from storage');
-      const response = {} as Record<'original' | 'modified', StorageResponse>;
+      const response = {} as { original: StorageResponse; modified?: StorageResponse };
 
       if (editor.video.original_blob) {
         const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(user, editor.video.original_blob), editor.video.original_blob);
@@ -32,21 +32,21 @@ export function Sidebar() {
         response.modified = data;
       }
 
-      const { error } = await supabase.from('recordings').insert({
-        name: editor.video.name,
-        original_file: response.original.id,
-        modified_file: response.modified.id,
-      });
+      const { error, data } = await supabase
+        .from('recordings')
+        .insert({ name: editor.video.name, original_file: response.original.id, modified_file: response.modified ? response.modified.id : null })
+        .select(`*, original_file (*), modified_file (*)`);
       if (error) throw error;
 
-      return response;
+      return data[0];
     },
     onSuccess: (response) => {
       console.log(response);
+      toast.success('The recording has been uploaded to cloud');
     },
     onError: (error) => {
       console.warn(error);
-      toast.error(unwrapError(error, 'Failed to upload video to cloud'));
+      toast.error(unwrapError(error, 'Oops! Something went wrong while uploading your video to cloud'));
     },
   });
 
@@ -62,6 +62,7 @@ export function Sidebar() {
             icon={<CloudArrowUp weight="bold" />}
             title="Upload to cloud"
             description="Get access to premium features"
+            loading={handleCloudUpload.isPending}
             onClick={() => handleCloudUpload.mutate()}
           />
           <SidebarAction icon={<Download weight="bold" />} title="Export as MP4" description="Download your video in .mp4 format" />
