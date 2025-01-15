@@ -29,7 +29,7 @@ class Editor {
           runInAction(() => {
             this.video = blob;
             this.name = blob.name;
-            this.blobURL = URL.createObjectURL(blob.original);
+            this.blobURL = URL.createObjectURL(blob.original_blob);
           });
         }
         break;

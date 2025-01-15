@@ -1,6 +1,7 @@
 /// <reference types='vitest' />
 
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 import { defineConfig } from 'vite';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
@@ -15,12 +16,12 @@ export default defineConfig({
     host: true,
   },
   preview: {
-    port: 4300,
+    port: 4200,
     host: true,
   },
   plugins: [
     TanStackRouterVite({
-      generatedRouteTree: '../../apps/dashboard/src/routes.gen.ts',
+      generatedRouteTree: path.resolve(__dirname, 'src/routes.gen.ts'),
     }),
     react({
       babel: {

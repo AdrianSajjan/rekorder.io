@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { forwardRef } from 'react';
 
-import { CaretRight, CloudArrowUp, Crop, Download, MusicNotes, Panorama, Scissors, ShareFat, Spinner, X } from '@phosphor-icons/react';
+import { CaretRight, CloudArrowUp, Crop, Download, MagnifyingGlassPlus, MusicNotes, Panorama, Scissors, ShareFat, Spinner, X } from '@phosphor-icons/react';
 import {
   Dialog,
   DialogClose,
@@ -63,12 +63,17 @@ const OfflineEditor = observer(() => {
             <PremiumFeatureDialog>
               <SidebarAction premium icon={<Panorama weight="bold" />} title="Backgrounds" description="Add a background behind your video" />
             </PremiumFeatureDialog>
+            <PremiumFeatureDialog>
+              <SidebarAction premium icon={<MagnifyingGlassPlus weight="bold" />} title="Zoom to point" description="Add a zoom to highlight stuffs" />
+            </PremiumFeatureDialog>
           </div>
         </div>
       </aside>
       <section className="flex-1 flex flex-col">
         <header className="h-16 bg-card-background shrink-0 border-b border-borders-input flex items-center justify-center">
-          <input value={editor.name} onChange={(event) => editor.updateName(event.target.value)} className="text-center w-96" />
+          {editor.blobURL ? (
+            <input value={editor.name} onChange={(event) => editor.updateName(event.target.value)} className="text-center text-sm w-96" />
+          ) : null}
         </header>
         <main className="flex-1 grid place-items-center p-10">
           <div className="h-auto w-full max-w-4xl relative">

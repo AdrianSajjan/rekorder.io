@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Rekorder.io",
-    "description": "Screen Recorder on steroids | AI powered product demo creator and editor",
+    "name": "Screech",
+    "description": "Screen recorder on steroids. Create and edit AI-powered product demos and videos in seconds. Share your recordings with your team and track the analytics.",
     "version": "1.0.0",
     "icons": {
         "16": "icons/icon16.png",
@@ -12,7 +12,6 @@
     "host_permissions": [
         "<all_urls>"
     ],
-    "action": {},
     "background": {
         "service_worker": "build/background.js"
     },
@@ -41,8 +40,12 @@
     "externally_connectable": {
         "matches": [
             "https://*.screech.ai/*",
-            "http://192.168.10.157:4200/*"
+            "http://127.0.0.1:4200/*"
         ],
         "accept_tls_channel_id": true
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';",
+        "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; child-src 'self';"
     }
 }

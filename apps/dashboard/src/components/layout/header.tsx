@@ -1,5 +1,6 @@
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { Lightning } from '@phosphor-icons/react/dist/ssr';
+import { supabase } from '@rekorder.io/database';
 import { Button } from '@rekorder.io/ui';
 
 export function Header() {
@@ -11,7 +12,7 @@ export function Header() {
           <span>Search for videos or stuffs</span>
           <span className="text-muted-foreground ml-auto">⌘K</span>
         </Button>
-        <Button variant="fancy" className="shrink-0 !ml-8 !mr-4">
+        <Button variant="fancy" className="shrink-0 !ml-8 !mr-4" onClick={() => supabase.auth.signOut()}>
           <Lightning size={16} weight="fill" />
           <span>Upgrade plan</span>
         </Button>

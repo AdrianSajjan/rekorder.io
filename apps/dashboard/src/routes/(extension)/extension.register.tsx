@@ -3,16 +3,15 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 import { ErrorMessages, EventConfig, ExtensionConfig } from '@rekorder.io/constants';
 import { supabase } from '@rekorder.io/database';
 import { Brand, Button, Divider, GoogleIcon, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
-import { unwrapError } from '@rekorder.io/utils';
+import { unwrapError, wait } from '@rekorder.io/utils';
 
 import { PasswordInput, PasswordRegex } from '../../components/ui/password-input';
-import { Session, User } from '@supabase/supabase-js';
 
 const RegisterSchema = z.object({
   email: z.string().nonempty('Please enter your email address').email('Please enter a valid email address'),
@@ -36,18 +35,14 @@ function RegisterPage() {
     },
   });
 
-  const handleSendAuthenticationEvent = (user: User | null, session: Session | null) => {
-    if (!user || !session) return toast.error('User or session not found');
-    window.chrome.runtime.sendMessage(ExtensionConfig.ExtensionId, { type: EventConfig.AuthenticateSuccess, payload: { user, session } });
-    toast.success('You have been registered to Screech extension, you will be redirected automatically');
-  };
-
   const handleRegister: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
     try {
       setSubmitting(true);
       const { error, data } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
-      handleSendAuthenticationEvent(data.user, data.session);
+
+      wait(1500).then(() => window.chrome.runtime.sendMessage(ExtensionConfig.ExtensionId, { type: EventConfig.AuthenticateSuccess, payload: data }));
+      toast.success('You have been registered, this tab will close automatically...');
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     } finally {
@@ -57,10 +52,12 @@ function RegisterPage() {
 
   const handleRegisterWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-      if (error) throw error;
-      const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
-      handleSendAuthenticationEvent(user.data.user, session.data.session);
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: 'https://localhost:4200/extension/auth/callback',
+        },
+      });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     }

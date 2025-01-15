@@ -88,7 +88,7 @@ const PluginCardCSS = css.resolve`
 
   .rekorder-horizontal-panel-content {
     padding: ${theme.space(6)};
-    max-height: ${theme.space(50)};
+    max-height: ${theme.space(56)};
     overflow-y: auto;
   }
 
@@ -126,7 +126,7 @@ const PluginCardHOC = observer(() => {
 
 const PluginCard = observer(() => {
   const handleDisposeEvents = useDisposeEvents();
-  const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 350, width: 375 } });
+  const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 350, width: 340 } });
 
   const handleScreenCapture = () => {
     switch (recorder.status) {

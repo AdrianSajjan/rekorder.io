@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import { z } from 'zod';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { supabase } from '@rekorder.io/database';
-import { unwrapError } from '@rekorder.io/utils';
 import { ErrorMessages } from '@rekorder.io/constants';
+import { supabase } from '@rekorder.io/database';
 import { AppleIcon, Button, Divider, GoogleIcon, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
+import { unwrapError } from '@rekorder.io/utils';
 
-import { authRedirectBaseURL } from '../../config/api';
 import { PasswordInput } from '../../components/ui/password-input';
-import { useAuthenticationStore } from '../../store/authentication';
+import { authRedirectBaseURL } from '../../config/api';
 
 export const Route = createFileRoute('/(auth)/_layout/login')({
   component: LoginPage,
@@ -27,9 +26,6 @@ const LoginSchema = z.object({
 type ILoginSchema = z.infer<typeof LoginSchema>;
 
 function LoginPage() {
-  const navigate = useNavigate();
-  const authentication = useAuthenticationStore();
-
   const [isSubmitting, setSubmitting] = useState(false);
 
   const { handleSubmit, control } = useForm<ILoginSchema>({
@@ -41,16 +37,12 @@ function LoginPage() {
   });
 
   const handleLoginWithPassword: SubmitHandler<ILoginSchema> = async ({ email, password }) => {
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-
-      authentication.login(data.user, data.session);
-      navigate({ to: '/dashboard' });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
-    } finally {
       setSubmitting(false);
     }
   };
@@ -117,7 +109,7 @@ function LoginPage() {
             render={({ field, fieldState: { error, invalid } }) => {
               return (
                 <div className="flex flex-col gap-1 mt-4">
-                  <div className="flex justify-between items-end">
+                  <div className="flex justify-between items-center">
                     <Label htmlFor="password">Password</Label>
                     <Link className="text-xs font-medium hover:underline" to="/forgot-password">
                       Forgot password?

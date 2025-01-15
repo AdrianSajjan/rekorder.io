@@ -110,9 +110,9 @@ class Thread {
    * TODO: Finish up the authentication system
    */
   private async __handleAuthenticateUser(tab: chrome.tabs.Tab) {
-    return this.__handleInitializeExtension(tab);
+    // return this.__handleInitializeExtension(tab);
     this.currentTab = tab;
-    this.authenticationTab = await chrome.tabs.create({ url: 'http://192.168.10.157:4200/extension/login', active: true });
+    this.authenticationTab = await chrome.tabs.create({ url: 'http://127.0.0.1:4200/extension/login', active: true });
   }
 
   private async __handleActionClickListener(tab: chrome.tabs.Tab) {

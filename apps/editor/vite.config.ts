@@ -11,12 +11,12 @@ export default defineConfig({
   base: '/build/',
   cacheDir: '../../node_modules/.vite/apps/editor',
   server: {
-    port: 4200,
-    host: 'localhost',
+    port: 4300,
+    host: true,
   },
   preview: {
     port: 4300,
-    host: 'localhost',
+    host: true,
   },
   plugins: [
     react({

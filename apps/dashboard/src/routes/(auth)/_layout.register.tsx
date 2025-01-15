@@ -1,18 +1,18 @@
-import { z } from 'zod';
-import { toast } from 'sonner';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
-import { supabase } from '@rekorder.io/database';
-import { unwrapError } from '@rekorder.io/utils';
 import { ErrorMessages } from '@rekorder.io/constants';
-import { LoadingButton, Button, Divider, Hint, Input, Label } from '@rekorder.io/ui';
-import { GoogleIcon } from '@rekorder.io/ui';
+import { supabase } from '@rekorder.io/database';
+import { Button, Divider, GoogleIcon, Hint, Input, Label, LoadingButton } from '@rekorder.io/ui';
+import { unwrapError } from '@rekorder.io/utils';
 
 import { PasswordInput, PasswordRegex } from '../../components/ui/password-input';
+import { authRedirectBaseURL } from '../../config/api';
 
 export const Route = createFileRoute('/(auth)/_layout/register')({
   component: RegisterPage,
@@ -26,8 +26,6 @@ const RegisterSchema = z.object({
 type IRegisterSchema = z.infer<typeof RegisterSchema>;
 
 function RegisterPage() {
-  const navigate = useNavigate();
-
   const [isSubmitting, setSubmitting] = useState(false);
 
   const { handleSubmit, control } = useForm<IRegisterSchema>({
@@ -38,26 +36,25 @@ function RegisterPage() {
     },
   });
 
-  const handleLogin: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
+  const handleRegister: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
+    setSubmitting(true);
     try {
-      setSubmitting(true);
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
-      navigate({ to: '/dashboard' });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
-    } finally {
       setSubmitting(false);
     }
   };
 
   const handleRegisterWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-      if (error) throw error;
-      const [user, session] = await Promise.all([supabase.auth.getUser(), supabase.auth.getSession()]);
-      console.log(user, session);
-      navigate({ to: '/dashboard' });
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: authRedirectBaseURL,
+        },
+      });
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     }
@@ -73,7 +70,7 @@ function RegisterPage() {
           <span>Sign up with Google</span>
         </Button>
         <Divider className="w-full mt-7 mb-5">or continue with email</Divider>
-        <form className="w-full flex flex-col" onSubmit={handleSubmit(handleLogin)}>
+        <form className="w-full flex flex-col" onSubmit={handleSubmit(handleRegister)}>
           <Controller
             name="email"
             control={control}

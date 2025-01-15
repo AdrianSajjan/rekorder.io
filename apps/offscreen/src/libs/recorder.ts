@@ -140,7 +140,7 @@ class OffscreenRecorder {
       const duration = this.timestamp;
 
       this.__resetState();
-      const id = await this.offlineDatabase.blobs.add({ uuid, name, duration, original: blob, modified: null, created_at: Date.now(), updated_at: null });
+      const id = await this.offlineDatabase.blobs.add({ uuid, name, duration, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null });
       chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
     } catch (error) {
       this.__resetState();

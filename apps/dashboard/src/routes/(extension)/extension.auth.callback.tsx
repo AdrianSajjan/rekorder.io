@@ -1,9 +1,11 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 import { CheckCircle, Spinner, XCircle } from '@phosphor-icons/react';
+
 import { supabase } from '@rekorder.io/database';
 import { animate, theme } from '@rekorder.io/ui';
 import { wait } from '@rekorder.io/utils';
-import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { EventConfig, ExtensionConfig } from '@rekorder.io/constants';
 
 export const Route = createFileRoute('/(extension)/extension/auth/callback')({
   component: RouteComponent,
@@ -23,12 +25,15 @@ function RouteComponent() {
   });
 
   useEffect(() => {
-    const promise = [supabase.auth.getUser(), supabase.auth.getSession(), wait(WAIT_TIME)] as const;
-    Promise.all(promise).then(([user, session]) => {
-      if (user.error || session.error || !session.data.session) {
-        setStatus({ value: 'error', message: user.error?.message || session.error?.message || 'An unknown error occurred while authenticating your session' });
+    const promise = [supabase.auth.getSession(), wait(WAIT_TIME)] as const;
+    Promise.all(promise).then(([session]) => {
+      if (session.error || !session.data.session) {
+        setStatus({ value: 'error', message: session.error?.message || 'An unknown error occurred while authenticating your session' });
       } else {
         setStatus({ value: 'success', message: 'You have been logged in, this tab will close automatically...' });
+        wait(WAIT_TIME).then(() =>
+          window.chrome.runtime.sendMessage(ExtensionConfig.ExtensionId, { type: EventConfig.AuthenticateSuccess, payload: session.data.session })
+        );
       }
     });
   }, []);
