@@ -5,11 +5,8 @@
     "types": [
       "node"
     ],
-    "composite": true,
-    "declaration": true,
   },
   "include": [
     "src/**/*.ts",
-    "../constants/src/**/*.ts"
   ]
 }
