@@ -47,7 +47,7 @@ const ScreenPlugin = observer(() => {
       <div className={clsx(ScreenPluginCSS.className, 'rekorder-screen-container')}>
         <Select value={recorder.surface} onValueChange={handleSurfaceChange}>
           <Select.Input />
-          <Select.Content>
+          <Select.Content portal={document.getElementById('rekorder-area')}>
             {RECORD_SURFACE_OPTIONS.map((option) => (
               <Select.Item key={option.value} value={option.value}>
                 {option.label}
