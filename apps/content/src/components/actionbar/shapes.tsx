@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { Circle, Rectangle, Triangle } from '@phosphor-icons/react';
 import { ToggleGroup, ToggleGroupItem } from '@radix-ui/react-toggle-group';
-import { theme } from '@rekorder.io/ui';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
@@ -53,7 +53,7 @@ const ShapesActionbar = observer(() => {
 
   return (
     <Fragment>
-      {ShapesActionbarCSS.styles}
+      <ResolvedStyle>{ShapesActionbarCSS}</ResolvedStyle>
       <ToggleGroup type="single" value={editor.shape} onValueChange={handleChange} className={clsx(ShapesActionbarCSS.className, 'rekorder-shapes-actionbar')}>
         {shapes.map((shape) => (
           <ToolbarAction asChild key={shape.value} tooltip={shape.tooltip}>

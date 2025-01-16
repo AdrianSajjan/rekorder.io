@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { ArrowUp, LineSegment } from '@phosphor-icons/react';
 import { ToggleGroup, ToggleGroupItem } from '@radix-ui/react-toggle-group';
-import { theme } from '@rekorder.io/ui';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
@@ -48,7 +48,7 @@ const LinesActionbar = observer(() => {
 
   return (
     <Fragment>
-      {LinesActionbarCSS.styles}
+      <ResolvedStyle>{LinesActionbarCSS}</ResolvedStyle>
       <ToggleGroup type="single" value={editor.line} onValueChange={handleChange} className={clsx(LinesActionbarCSS.className, 'rekorder-lines-actionbar')}>
         {lines.map((line) => (
           <ToolbarAction asChild key={line.value} tooltip={line.tooltip}>

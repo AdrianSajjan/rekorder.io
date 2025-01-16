@@ -7,7 +7,7 @@ import { Fragment } from 'react';
 
 import { DotsThree, QuestionMark, X } from '@phosphor-icons/react';
 import { EventConfig } from '@rekorder.io/constants';
-import { AnimateHeight, Brand, Button, HorizontalTabs, theme } from '@rekorder.io/ui';
+import { AnimateHeight, Brand, Button, HorizontalTabs, ResolvedStyle, theme } from '@rekorder.io/ui';
 
 import { AudioPlugin } from './audio';
 import { ScreenPlugin } from './screen';
@@ -148,7 +148,7 @@ const PluginCard = observer(() => {
 
   return (
     <Fragment>
-      {PluginCardCSS.styles}
+      <ResolvedStyle>{PluginCardCSS}</ResolvedStyle>
       <Draggable nodeRef={drag.ref} position={drag.position} onStop={drag.onChangePosition} bounds={drag.bounds}>
         <div ref={drag.ref} className={clsx(PluginCardCSS.className, 'rekorder-plugin-container')}>
           <article className={clsx(PluginCardCSS.className, 'rekorder-plugin-card')}>

@@ -3,6 +3,7 @@ import { clone } from '@rekorder.io/utils';
 import { Autocomplete } from '@rekorder.io/types';
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { checkPushToTalkActive, checkPushToTalkInactive } from '@rekorder.io/utils';
+import { shadowRootElementById } from '../lib/utils';
 
 class Microphone {
   muted: boolean;
@@ -23,7 +24,7 @@ class Microphone {
   }
 
   private get _waveform() {
-    const iframe = document.getElementById('rekorder-waveform-iframe') as HTMLIFrameElement | null;
+    const iframe = shadowRootElementById('rekorder-waveform-iframe') as HTMLIFrameElement | null;
     return iframe?.contentWindow ?? window;
   }
 

@@ -6,10 +6,10 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
-import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { AlertDialog, animations, ResolvedStyle, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 
 import { camera } from '../../store/camera';
-import { openPermissionSettings } from '../../lib/utils';
+import { openPermissionSettings, shadowRootElementById } from '../../lib/utils';
 import { useRequestCameraDevices } from '../../hooks/use-camera-devices';
 import { SwitchLabel } from '../ui/switch-label';
 
@@ -72,7 +72,7 @@ const CameraPlugin = observer(() => {
 
   return (
     <Fragment>
-      {CameraPluginCSS.styles}
+      <ResolvedStyle>{CameraPluginCSS}</ResolvedStyle>
       <div className={clsx(CameraPluginCSS.className, 'rekorder-camera-plugin-container')}>
         <Select value={camera.device} onValueChange={camera.changeDevice} open={isCameraSelectOpen} onOpenChange={handleCameraSelectOpenChange}>
           <Select.Input className={clsx(CameraPluginCSS.className, 'rekorder-select-input')}>
@@ -88,7 +88,7 @@ const CameraPlugin = observer(() => {
               ) : null}
             </div>
           </Select.Input>
-          <Select.Content portal={document.getElementById('rekorder-area')}>
+          <Select.Content portal={shadowRootElementById('rekorder-area')}>
             <Select.Item value="n/a">No Camera</Select.Item>
             {cameras.length ? <Select.Separator /> : null}
             {cameras.map((camera, index) => (

@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { ToggleGroup, ToggleGroupItem } from '@radix-ui/react-toggle-group';
 import { Toggle } from '@radix-ui/react-toggle';
-import { Divider, theme } from '@rekorder.io/ui';
+import { Divider, ResolvedStyle, theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
@@ -33,6 +33,7 @@ import { ToolbarAction } from '../ui/toolbar-action';
 import { editor, EditorMode } from '../../store/editor';
 import { LinesActionbar } from './lines';
 import { StrokeWidthActionbar } from './stroke';
+import { shadowRootElementById } from '../../lib/utils';
 
 const DrawingActionbarCSS = css.resolve`
   * {
@@ -107,7 +108,7 @@ const LinesComponents = {
 };
 
 const EditorActionbar = observer(() => {
-  const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
+  const toolbarContainer = shadowRootElementById('rekorder-toolbar') as HTMLElement;
 
   const handleValueChange = (value: string) => {
     editor.toggleDrawingMode(value as EditorMode);
@@ -115,7 +116,7 @@ const EditorActionbar = observer(() => {
 
   return (
     <Fragment>
-      {DrawingActionbarCSS.styles}
+      <ResolvedStyle>{DrawingActionbarCSS}</ResolvedStyle>
       <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-container')}>
         <ToggleGroup
           type="single"

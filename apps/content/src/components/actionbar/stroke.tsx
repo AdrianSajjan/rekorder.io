@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 import { ToggleGroup, ToggleGroupItem } from '@radix-ui/react-toggle-group';
 
 import { editor } from '../../store/editor';
@@ -48,7 +48,7 @@ const StrokeWidthActionbar = observer(() => {
 
   return (
     <Fragment>
-      {StrokeWidthActionbarCSS.styles}
+      <ResolvedStyle>{StrokeWidthActionbarCSS}</ResolvedStyle>
       <ToggleGroup
         type="single"
         value={String(editor.width)}

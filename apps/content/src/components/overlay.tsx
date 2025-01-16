@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
-import { theme } from '@rekorder.io/ui';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 
 import { recorder } from '../store/recorder';
 
@@ -28,7 +28,7 @@ const Overlay = observer(() => {
 
   return (
     <Fragment>
-      {OverlayCSS.styles}
+      <ResolvedStyle>{OverlayCSS}</ResolvedStyle>
       <div data-state={recorder.status} className={clsx(OverlayCSS.className, 'rekorder-overlay')} />
     </Fragment>
   );

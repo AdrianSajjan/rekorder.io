@@ -5,6 +5,8 @@ import { Spinner } from '@phosphor-icons/react';
 import { Button, type ButtonProps } from './button';
 import { Fragment } from 'react/jsx-runtime';
 
+import { ResolvedStyle } from '../style/resolved-styled';
+
 interface LoadingButtonProps extends ButtonProps {
   loading?: boolean;
 }
@@ -52,7 +54,7 @@ const LoadingButtonCSS = css.resolve`
 const LoadingButton = ({ loading, children, className, ...props }: LoadingButtonProps) => {
   return (
     <Fragment>
-      {LoadingButtonCSS.styles}
+      <ResolvedStyle>{LoadingButtonCSS}</ResolvedStyle>
       <Button className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button', className)} {...props} data-loading={loading}>
         <span className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button-content')}>{children}</span>
         {loading ? (

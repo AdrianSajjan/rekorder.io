@@ -5,12 +5,12 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 import { useState } from 'react';
 
-import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { AlertDialog, animations, ResolvedStyle, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 import { Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 
 import { SwitchLabel } from '../ui/switch-label';
 import { microphone } from '../../store/microphone';
-import { openPermissionSettings } from '../../lib/utils';
+import { openPermissionSettings, shadowRootElementById } from '../../lib/utils';
 import { useRequestAudioDevices } from '../../hooks/use-audio-devices';
 
 const AudioPluginCSS = css.resolve`
@@ -82,7 +82,7 @@ const AudioPlugin = observer(() => {
 
   return (
     <Fragment>
-      {AudioPluginCSS.styles}
+      <ResolvedStyle>{AudioPluginCSS}</ResolvedStyle>
       <div className={clsx(AudioPluginCSS.className, 'rekorder-audio-container')}>
         <Select value={microphone.device} onValueChange={microphone.changeDevice} open={isMicrophoneSelectOpen} onOpenChange={handleMicrophoneSelectOpenChange}>
           <Select.Input className={clsx(AudioPluginCSS.className, 'rekorder-select-input')}>
@@ -98,7 +98,7 @@ const AudioPlugin = observer(() => {
               ) : null}
             </div>
           </Select.Input>
-          <Select.Content portal={document.getElementById('rekorder-area')}>
+          <Select.Content portal={shadowRootElementById('rekorder-area')}>
             <Select.Item value="n/a">No Microphone</Select.Item>
             {microphones.length ? <Select.Separator /> : null}
             {microphones.map((microphone, index) => (

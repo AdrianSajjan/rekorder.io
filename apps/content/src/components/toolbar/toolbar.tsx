@@ -5,7 +5,7 @@ import Draggable from 'react-draggable';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react';
 import { DotsSixVertical } from '@phosphor-icons/react';
-import { Divider, theme, Tooltip } from '@rekorder.io/ui';
+import { Divider, ResolvedStyle, theme, Tooltip } from '@rekorder.io/ui';
 
 import { ToolbarActionbarControls } from './actionbar';
 import { ToolbarRecordingControls } from './playback';
@@ -79,7 +79,7 @@ const PluginToolbar = observer(() => {
 
   return (
     <Fragment>
-      {PluginToolbarCSS.styles}
+      <ResolvedStyle>{PluginToolbarCSS}</ResolvedStyle>
       <Draggable nodeRef={drag.ref} bounds={drag.bounds} position={drag.position} onStop={drag.onChangePosition}>
         <article ref={drag.ref} id="rekorder-toolbar" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar')}>
           <Tooltip.Provider disableHoverableContent delayDuration={500}>

@@ -9,6 +9,7 @@ import { CaretDown, CheckCircle } from '@phosphor-icons/react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
+import { ResolvedStyle } from '../style/resolved-styled';
 
 interface ISelectContext {
   size: 'small' | 'medium' | 'large';
@@ -194,7 +195,7 @@ const SelectInput = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(({ c
 
   return (
     <React.Fragment>
-      {SelectCSS.styles}
+      <ResolvedStyle>{SelectCSS}</ResolvedStyle>
       <SelectPrimitive.Trigger ref={ref} className={clsx(SelectCSS.className, 'rekorder-trigger', theme.createClassName(size), className)} {...props}>
         <SelectPrimitive.Value placeholder={placeholder}>{children}</SelectPrimitive.Value>
         <SelectPrimitive.Icon className={clsx(SelectCSS.className, 'rekorder-icon')}>
@@ -258,22 +259,19 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
     const container = isBoolean(portal) || isNil(portal) ? null : portal;
 
     return (
-      <React.Fragment>
-        {SelectCSS.styles}
-        <SelectPrimitive.Portal container={container}>
-          <SelectPrimitive.Content
-            className={clsx(SelectCSS.className, 'rekorder-content', theme.createClassName(size))}
-            position={position}
-            sideOffset={sideOffset}
-            ref={ref}
-            {...props}
-          >
-            <SelectPrimitive.ScrollUpButton />
-            <SelectPrimitive.Viewport ref={viewport}>{options ? options.map(renderOption) : children}</SelectPrimitive.Viewport>
-            <SelectPrimitive.ScrollDownButton />
-          </SelectPrimitive.Content>
-        </SelectPrimitive.Portal>
-      </React.Fragment>
+      <SelectPrimitive.Portal container={container}>
+        <SelectPrimitive.Content
+          className={clsx(SelectCSS.className, 'rekorder-content', theme.createClassName(size))}
+          position={position}
+          sideOffset={sideOffset}
+          ref={ref}
+          {...props}
+        >
+          <SelectPrimitive.ScrollUpButton />
+          <SelectPrimitive.Viewport ref={viewport}>{options ? options.map(renderOption) : children}</SelectPrimitive.Viewport>
+          <SelectPrimitive.ScrollDownButton />
+        </SelectPrimitive.Content>
+      </SelectPrimitive.Portal>
     );
   }
 );

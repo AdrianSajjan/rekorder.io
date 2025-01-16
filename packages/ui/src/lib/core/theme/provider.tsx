@@ -3,10 +3,15 @@ import { ReactNode } from 'react';
 import { FontsProvider } from '../fonts/provider';
 import { AnimationsProvider } from '../animations/provider';
 
-export function ThemeProvider({ children }: { children?: ReactNode }) {
+interface ThemeProviderProps {
+  children?: ReactNode;
+  global?: boolean;
+}
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <FontsProvider>
-      <AnimationsProvider>{children}</AnimationsProvider>
+      <AnimationsProvider {...props}>{children}</AnimationsProvider>
     </FontsProvider>
   );
 }

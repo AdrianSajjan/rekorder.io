@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { ArrowBendUpLeft, Subtract, TrashSimple } from '@phosphor-icons/react';
-import { Divider, theme } from '@rekorder.io/ui';
+import { Divider, ResolvedStyle, theme } from '@rekorder.io/ui';
 
 import { blur } from '../../store/blur';
 import { ToolbarAction } from '../ui/toolbar-action';
@@ -40,7 +40,7 @@ const BlurActionbarCSS = css.resolve`
 const BlurActionbar = observer(() => {
   return (
     <Fragment>
-      {BlurActionbarCSS.styles}
+      <ResolvedStyle>{BlurActionbarCSS}</ResolvedStyle>
       <div className={clsx(BlurActionbarCSS.className, 'rekorder-blur-actionbar-container')}>
         <ToolbarAction data-state="on">
           <Subtract size={16} weight="fill" />

@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 
 import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-styled';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
@@ -14,12 +15,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const ButtonCSS = css.resolve`
-  @property --gradient-form {
-    syntax: '<color>';
-    initial-value: rgba(255, 255, 255, 0.2);
-    inherits: false;
-  }
-
   *,
   *::before,
   *::after {
@@ -321,13 +316,24 @@ const ButtonCSS = css.resolve`
   }
 `;
 
+try {
+  CSS.registerProperty({
+    name: '--gradient-form',
+    syntax: '<color>',
+    initialValue: 'rgba(255, 255, 255, 0.2)',
+    inherits: false,
+  });
+} catch {
+  console.warn('CSS.registerProperty is not supported or property already exists');
+}
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ asChild, children, color = 'primary', size = 'medium', variant = 'solid', className, ...rest }, forwardedRef) => {
     const Component = asChild ? Slot : 'button';
 
     return (
       <React.Fragment>
-        {ButtonCSS.styles}
+        <ResolvedStyle>{ButtonCSS}</ResolvedStyle>
         <Component
           ref={forwardedRef}
           className={clsx(

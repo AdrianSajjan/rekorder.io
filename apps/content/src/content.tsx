@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
 import { Toaster } from 'sonner';
-import { animations, theme, ThemeProvider } from '@rekorder.io/ui';
+import { animations, ResolvedStyle, theme, ThemeProvider } from '@rekorder.io/ui';
 
 import { CameraPreview } from './components/camera';
 import { Cursors } from './components/cursor';
@@ -26,6 +26,7 @@ const RecorderCSS = css.resolve`
   }
 
   .rekorder-area {
+    inset: 0;
     opacity: 0;
     position: fixed;
     z-index: ${theme.zIndex(1)};
@@ -49,7 +50,7 @@ const Content = observer(() => {
 
   return (
     <ThemeProvider>
-      {RecorderCSS.styles}
+      <ResolvedStyle>{RecorderCSS}</ResolvedStyle>
       <section id="rekorder-area" className={clsx(RecorderCSS.className, 'rekorder-area')}>
         <Overlay />
         <EditorArea />

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { theme } from '@rekorder.io/ui';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 import { Fragment } from 'react/jsx-runtime';
 
 const SwitchLabelCSS = css.resolve`
@@ -19,7 +19,7 @@ const SwitchLabelCSS = css.resolve`
 export function SwitchLabel({ children, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
   return (
     <Fragment>
-      {SwitchLabelCSS.styles}
+      <ResolvedStyle>{SwitchLabelCSS}</ResolvedStyle>
       <label className={clsx(SwitchLabelCSS.className, 'rekorder-switch-label')} {...props}>
         {children}
       </label>

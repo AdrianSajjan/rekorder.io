@@ -3,7 +3,7 @@ import * as React from 'react';
 import css from 'styled-jsx/css';
 import clsx from 'clsx';
 
-import { theme, Tooltip } from '@rekorder.io/ui';
+import { ResolvedStyle, theme, Tooltip } from '@rekorder.io/ui';
 import { Slot } from '@radix-ui/react-slot';
 
 interface ToolbarActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -67,7 +67,7 @@ function ToolbarAction({ tooltip, className, children, actionbarIndicator, asChi
 
   return (
     <React.Fragment>
-      {ToolbarActionCSS.styles}
+      <ResolvedStyle>{ToolbarActionCSS}</ResolvedStyle>
       {tooltip ? (
         <Tooltip content={tooltip} arrow={false} sideOffset={12}>
           <div className="tooltip-area" aria-label={tooltip}>

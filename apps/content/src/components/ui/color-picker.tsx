@@ -1,12 +1,16 @@
-import css from 'styled-jsx/css';
-import { animations, theme } from '@rekorder.io/ui';
-import { Popover, PopoverContent, PopoverPortal, PopoverProps, PopoverTrigger } from '@radix-ui/react-popover';
-import { HexColorPicker } from 'react-colorful';
 import clsx from 'clsx';
-import { Eyedropper } from '@phosphor-icons/react';
+import css from 'styled-jsx/css';
+
 import { toast } from 'sonner';
-import { unwrapError } from '@rekorder.io/utils';
 import { useState } from 'react';
+import { HexColorPicker } from 'react-colorful';
+
+import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';
+import { Popover, PopoverContent, PopoverPortal, PopoverProps, PopoverTrigger } from '@radix-ui/react-popover';
+import { Eyedropper } from '@phosphor-icons/react';
+import { unwrapError } from '@rekorder.io/utils';
+
+import { shadowRootElementById } from '../../lib/utils';
 
 const ColorfulPickerCSS = css.global`
   #rekorder-colorful-picker .react-colorful {
@@ -207,14 +211,12 @@ export function ColorPicker({ children, color, onChange, ...props }: ColorPicker
 
   return (
     <Popover open={isOpen} onOpenChange={setOpen} {...props}>
-      {ColorPickerCSS.styles}
-      <style jsx global>
-        {ColorfulPickerCSS}
-      </style>
+      <ResolvedStyle>{ColorPickerCSS}</ResolvedStyle>
+      <style>{ColorfulPickerCSS}</style>
       <PopoverTrigger asChild>
         <div id="color-picker-trigger">{children}</div>
       </PopoverTrigger>
-      <PopoverPortal container={document.getElementById('rekorder-area')}>
+      <PopoverPortal container={shadowRootElementById('rekorder-area')}>
         <PopoverContent
           side="top"
           sideOffset={20}
@@ -229,7 +231,7 @@ export function ColorPicker({ children, color, onChange, ...props }: ColorPicker
               <PopoverTrigger asChild>
                 <button className={clsx(ColorPickerCSS.className, 'rekorder-color-swatch', 'rekorder-color-colorful-trigger')} />
               </PopoverTrigger>
-              <PopoverPortal container={document.getElementById('rekorder-toolbar')}>
+              <PopoverPortal container={shadowRootElementById('rekorder-toolbar')}>
                 <PopoverContent
                   side="top"
                   sideOffset={20}

@@ -2,7 +2,7 @@ import css from 'styled-jsx/css';
 import clsx from 'clsx';
 
 import { observer } from 'mobx-react';
-import { theme } from '@rekorder.io/ui';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 
 import { recorder } from '../../store/recorder';
 
@@ -29,7 +29,7 @@ const RecordTimerCSS = css.resolve`
 const ToolbarRecordTimer = observer((props: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div {...props}>
-      {RecordTimerCSS.styles}
+      <ResolvedStyle>{RecordTimerCSS}</ResolvedStyle>
       <div className={clsx(RecordTimerCSS.className, 'timer')}>
         <span className={clsx(RecordTimerCSS.className, 'time')}>{recorder.time}</span>
       </div>

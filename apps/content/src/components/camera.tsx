@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { Fragment, useMemo, useState } from 'react';
 
 import { ArrowsOutSimple, X } from '@phosphor-icons/react';
-import { animations, theme } from '@rekorder.io/ui';
+import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';
 
 import { useDragControls } from '../hooks/use-drag-controls';
 import { camera } from '../store/camera';
@@ -123,7 +123,7 @@ const CameraPreview = observer(() => {
 
   return (
     <Fragment>
-      {CameraPreviewCSS.styles}
+      <ResolvedStyle>{CameraPreviewCSS}</ResolvedStyle>
       <Draggable handle="#rekorder-camera-handle" nodeRef={drag.ref} position={drag.position} bounds={drag.bounds} onStop={drag.onChangePosition}>
         <div ref={drag.ref} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
           <div id="rekorder-camera-handle" className={clsx(CameraPreviewCSS.className, 'rekorder-camera-handle')} style={styles.handle}>

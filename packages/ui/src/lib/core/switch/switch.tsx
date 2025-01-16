@@ -1,8 +1,11 @@
+import * as React from 'react';
+import * as SwitchPrimitive from '@radix-ui/react-switch';
+
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
-import * as SwitchPrimitive from '@radix-ui/react-switch';
-import { forwardRef, Fragment } from 'react';
+
 import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-styled';
 
 interface SwitchProps extends SwitchPrimitive.SwitchProps {
   thumb?: SwitchPrimitive.SwitchThumbProps;
@@ -133,13 +136,13 @@ const SwitchCSS = css.resolve`
   }
 `;
 
-const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({ thumb, size = 'small', className, ...props }, ref) => (
-  <Fragment>
-    {SwitchCSS.styles}
+const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(({ thumb, size = 'small', className, ...props }, ref) => (
+  <React.Fragment>
+    <ResolvedStyle>{SwitchCSS}</ResolvedStyle>
     <SwitchPrimitive.Root className={clsx(SwitchCSS.className, 'root', size, className)} ref={ref} {...props}>
       <SwitchPrimitive.Thumb {...thumb} className={clsx(SwitchCSS.className, 'thumb', size, thumb?.className)} />
     </SwitchPrimitive.Root>
-  </Fragment>
+  </React.Fragment>
 ));
 
 export { Switch };

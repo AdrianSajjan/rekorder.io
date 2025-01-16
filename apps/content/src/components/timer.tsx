@@ -3,13 +3,13 @@ import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { useCountdown } from '@rekorder.io/hooks';
-import { animations, theme } from '@rekorder.io/ui';
+import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';
 import { RecorderConfig } from '@rekorder.io/constants';
 
 import { recorder } from '../store/recorder';
-import { AnimatePresence, motion } from 'framer-motion';
 
 const TimerCSS = css.resolve`
   * {
@@ -74,7 +74,7 @@ const TimerCountdown = observer(() => {
 
   return (
     <Fragment>
-      {TimerCSS.styles}
+      <ResolvedStyle>{TimerCSS}</ResolvedStyle>
       <div className={clsx(TimerCSS.className, 'rekorder-timer-container')}>
         <AnimatePresence>
           <motion.h3

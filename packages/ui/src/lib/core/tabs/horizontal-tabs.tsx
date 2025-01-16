@@ -9,6 +9,7 @@ import { LayoutGroup, motion } from 'framer-motion';
 import { useStateObserver } from '@rekorder.io/hooks';
 
 import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-styled';
 
 const HorizontalTabsCSS = css.resolve`
   *,
@@ -117,7 +118,7 @@ interface HorizontalTabsRootProps extends Omit<Tabs.TabsProps, 'orientation'> {
 const HorizontalTabsRoot = React.forwardRef<HTMLDivElement, HorizontalTabsRootProps>(({ className, size = 'medium', ...props }, ref) => {
   return (
     <React.Fragment>
-      {HorizontalTabsCSS.styles}
+      <ResolvedStyle>{HorizontalTabsCSS}</ResolvedStyle>
       <Tabs.Root ref={ref} className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-control', size, className)} {...props} />
     </React.Fragment>
   );

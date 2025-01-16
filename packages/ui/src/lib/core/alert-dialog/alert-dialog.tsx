@@ -7,6 +7,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import { theme } from '../../theme';
 import { animations } from '../../animations';
 import { Button, ButtonProps } from '../button/button';
+import { ResolvedStyle } from '../style/resolved-styled';
 
 const AlertDialogCSS = css.resolve`
   * {
@@ -133,7 +134,7 @@ const AlertDialogOverlay = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <React.Fragment>
-    {AlertDialogCSS.styles}
+    <ResolvedStyle>{AlertDialogCSS}</ResolvedStyle>
     <AlertDialogPrimitive.Overlay className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-overlay', className)} {...props} ref={ref} />
   </React.Fragment>
 ));
@@ -143,62 +144,44 @@ const AlertDialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
 >(({ className, ...props }, ref) => (
   <React.Fragment>
-    {AlertDialogCSS.styles}
+    <ResolvedStyle>{AlertDialogCSS}</ResolvedStyle>
     <AlertDialogPrimitive.Content className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-content', className)} {...props} ref={ref} />
   </React.Fragment>
 ));
 
 const AlertDialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <React.Fragment>
-    {AlertDialogCSS.styles}
-    <div className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-header', className)} {...props} />
-  </React.Fragment>
+  <div className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-header', className)} {...props} />
 );
 
 const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <React.Fragment>
-    {AlertDialogCSS.styles}
-    <div className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-footer', className)} {...props} />
-  </React.Fragment>
+  <div className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-footer', className)} {...props} />
 );
 
 const AlertDialogTitle = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <React.Fragment>
-    {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Title ref={ref} className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-title', className)} {...props} />
-  </React.Fragment>
+  <AlertDialogPrimitive.Title ref={ref} className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-title', className)} {...props} />
 ));
 
 const AlertDialogDescription = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Description>
 >(({ className, ...props }, ref) => (
-  <React.Fragment>
-    {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Description ref={ref} className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-description', className)} {...props} />
-  </React.Fragment>
+  <AlertDialogPrimitive.Description ref={ref} className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-description', className)} {...props} />
 ));
 
 const AlertDialogAction = React.forwardRef<React.ElementRef<typeof AlertDialogPrimitive.Action>, ButtonProps>(({ className, ...props }, ref) => (
-  <React.Fragment>
-    {AlertDialogCSS.styles}
-    <AlertDialogPrimitive.Action asChild>
-      <Button className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-action', className)} ref={ref} {...props} />
-    </AlertDialogPrimitive.Action>
-  </React.Fragment>
+  <AlertDialogPrimitive.Action asChild>
+    <Button className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-action', className)} ref={ref} {...props} />
+  </AlertDialogPrimitive.Action>
 ));
 
 const AlertDialogCancel = React.forwardRef<React.ElementRef<typeof AlertDialogPrimitive.Cancel>, ButtonProps>(
   ({ className, variant = 'light', color = 'accent', ...props }, ref) => (
-    <React.Fragment>
-      {AlertDialogCSS.styles}
-      <AlertDialogPrimitive.Cancel asChild>
-        <Button className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-cancel', className)} variant={variant} color={color} ref={ref} {...props} />
-      </AlertDialogPrimitive.Cancel>
-    </React.Fragment>
+    <AlertDialogPrimitive.Cancel asChild>
+      <Button className={clsx(AlertDialogCSS.className, 'rekorder-alert-dialog-cancel', className)} variant={variant} color={color} ref={ref} {...props} />
+    </AlertDialogPrimitive.Cancel>
   )
 );
 

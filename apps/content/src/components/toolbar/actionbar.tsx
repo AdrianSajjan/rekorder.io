@@ -4,6 +4,7 @@ import { Cursor, PencilSimple, Subtract } from '@phosphor-icons/react';
 
 import { cursor } from '../../store/cursor';
 import { toolbar } from '../../store/toolbar';
+import { shadowRootElementById } from '../../lib/utils';
 
 import { BlurActionbar } from '../actionbar/blur';
 import { Actionbar } from '../actionbar/actionbar';
@@ -23,7 +24,7 @@ const cursors = {
 };
 
 const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, 'className'>) => {
-  const toolbarContainer = document.getElementById('rekorder-toolbar') as HTMLElement;
+  const toolbarContainer = shadowRootElementById('rekorder-toolbar') as HTMLElement;
 
   return (
     <ToggleGroup value={toolbar.actionbarState} onValueChange={toolbar.updateActionbarState} type="single" {...props}>

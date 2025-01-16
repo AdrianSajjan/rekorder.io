@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { Popover, PopoverContent, PopoverPortal, PopoverProps, PopoverTrigger } from '@radix-ui/react-popover';
-import { animations, theme } from '@rekorder.io/ui';
+import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';
 
 interface ActionbarProps extends PopoverProps {
   content: React.ReactNode;
@@ -57,7 +57,7 @@ const ActionbarCSS = css.resolve`
 export function Actionbar({ children, content, container, indicator = 'mask', ...props }: ActionbarProps) {
   return (
     <Popover {...props}>
-      {ActionbarCSS.styles}
+      <ResolvedStyle>{ActionbarCSS}</ResolvedStyle>
       <PopoverTrigger asChild>
         <div className="popover-area">{children}</div>
       </PopoverTrigger>

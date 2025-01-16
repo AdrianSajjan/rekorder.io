@@ -6,6 +6,7 @@ import * as React from 'react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
+import { ResolvedStyle } from '../style/resolved-styled';
 
 interface Tooltip extends React.ForwardRefExoticComponent<TooltipProps & React.RefAttributes<HTMLDivElement>> {
   Provider: typeof TooltipPrimitive.TooltipProvider;
@@ -100,7 +101,7 @@ const TooltipRoot = React.forwardRef<HTMLDivElement, TooltipProps>(
   ({ content, arrow, portal, side, sideOffset = 4, align, alignOffset, colorScheme, ...props }, ref) => {
     return (
       <React.Fragment>
-        {TooltipCSS.styles}
+        <ResolvedStyle>{TooltipCSS}</ResolvedStyle>
         <TooltipPrimitive.Root {...props}>
           <TooltipPrimitive.Trigger asChild>{props.children}</TooltipPrimitive.Trigger>
           <TooltipContent ref={ref} {...{ arrow, portal, side, align, sideOffset, alignOffset, colorScheme }}>

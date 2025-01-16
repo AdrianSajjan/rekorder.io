@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
-import { theme } from '@rekorder.io/ui';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 import { Fragment } from 'react/jsx-runtime';
 import { Pause, Play, Trash } from '@phosphor-icons/react';
 
@@ -45,7 +45,7 @@ const RecordControlCSS = css.resolve`
 const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <Fragment>
-      {RecordControlCSS.styles}
+      <ResolvedStyle>{RecordControlCSS}</ResolvedStyle>
       <div {...props}>
         <ToolbarAction tooltip="Save recording" onClick={recorder.saveScreenCapture} disabled={disabled.includes(recorder.status)}>
           <div data-status={recorder.status} className={clsx(RecordControlCSS.className, 'rekorder-save-icon')} />

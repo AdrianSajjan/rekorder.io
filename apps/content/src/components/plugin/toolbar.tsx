@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { animations, Switch, theme } from '@rekorder.io/ui';
+import { animations, ResolvedStyle, Switch, theme } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
@@ -33,7 +33,7 @@ const ToolbarPluginCSS = css.resolve`
 const ToolbarPlugin = observer(() => {
   return (
     <Fragment>
-      {ToolbarPluginCSS.styles}
+      <ResolvedStyle>{ToolbarPluginCSS}</ResolvedStyle>
       <div className={clsx(ToolbarPluginCSS.className, 'rekorder-toolbar-plugin-container')}>
         <div className={clsx(ToolbarPluginCSS.className, 'toggle-control')}>
           <label className={clsx(ToolbarPluginCSS.className, 'toggle-control-label')} htmlFor="hide-toolbar">

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 import { Cursor } from '@phosphor-icons/react';
 import { ToggleGroup, ToggleGroupItem } from '@radix-ui/react-toggle-group';
-import { Divider, theme } from '@rekorder.io/ui';
+import { Divider, ResolvedStyle, theme } from '@rekorder.io/ui';
 
 import { ToolbarAction } from '../ui/toolbar-action';
 import { CursorClickIcon } from '../icons/cursor-click';
@@ -48,7 +48,8 @@ const CursorActionbar = observer(() => {
 
   return (
     <Fragment>
-      {CursorActionbarCSS.styles}
+      <ResolvedStyle>{CursorActionbarCSS}</ResolvedStyle>
+
       <ToggleGroup
         type="single"
         value={cursor.mode}

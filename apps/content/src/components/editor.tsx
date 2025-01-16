@@ -3,9 +3,10 @@ import * as fabric from 'fabric';
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { useCallback, useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
+import { useCallback, useEffect, useRef } from 'react';
 import { FabricJSCanvas } from '@rekorder.io/canvas';
+import { ResolvedStyle } from '@rekorder.io/ui';
 
 import { toolbar } from '../store/toolbar';
 import { editor } from '../store/editor';
@@ -50,7 +51,7 @@ const EditorArea = observer(() => {
 
   return (
     <div ref={workspace$} data-state={state} className={clsx(EditorAreaCSS.className, 'rekorder-editor-area')}>
-      {EditorAreaCSS.styles}
+      <ResolvedStyle>{EditorAreaCSS}</ResolvedStyle>
       <FabricJSCanvas onLoad={handleLoad} className={clsx(EditorAreaCSS.className, 'rekorder-editor-canvas')} />
     </div>
   );

@@ -10,6 +10,7 @@ import { forwardRef, Fragment, useCallback, useEffect, useRef, useState } from '
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
+import { ResolvedStyle } from '../style/resolved-styled';
 
 interface VideoPlayerProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   container?: string;
@@ -225,6 +226,7 @@ interface VideoPlayerControls {
 
 const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container, className, controls: isControlsVisible = true, ...props }, ref) => {
   const video$ = useRef<HTMLVideoElement>(null!);
+  const container$ = useRef<HTMLDivElement>(null!);
 
   const [controls, setControls] = useState<VideoPlayerControls>({
     started: false,
@@ -341,8 +343,9 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
 
   return (
     <Fragment>
-      {VideoPlayerCSS.styles}
-      <div id="rekorder-video-player" className={clsx(container, 'rekorder-video-player-container', VideoPlayerCSS.className)}>
+      <ResolvedStyle>{VideoPlayerCSS}</ResolvedStyle>
+
+      <div id="rekorder-video-player" ref={container$} className={clsx(container, 'rekorder-video-player-container', VideoPlayerCSS.className)}>
         <video ref={handleInitializeRefs} {...props} className={clsx(className, 'rekorder-video-player', VideoPlayerCSS.className)} controls={false} />
         {!isControlsVisible || !controls.loaded ? null : !controls.started ? (
           <button className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-start')} onClick={handlePlay}>
@@ -365,7 +368,7 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
                   {controls.muted ? <SpeakerX size={18} weight="fill" /> : <SpeakerHigh size={18} weight="fill" />}
                 </button>
               </HoverCardTrigger>
-              <HoverCardPortal container={document.getElementById('rekorder-video-player')}>
+              <HoverCardPortal container={container$.current}>
                 <HoverCardContent side="top" className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-audio-control')}>
                   <VideoSoundControl min={0} max={1} step={0.01} value={[controls.volume]} onValueChange={handleChangeVolume} />
                 </HoverCardContent>
@@ -390,22 +393,18 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
 
 function VideoTimelineSeeker(props: SliderProps) {
   return (
-    <Fragment>
-      {VideoPlayerCSS.styles}
-      <Slider step={0.1} {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
-        <SliderTrack className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-track')}>
-          <SliderRange className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-range')} />
-        </SliderTrack>
-        <SliderThumb className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-thumb')} />
-      </Slider>
-    </Fragment>
+    <Slider step={0.1} {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
+      <SliderTrack className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-track')}>
+        <SliderRange className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-range')} />
+      </SliderTrack>
+      <SliderThumb className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-thumb')} />
+    </Slider>
   );
 }
 
 function VideoSoundControl({ children, ...props }: SliderProps) {
   return (
     <div className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-audio-control-container')}>
-      {VideoPlayerCSS.styles}
       <Slider step={1} orientation="vertical" {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
         <SliderTrack className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-track')}>
           <SliderRange className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-range')} />
