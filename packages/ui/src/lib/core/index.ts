@@ -1,4 +1,5 @@
 export * from './brand/brand';
+export * from './style/resolved-styled';
 
 export * from './button/button';
 export * from './button/loading-button';

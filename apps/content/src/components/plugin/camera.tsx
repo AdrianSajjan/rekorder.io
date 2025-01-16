@@ -11,6 +11,7 @@ import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@re
 import { camera } from '../../store/camera';
 import { openPermissionSettings } from '../../lib/utils';
 import { useRequestCameraDevices } from '../../hooks/use-camera-devices';
+import { SwitchLabel } from '../ui/switch-label';
 
 const CameraPluginCSS = css.resolve`
   .rekorder-camera-plugin-container {
@@ -32,6 +33,13 @@ const CameraPluginCSS = css.resolve`
     align-items: center;
     gap: ${theme.space(3)};
     flex: 1;
+  }
+
+  .select-value-label {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
   }
 
   .select-badge {
@@ -71,7 +79,9 @@ const CameraPlugin = observer(() => {
           <Select.Input className={clsx(CameraPluginCSS.className, 'select-input')}>
             <div className={clsx(CameraPluginCSS.className, 'select-value')}>
               {camera.device === 'n/a' ? <VideoCameraSlash size={16} /> : <VideoCamera size={16} />}
-              {camera.device === 'n/a' ? 'No Camera' : cameras.find((c) => c.deviceId === camera.device)?.label}
+              <span className={clsx(CameraPluginCSS.className, 'select-value-label')}>
+                {camera.device === 'n/a' ? 'No Camera' : cameras.find((c) => c.deviceId === camera.device)?.label}
+              </span>
               {camera.device === 'n/a' ? (
                 <StatusBadge className={clsx(CameraPluginCSS.className, 'select-badge')} variant="error">
                   Off
@@ -90,15 +100,11 @@ const CameraPlugin = observer(() => {
           </Select.Content>
         </Select>
         <div className={clsx(CameraPluginCSS.className, 'toggle-control')}>
-          <label className={clsx(CameraPluginCSS.className, 'toggle-control-label')} htmlFor="flip-camera">
-            Flip Camera
-          </label>
+          <SwitchLabel htmlFor="flip-camera">Flip Camera</SwitchLabel>
           <Switch id="flip-camera" checked={camera.flip} onCheckedChange={camera.updateFlip} />
         </div>
         <div className={clsx(CameraPluginCSS.className, 'toggle-control')}>
-          <label className={clsx(CameraPluginCSS.className, 'toggle-control-label')} htmlFor="effects">
-            Camera Effects
-          </label>
+          <SwitchLabel htmlFor="effects">Camera Effects</SwitchLabel>
           <Switch id="effects" />
         </div>
       </div>

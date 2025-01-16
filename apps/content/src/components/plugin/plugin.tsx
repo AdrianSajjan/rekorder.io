@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
+import Draggable from 'react-draggable';
 
 import { observer } from 'mobx-react';
 import { Fragment } from 'react';
@@ -9,15 +9,14 @@ import { DotsThree, QuestionMark, X } from '@phosphor-icons/react';
 import { EventConfig } from '@rekorder.io/constants';
 import { AnimateHeight, Brand, Button, HorizontalTabs, theme } from '@rekorder.io/ui';
 
+import { AudioPlugin } from './audio';
+import { ScreenPlugin } from './screen';
+import { CameraPlugin } from './camera';
+
 import { recorder } from '../../store/recorder';
 import { RECORDER_ROOT } from '../../constants/layout';
-import { useDisposeEvents } from '../../hooks/use-dispose-events';
 import { useDragControls } from '../../hooks/use-drag-controls';
-
-import { AudioPlugin } from './audio';
-import { CameraPlugin } from './camera';
-import { ScreenPlugin } from './screen';
-import { ToolbarPlugin } from './toolbar';
+import { useDisposeEvents } from '../../hooks/use-dispose-events';
 
 const PluginCardCSS = css.resolve`
   .rekorder-plugin-container {

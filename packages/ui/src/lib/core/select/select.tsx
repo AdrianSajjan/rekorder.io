@@ -59,6 +59,8 @@ const SelectCSS = css.resolve`
 
     cursor: pointer;
     font-weight: 400;
+    text-align: left;
+
     font-family: ${theme.fonts.default};
     color: ${theme.colors.background.text};
     background-color: ${theme.colors.core.white};

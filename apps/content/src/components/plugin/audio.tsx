@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { AlertDialog, animations, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 import { Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 
+import { SwitchLabel } from '../ui/switch-label';
 import { microphone } from '../../store/microphone';
 import { openPermissionSettings } from '../../lib/utils';
 import { useRequestAudioDevices } from '../../hooks/use-audio-devices';
@@ -109,9 +110,9 @@ const AudioPlugin = observer(() => {
           </Select.Content>
         </Select>
         <div className={clsx(AudioPluginCSS.className, 'toggle-control')}>
-          <label htmlFor="push-to-talk" className={clsx(AudioPluginCSS.className, 'toggle-control-label')}>
+          <SwitchLabel htmlFor="push-to-talk">
             Push to Talk <small className={clsx(AudioPluginCSS.className, 'push-to-talk-command')}>(⌥⇧U)</small>
-          </label>
+          </SwitchLabel>
           <Switch checked={microphone.pushToTalk} onCheckedChange={microphone.updatePushToTalk} id="push-to-talk" />
         </div>
         {microphone.device !== 'n/a' ? (

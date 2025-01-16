@@ -39,7 +39,8 @@ const RecordControlCSS = css.resolve`
     background-color: ${theme.colors.text.muted};
   }
 
-  .rekorder-save-icon[data-status='active'] {
+  .rekorder-save-icon[data-status='active'],
+  .rekorder-save-icon[data-status='paused'] {
     background-color: ${theme.colors.destructive.main};
   }
 `;

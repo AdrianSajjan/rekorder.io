@@ -7,6 +7,7 @@ import { observer } from 'mobx-react';
 
 import { recorder } from '../../store/recorder';
 import { RECORD_SURFACE_OPTIONS } from '../../constants/recorder';
+import { SwitchLabel } from '../ui/switch-label';
 
 const ScreenPluginCSS = css.resolve`
   .rekorder-screen-container {
@@ -26,14 +27,6 @@ const ScreenPluginCSS = css.resolve`
     justify-content: space-between;
     gap: ${theme.space(3)};
   }
-
-  .rekorder-toggle-control-label {
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: ${theme.space(0.5)};
-    color: ${theme.colors.background.text};
-  }
 `;
 
 const ScreenPlugin = observer(() => {
@@ -47,22 +40,16 @@ const ScreenPlugin = observer(() => {
       <div className={clsx(ScreenPluginCSS.className, 'rekorder-screen-container')}>
         <Select value={recorder.surface} onValueChange={handleSurfaceChange}>
           <Select.Input />
-          <Select.Content portal={document.getElementById('rekorder-area')}>
-            {RECORD_SURFACE_OPTIONS.map((option) => (
-              <Select.Item key={option.value} value={option.value}>
-                {option.label}
-              </Select.Item>
-            ))}
-          </Select.Content>
+          <Select.Content options={RECORD_SURFACE_OPTIONS} portal={document.getElementById('rekorder-area')} />
         </Select>
         {recorder.surface === 'tab' || recorder.surface === 'browser' ? (
           <div className={clsx('rekorder-toggle-control', ScreenPluginCSS.className)}>
-            <label className={clsx(ScreenPluginCSS.className, 'rekorder-toggle-control-label')}>Capture Device Audio</label>
+            <SwitchLabel>Capture Device Audio</SwitchLabel>
             <Switch checked={recorder.audio} onCheckedChange={recorder.changeDesktopAudio} />
           </div>
         ) : null}
         <div className={clsx('rekorder-toggle-control', ScreenPluginCSS.className)}>
-          <label className={clsx(ScreenPluginCSS.className, 'rekorder-toggle-control-label')}>Zoom on Click</label>
+          <SwitchLabel>Zoom on Click</SwitchLabel>
           <Switch />
         </div>
       </div>

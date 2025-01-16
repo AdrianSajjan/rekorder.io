@@ -80,10 +80,10 @@ const TimerCountdown = observer(() => {
     <Fragment>
       {TimerCSS.styles}
       <div className={clsx(TimerCSS.className, 'rekorder-timer-container')}>
-        <svg className={clsx(TimerCSS.className, 'rekorder-timer-shape')} viewBox="0 0 830 930" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className={clsx(TimerCSS.className, 'rekorder-timer-shape')} viewBox="0 0 830 930" fill="none">
           <path
             d="M126.5 263.5C333.224 159.786 336.5 -50.1667 486 13C535.5 33.9147 528.8 94.0998 652 88.4998C775.2 82.8998 815.333 275.5 785 411C750 579 854.246 482.865 827 719C785 1083 -125.687 917.5 126.5 719C149.833 693.333 -167.5 411 126.5 263.5Z"
-            fill={theme.alpha(theme.colors.primary.main, 0.3)}
+            fill={theme.colors.primary.light}
           />
         </svg>
         <span className={clsx(TimerCSS.className, 'rekorder-timer-text')}>{time}</span>
