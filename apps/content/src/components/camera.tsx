@@ -14,6 +14,7 @@ import { camera } from '../store/camera';
 const CameraPreviewCSS = css.resolve`
   * {
     margin: 0;
+    box-sizing: border-box;
   }
 
   button {
@@ -27,18 +28,20 @@ const CameraPreviewCSS = css.resolve`
 
   .rekorder-close-button,
   .rekorder-resize-button {
-    height: 32px;
-    width: 32px;
-    border-radius: 100%;
+    width: ${theme.space(8)};
+    height: ${theme.space(8)};
+    border-radius: ${theme.space(8)};
 
     position: absolute;
     display: grid;
     place-items: center;
-    background-color: ${theme.colors.core.black};
+
+    background-color: ${theme.colors.core.jetblack};
+    box-shadow: ${theme.ring({ ring: { width: 2, color: theme.alpha(theme.colors.core.white, 0.3) } })};
 
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s;
+    transition: background-color 0.2s ease-out;
   }
 
   .rekorder-close-button {
@@ -55,7 +58,7 @@ const CameraPreviewCSS = css.resolve`
 
   .rekorder-close-button:hover,
   .rekorder-resize-button:hover {
-    background-color: ${theme.alpha(theme.colors.core.black, 0.8)};
+    background-color: ${theme.colors.core.black};
   }
 
   .rekorder-camera-container:hover .rekorder-close-button,
@@ -137,7 +140,7 @@ const CameraPreview = observer(() => {
             <button onClick={() => camera.changeDevice('n/a')} className={clsx(CameraPreviewCSS.className, 'rekorder-close-button')}>
               <X size={16} weight="bold" color={theme.colors.core.white} />
             </button>
-            <button className={clsx(CameraPreviewCSS.className, 'rekorder-resize-button')} onClick={() => setCameraSize(cameraSize === 200 ? 400 : 200)}>
+            <button className={clsx(CameraPreviewCSS.className, 'rekorder-resize-button')} onClick={() => setCameraSize(cameraSize === 200 ? 300 : 200)}>
               <ArrowsOutSimple weight="bold" size={16} color={theme.colors.core.white} />
             </button>
           </div>
