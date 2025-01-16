@@ -19,8 +19,8 @@ const PluginToolbarCSS = css.resolve`
   .rekorder-toolbar {
     position: absolute;
     pointer-events: auto;
-
     width: fit-content;
+
     display: flex;
     align-items: center;
 
@@ -53,9 +53,6 @@ const PluginToolbarCSS = css.resolve`
     gap: ${theme.space(0.5)};
     padding-left: ${theme.space(3)};
     padding-right: ${theme.space(3)};
-  }
-
-  .rekorder-toolbar-controls {
     border-right: 1px solid ${theme.alpha(theme.colors.borders.input, 0.3)};
   }
 
@@ -80,11 +77,6 @@ const PluginToolbarCSS = css.resolve`
 
   .rekorder-toolbar-handle:active {
     cursor: grabbing;
-  }
-
-  .rekorder-toolbar-timer {
-    padding-left: ${theme.space(5)};
-    padding-right: ${theme.space(5)};
   }
 `;
 
