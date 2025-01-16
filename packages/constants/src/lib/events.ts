@@ -51,7 +51,7 @@ export const EventConfig = {
   GetSessionStorageSuccess: 'get.session.storage.success',
   GetSessionStorageError: 'get.session.storage.error',
 
-  Authenticate: 'authenticate',
+  AuthenticateEditor: 'authenticate.editor',
   AuthenticateSuccess: 'authenticate.success',
   AuthenticateError: 'authenticate.error',
 

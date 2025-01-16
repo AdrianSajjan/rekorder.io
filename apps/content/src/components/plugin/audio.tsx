@@ -17,54 +17,49 @@ const AudioPluginCSS = css.resolve`
   .rekorder-audio-container {
     display: flex;
     flex-direction: column;
-    gap: ${theme.space(5)};
 
+    gap: ${theme.space(5)};
     animation-name: ${animations['fade-in']};
+
     animation-duration: 300ms;
     animation-timing-function: ease-out;
   }
 
-  .select-input {
+  .rekorder-select-input {
     width: 100%;
   }
 
-  .select-value {
+  .rekorder-select-value {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: ${theme.space(3)};
-    flex: 1;
   }
 
-  .select-value-label {
+  .rekorder-select-value-label {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
   }
 
-  .select-badge {
+  .rekorder-select-badge {
     margin-left: auto;
   }
 
-  .toggle-control {
+  .rekorder-toggle-control {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: ${theme.space(3)};
   }
 
-  .toggle-control-label {
-    font-size: 14px;
-    color: ${theme.colors.background.text};
-  }
-
-  .push-to-talk-command {
+  .rekorder-push-to-talk-command {
     font-size: 12px;
     color: ${theme.colors.background.text};
   }
 
-  .waveform {
+  .rekorder-waveform {
     width: 100%;
     height: ${theme.space(10)};
   }
@@ -86,14 +81,14 @@ const AudioPlugin = observer(() => {
       {AudioPluginCSS.styles}
       <div className={clsx(AudioPluginCSS.className, 'rekorder-audio-container')}>
         <Select value={microphone.device} onValueChange={microphone.changeDevice} open={isMicrophoneSelectOpen} onOpenChange={handleMicrophoneSelectOpenChange}>
-          <Select.Input className={clsx(AudioPluginCSS.className, 'select-input')}>
-            <div className={clsx(AudioPluginCSS.className, 'select-value')}>
+          <Select.Input className={clsx(AudioPluginCSS.className, 'rekorder-select-input')}>
+            <div className={clsx(AudioPluginCSS.className, 'rekorder-select-value')}>
               {microphone.device === 'n/a' ? <MicrophoneSlash size={16} /> : <Microphone size={16} />}
-              <span className={clsx(AudioPluginCSS.className, 'select-value-label')}>
+              <span className={clsx(AudioPluginCSS.className, 'rekorder-select-value-label')}>
                 {microphone.device === 'n/a' ? 'No Microphone' : microphones.find((m) => m.deviceId === microphone.device)?.label}
               </span>
               {microphone.device === 'n/a' ? (
-                <StatusBadge variant="error" className={clsx(AudioPluginCSS.className, 'select-badge')}>
+                <StatusBadge variant="error" className={clsx(AudioPluginCSS.className, 'rekorder-select-badge')}>
                   Off
                 </StatusBadge>
               ) : null}
@@ -109,9 +104,9 @@ const AudioPlugin = observer(() => {
             ))}
           </Select.Content>
         </Select>
-        <div className={clsx(AudioPluginCSS.className, 'toggle-control')}>
+        <div className={clsx(AudioPluginCSS.className, 'rekorder-toggle-control')}>
           <SwitchLabel htmlFor="push-to-talk">
-            Push to Talk <small className={clsx(AudioPluginCSS.className, 'push-to-talk-command')}>(⌥⇧U)</small>
+            Push to Talk <small className={clsx(AudioPluginCSS.className, 'rekorder-push-to-talk-command')}>(⌥⇧U)</small>
           </SwitchLabel>
           <Switch checked={microphone.pushToTalk} onCheckedChange={microphone.updatePushToTalk} id="push-to-talk" />
         </div>
@@ -120,7 +115,7 @@ const AudioPlugin = observer(() => {
             title="Waveform"
             id="rekorder-waveform-iframe"
             src={chrome.runtime.getURL('/build/waveform.html')}
-            className={clsx(AudioPluginCSS.className, 'waveform')}
+            className={clsx(AudioPluginCSS.className, 'rekorder-waveform')}
             allow="microphone *"
           />
         ) : null}

@@ -28,7 +28,9 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
       setStatus('unauthenticated');
       setSession(null);
     }
+  }, []);
 
+  useEffect(() => {
     const listener = supabase.auth.onAuthStateChange((_, session) => {
       if (session) {
         setStatus('authenticated');

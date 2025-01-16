@@ -4,16 +4,19 @@ import { checkBrowserName } from '@rekorder.io/utils';
 import type { Session } from '@supabase/supabase-js';
 
 const OFFSCREEN_PATH = 'build/offscreen.html';
+const AUTHENTICATION_URL = 'http://localhost:4200/extension/login';
 
 class Thread {
   enabled: boolean;
   offscreenPromise: Promise<void> | null;
   editorResolvers: PromiseWithResolvers<void> | null;
-  injectedTabs: Set<chrome.tabs.Tab>;
 
   editorTab: chrome.tabs.Tab | null;
   currentTab: chrome.tabs.Tab | null;
+  injectedTabs: Set<chrome.tabs.Tab>;
   originalTab: chrome.tabs.Tab | null;
+
+  authenticationMode: 'script' | 'editor';
   authenticationTab: chrome.tabs.Tab | null;
 
   handleTabChangeListener = this.__handleTabChangeListener.bind(this);
@@ -29,12 +32,14 @@ class Thread {
     this.enabled = false;
     this.editorResolvers = null;
     this.offscreenPromise = null;
-    this.injectedTabs = new Set();
 
     this.editorTab = null;
     this.currentTab = null;
     this.originalTab = null;
+    this.injectedTabs = new Set();
+
     this.authenticationTab = null;
+    this.authenticationMode = 'script';
   }
 
   private async __handleCloseExtension() {
@@ -103,6 +108,7 @@ class Thread {
     this.enabled = true;
     this.currentTab = tab;
     this.originalTab = tab;
+
     this.injectedTabs.add(tab);
     this.__injectContentScript();
   }
@@ -112,7 +118,30 @@ class Thread {
    */
   private async __handleAuthenticateUser(tab: chrome.tabs.Tab) {
     this.currentTab = tab;
-    this.authenticationTab = await chrome.tabs.create({ url: 'http://localhost:4200/extension/login', active: true });
+    this.authenticationMode = 'script';
+    this.authenticationTab = await chrome.tabs.create({ url: AUTHENTICATION_URL, active: true });
+  }
+
+  
+
+  private __handleAuthenticationSuccess(message: RuntimeMessage) {
+    switch (this.authenticationMode) {
+      case 'script':
+        if (this.currentTab) {
+          chrome.tabs.highlight({ tabs: this.currentTab.index, windowId: this.currentTab.windowId }, () => {
+            this.__handleInitializeExtension(this.currentTab!);
+          });
+        }
+        break;
+
+      case 'editor':
+        if (this.editorTab) {
+          chrome.tabs.highlight({ tabs: this.editorTab.index, windowId: this.editorTab.windowId }, () => {
+            if (this.editorTab) chrome.tabs.sendMessage(this.editorTab.id!, message);
+          });
+        }
+        break;
+    }
   }
 
   private async __handleActionClickListener(tab: chrome.tabs.Tab) {
@@ -373,6 +402,17 @@ class Thread {
         return false;
       }
 
+      /**
+       * Authenticate the editor, sent from the content script
+       */
+      case EventConfig.AuthenticateEditor: {
+        this.authenticationMode = 'editor';
+        chrome.tabs.create({ url: AUTHENTICATION_URL, active: true }, (tab) => {
+          this.authenticationTab = tab;
+        });
+        return false;
+      }
+
       default: {
         console.log('Unhandled message type:', message.type);
         return false;
@@ -388,18 +428,12 @@ class Thread {
       case EventConfig.AuthenticateSuccess: {
         if (message.payload) {
           chrome.storage.local.set({ [StorageConfig.Authentication]: message.payload }, () => {
-            console.log('User has been authenticated, closing authentication tab and initializing extension in the active tab');
+            console.log('User has been authenticated, closing authentication tab');
             if (!this.authenticationTab || !this.authenticationTab.id) {
-              if (this.currentTab)
-                chrome.tabs.highlight({ tabs: this.currentTab.index, windowId: this.currentTab.windowId }, () =>
-                  this.__handleInitializeExtension(this.currentTab!)
-                );
+              this.__handleAuthenticationSuccess(message);
             } else {
               chrome.tabs.remove(this.authenticationTab.id, () => {
-                if (this.currentTab)
-                  chrome.tabs.highlight({ tabs: this.currentTab.index, windowId: this.currentTab.windowId }, () =>
-                    this.__handleInitializeExtension(this.currentTab!)
-                  );
+                this.__handleAuthenticationSuccess(message);
               });
             }
           });

@@ -13,11 +13,17 @@ const ScreenPluginCSS = css.resolve`
   .rekorder-screen-container {
     display: flex;
     flex-direction: column;
-    gap: ${theme.space(5)};
 
+    gap: ${theme.space(4)};
     animation-name: ${animations['fade-in']};
+
     animation-duration: 300ms;
     animation-timing-function: ease-out;
+  }
+
+  .rekorder-select-input {
+    width: 100%;
+    margin-bottom: ${theme.space(1)};
   }
 
   .rekorder-toggle-control {
@@ -25,7 +31,6 @@ const ScreenPluginCSS = css.resolve`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: ${theme.space(3)};
   }
 `;
 
@@ -39,7 +44,7 @@ const ScreenPlugin = observer(() => {
       {ScreenPluginCSS.styles}
       <div className={clsx(ScreenPluginCSS.className, 'rekorder-screen-container')}>
         <Select value={recorder.surface} onValueChange={handleSurfaceChange}>
-          <Select.Input />
+          <Select.Input className={clsx(ScreenPluginCSS.className, 'rekorder-select-input')} />
           <Select.Content options={RECORD_SURFACE_OPTIONS} portal={document.getElementById('rekorder-area')} />
         </Select>
         {recorder.surface === 'tab' || recorder.surface === 'browser' ? (
