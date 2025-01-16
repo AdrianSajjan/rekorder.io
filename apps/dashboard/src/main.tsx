@@ -21,7 +21,7 @@ root.render(
 
 function RootApplication() {
   return (
-    <ThemeProvider>
+    <ThemeProvider global>
       <RouterProvider router={router} />
     </ThemeProvider>
   );
