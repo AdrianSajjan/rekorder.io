@@ -41,7 +41,6 @@ const ToolbarActionbarControls = observer((props: Pick<ToggleGroupSingleProps, '
           </ToggleGroupItem>
         </ToolbarAction>
       </Actionbar>
-
       <Actionbar open={toolbar.actionbarState === 'click'} container={toolbarContainer} content={<CursorActionbar />}>
         <ToolbarAction actionbarIndicator asChild tooltip="Toggle click mode">
           <ToggleGroupItem value="click">{cursors[cursor.mode]}</ToggleGroupItem>

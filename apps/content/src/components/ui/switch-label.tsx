@@ -7,7 +7,7 @@ import { Fragment } from 'react/jsx-runtime';
 const SwitchLabelCSS = css.resolve`
   .rekorder-switch-label {
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 400;
     align-items: center;
     display: inline-flex;
 

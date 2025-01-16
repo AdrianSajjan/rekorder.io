@@ -39,11 +39,12 @@ const ButtonCSS = css.resolve`
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     gap: ${theme.space(3)};
+    font-family: ${theme.fonts.default};
 
     cursor: pointer;
-    font-weight: 400;
-    font-family: ${theme.fonts.default};
+    font-weight: 500;
     transition: background-color 200ms ease-in-out;
   }
 

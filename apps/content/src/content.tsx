@@ -60,7 +60,7 @@ const Content = observer(() => {
           <CameraPreview />
           <TimerCountdown />
         </div>
-        {/* <Permission /> */}
+        <Permission />
         <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING_SMALL} />
       </section>
     </ThemeProvider>

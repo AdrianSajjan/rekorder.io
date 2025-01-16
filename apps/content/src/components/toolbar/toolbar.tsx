@@ -5,7 +5,7 @@ import Draggable from 'react-draggable';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react';
 import { DotsSixVertical } from '@phosphor-icons/react';
-import { theme, Tooltip } from '@rekorder.io/ui';
+import { Divider, theme, Tooltip } from '@rekorder.io/ui';
 
 import { ToolbarActionbarControls } from './actionbar';
 import { ToolbarRecordingControls } from './playback';
@@ -27,8 +27,8 @@ const PluginToolbarCSS = css.resolve`
     font-family: ${theme.fonts.default};
     background-color: ${theme.colors.core.jetblack};
 
+    padding: ${theme.space(3)};
     height: ${theme.space(12)};
-    padding: ${theme.space(3)} 0;
     border-radius: ${theme.space(12)};
   }
 
@@ -49,20 +49,7 @@ const PluginToolbarCSS = css.resolve`
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    gap: ${theme.space(0.5)};
-    padding-left: ${theme.space(3)};
-    padding-right: ${theme.space(3)};
-    border-right: 1px solid ${theme.alpha(theme.colors.borders.input, 0.3)};
-  }
-
-  .rekorder-toolbar-controls:first-child {
-    padding: 0 ${theme.space(2)};
-  }
-
-  .rekorder-toolbar-controls:last-child {
-    border-right: none;
-    padding-right: ${theme.space(3)};
+    gap: ${theme.space(1)};
   }
 
   .rekorder-toolbar-handle {
@@ -70,13 +57,20 @@ const PluginToolbarCSS = css.resolve`
     display: grid;
     place-items: center;
 
-    width: ${theme.space(8)};
     height: ${theme.space(8)};
+    padding-left: ${theme.space(1)};
     border-radius: ${theme.space(8)};
   }
 
   .rekorder-toolbar-handle:active {
     cursor: grabbing;
+  }
+
+  .rekorder-toolbar-divider {
+    width: 1px !important;
+    height: ${theme.space(6)} !important;
+    margin: 0 ${theme.space(3)} !important;
+    background-color: ${theme.alpha(theme.colors.borders.input, 0.3)} !important;
   }
 `;
 
@@ -86,7 +80,7 @@ const PluginToolbar = observer(() => {
   return (
     <Fragment>
       {PluginToolbarCSS.styles}
-      <Draggable nodeRef={drag.ref} bounds={drag.bounds} handle="#rekorder-toolbar-handle" position={drag.position} onStop={drag.onChangePosition}>
+      <Draggable nodeRef={drag.ref} bounds={drag.bounds} position={drag.position} onStop={drag.onChangePosition}>
         <article ref={drag.ref} id="rekorder-toolbar" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar')}>
           <Tooltip.Provider disableHoverableContent delayDuration={500}>
             <div id="rekorder-toolbar-handle" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')}>
@@ -94,7 +88,9 @@ const PluginToolbar = observer(() => {
                 <DotsSixVertical weight="bold" size={20} color={theme.colors.accent.main} />
               </div>
             </div>
+            <Divider orientation="vertical" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-divider')} />
             <ToolbarRecordingControls className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')} />
+            <Divider orientation="vertical" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-divider')} />
             <ToolbarActionbarControls className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')} />
           </Tooltip.Provider>
         </article>

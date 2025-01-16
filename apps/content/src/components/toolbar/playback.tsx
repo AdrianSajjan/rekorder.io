@@ -17,11 +17,8 @@ const RecordControlCSS = css.resolve`
     display: flex;
     align-items: center;
 
-    margin: 0 ${theme.space(0.5)};
-    padding: ${theme.space(0.5)} ${theme.space(3)};
-
-    gap: ${theme.space(2)};
     border-radius: ${theme.space(10)};
+    padding: ${theme.space(0.5)} ${theme.space(3)};
     background-color: ${theme.alpha(theme.colors.text.muted, 0.1)};
   }
 
