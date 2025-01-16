@@ -40,7 +40,7 @@ const ToolbarActionCSS = css.resolve`
   }
 
   .toolbar-action:hover {
-    background-color: ${theme.colors.background.main};
+    background-color: ${theme.alpha(theme.colors.accent.dark, 0.2)};
   }
 
   .toolbar-action:disabled {
@@ -57,37 +57,8 @@ const ToolbarActionCSS = css.resolve`
   .toolbar-action[data-state='open'],
   .toolbar-action[aria-pressed='true'],
   .toolbar-action[aria-checked='true'] {
-    background-color: ${theme.alpha(theme.colors.primary.main, 0.15)};
-    color: ${theme.colors.primary.dark};
-  }
-
-  .toolbar-action.actionbar-indicator::before {
-    content: '';
-
-    width: 100%;
-    height: 50%;
-    display: block;
-    border-radius: 80px 80px 0% 0%;
-
-    position: absolute;
-    z-index: -1;
-    top: -${theme.space(3)};
-
-    border-right: ${theme.space(1)} solid ${theme.colors.core.white};
-    border-top: ${theme.space(2)} solid ${theme.colors.core.white};
-    border-left: ${theme.space(1)} solid ${theme.colors.core.white};
-
-    opacity: 0;
-    background-color: transparent;
-    transform: scale(0);
-    transition: transform 0.25s ease-out, opacity 0.25s ease-in-out;
-  }
-
-  .toolbar-action.actionbar-indicator[data-state='on']::before,
-  .toolbar-action.actionbar-indicator[aria-pressed='true']::before,
-  .toolbar-action.actionbar-indicator[aria-checked='true']::before {
-    transform: scale(1);
-    opacity: 1;
+    background-color: ${theme.colors.primary.dark};
+    color: ${theme.colors.primary.text};
   }
 `;
 

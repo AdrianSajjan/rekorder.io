@@ -13,7 +13,7 @@ const OverlayCSS = css.resolve`
     position: fixed;
     pointer-events: none;
     z-index: 1;
-    background-color: ${theme.alpha(theme.colors.core.black, 0.15)};
+    background-color: ${theme.alpha(theme.colors.core.black, 0.6)};
   }
 `;
 

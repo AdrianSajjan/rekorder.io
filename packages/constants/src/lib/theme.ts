@@ -53,6 +53,7 @@ export const theme = {
     core: {
       black: '#0a0d14',
       white: '#ffffff',
+      jetblack: '#1a1a1a',
     },
     card: {
       background: '#ffffff',

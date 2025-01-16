@@ -172,7 +172,6 @@ const PluginCard = observer(() => {
                 <HorizontalTabs.Trigger value="screen">Screen</HorizontalTabs.Trigger>
                 <HorizontalTabs.Trigger value="camera">Camera</HorizontalTabs.Trigger>
                 <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
-                <HorizontalTabs.Trigger value="toolbar">Toolbar</HorizontalTabs.Trigger>
               </HorizontalTabs.List>
               <AnimateHeight className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel')}>
                 <div className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel-content')}>
@@ -184,9 +183,6 @@ const PluginCard = observer(() => {
                   </HorizontalTabs.Panel>
                   <HorizontalTabs.Panel value="audio">
                     <AudioPlugin />
-                  </HorizontalTabs.Panel>
-                  <HorizontalTabs.Panel value="toolbar">
-                    <ToolbarPlugin />
                   </HorizontalTabs.Panel>
                 </div>
               </AnimateHeight>

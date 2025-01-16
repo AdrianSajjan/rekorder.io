@@ -32,6 +32,7 @@ import { ColorPicker } from '../ui/color-picker';
 import { ToolbarAction } from '../ui/toolbar-action';
 import { editor, EditorMode } from '../../store/editor';
 import { LinesActionbar } from './lines';
+import { StrokeWidthActionbar } from './stroke';
 
 const DrawingActionbarCSS = css.resolve`
   * {
@@ -44,12 +45,8 @@ const DrawingActionbarCSS = css.resolve`
     font-family: ${theme.fonts.default};
 
     display: flex;
-    align-items: center;
     width: fit-content;
-
-    height: ${theme.space(11)};
-    border-radius: ${theme.space(3)};
-    padding: ${theme.space(2)} ${theme.space(3)};
+    align-items: center;
   }
 
   .rekorder-drawing-actionbar-group {
@@ -59,7 +56,10 @@ const DrawingActionbarCSS = css.resolve`
   }
 
   .rekorder-drawing-actionbar-divider {
+    width: 1px !important;
     height: ${theme.space(6)} !important;
+    background-color: ${theme.alpha(theme.colors.borders.input, 0.3)} !important;
+
     margin-left: ${theme.space(2)};
     margin-right: ${theme.space(2)};
   }
@@ -170,13 +170,15 @@ const EditorActionbar = observer(() => {
               <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-color')} style={{ background: editor.color }} />
             </ToolbarAction>
           </ColorPicker>
-          <ToolbarAction tooltip="Stroke width">
-            <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-width-icon')}>
-              <span className={clsx(DrawingActionbarCSS.className)} />
-              <span className={clsx(DrawingActionbarCSS.className)} />
-              <span className={clsx(DrawingActionbarCSS.className)} />
-            </div>
-          </ToolbarAction>
+          <Actionbar indicator="arrow" content={<StrokeWidthActionbar />} container={toolbarContainer}>
+            <ToolbarAction tooltip="Stroke width">
+              <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-width-icon')}>
+                <span className={clsx(DrawingActionbarCSS.className)} />
+                <span className={clsx(DrawingActionbarCSS.className)} />
+                <span className={clsx(DrawingActionbarCSS.className)} />
+              </div>
+            </ToolbarAction>
+          </Actionbar>
           <ToolbarAction asChild tooltip="Toggle fill">
             <Toggle pressed={editor.fill} onPressedChange={editor.toggleFill}>
               <PaintBucket size={16} weight="bold" />

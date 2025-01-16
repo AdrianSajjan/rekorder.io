@@ -3,7 +3,7 @@ import { ControlPosition, DraggableEventHandler } from 'react-draggable';
 import { useWindowDimensions } from '@rekorder.io/hooks';
 
 import { measureElement } from '../lib/utils';
-import { SAFE_AREA_PADDING } from '../constants/layout';
+import { SAFE_AREA_PADDING_SMALL, SAFE_AREA_PADDING_LARGE } from '../constants/layout';
 
 interface DragControlsProps {
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -15,6 +15,8 @@ function initializeDefaultPosition(
   screen: Pick<DOMRect, 'height' | 'width'>,
   element: Pick<DOMRect, 'height' | 'width'>
 ): ControlPosition {
+  const SAFE_AREA_PADDING = position === "top-right" ? SAFE_AREA_PADDING_LARGE : SAFE_AREA_PADDING_SMALL;
+
   switch (position) {
     case 'top-left':
       return { x: SAFE_AREA_PADDING, y: SAFE_AREA_PADDING };
@@ -23,10 +25,7 @@ function initializeDefaultPosition(
     case 'bottom-left':
       return { x: SAFE_AREA_PADDING, y: screen.height - element.height - SAFE_AREA_PADDING };
     case 'bottom-right':
-      return {
-        x: screen.width - element.width - SAFE_AREA_PADDING,
-        y: screen.height - element.height - SAFE_AREA_PADDING,
-      };
+      return { x: screen.width - element.width - SAFE_AREA_PADDING, y: screen.height - element.height - SAFE_AREA_PADDING };
   }
 }
 
@@ -43,6 +42,8 @@ export function useDragControls<T extends HTMLElement>(props: DragControlsProps)
   const onChangePosition: DraggableEventHandler = useCallback((event, data) => {
     setPosition({ x: data.x, y: data.y });
   }, []);
+
+  const SAFE_AREA_PADDING = props.position === "top-right" ? SAFE_AREA_PADDING_LARGE : SAFE_AREA_PADDING_SMALL;
 
   useEffect(() => {
     if (screenWidth > elementWidth + SAFE_AREA_PADDING * 2) {
@@ -64,7 +65,7 @@ export function useDragControls<T extends HTMLElement>(props: DragControlsProps)
         setPosition((state) => ({ ...state, y: screenHeight - elementHeight - SAFE_AREA_PADDING }));
       }
     }
-  }, [screenHeight, screenWidth, elementHeight, elementWidth, position]);
+  }, [screenHeight, screenWidth, elementHeight, elementWidth, position, SAFE_AREA_PADDING]);
 
   const bounds = {
     left: SAFE_AREA_PADDING,

@@ -18,16 +18,13 @@ const LinesActionbarCSS = css.resolve`
   .rekorder-lines-actionbar {
     pointer-events: auto;
     position: relative;
-    font-family: ${theme.fonts.default};
 
     display: flex;
     align-items: center;
     width: fit-content;
-    gap: ${theme.space(1)};
 
-    height: ${theme.space(11)};
-    border-radius: ${theme.space(3)};
-    padding: ${theme.space(2)} ${theme.space(3)};
+    gap: ${theme.space(1)};
+    font-family: ${theme.fonts.default};
   }
 `;
 

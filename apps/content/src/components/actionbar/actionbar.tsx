@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { Popover, PopoverArrow, PopoverContent, PopoverPortal, PopoverProps, PopoverTrigger } from '@radix-ui/react-popover';
+import { Popover, PopoverContent, PopoverPortal, PopoverProps, PopoverTrigger } from '@radix-ui/react-popover';
 import { animations, theme } from '@rekorder.io/ui';
 
 interface ActionbarProps extends PopoverProps {
@@ -17,27 +17,17 @@ const ActionbarCSS = css.resolve`
 
   .rekorder-actionbar-popover-content {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: ${theme.space(12)};
     z-index: ${theme.zIndex(50)};
+    padding: ${theme.space(3)};
 
-    border-radius: ${theme.space(3)};
-    background-color: ${theme.colors.background.light};
-    border: 1px solid ${theme.colors.borders.input};
-  }
-
-  .rekorder-actionbar-popover-content[data-indicator='mask'] {
-    mask: radial-gradient(circle farthest-side at center 67px, transparent 28px, #000000 20px 100%) 50% 50%/100% 100% no-repeat;
-  }
-
-  .rekorder-actionbar-popover-arrow {
-    transform: translateY(-50%) rotate(-45deg);
-    clip-path: polygon(0 100%, 0 0, 100% 100%);
-    border-bottom-left-radius: ${theme.space(0.5)};
-
-    border: 1px solid ${theme.colors.borders.input};
-    background-color: ${theme.colors.background.light};
-
-    height: ${theme.space(2.25)};
-    width: ${theme.space(2.25)};
+    border-radius: ${theme.space(12)};
+    background-color: ${theme.colors.core.jetblack};
+    box-shadow: ${theme.ring({ ring: { width: 2.5, color: theme.alpha(theme.colors.core.white, 0.3) } })};
   }
 
   .rekorder-actionbar-popover-content[data-state='open'] {
@@ -64,18 +54,12 @@ export function Actionbar({ children, content, container, indicator = 'mask', ..
         <PopoverContent
           side="top"
           align="center"
-          data-indicator={indicator}
-          className={clsx(ActionbarCSS.className, 'rekorder-actionbar-popover-content')}
+          sideOffset={20}
           avoidCollisions={false}
           onOpenAutoFocus={(e) => e.preventDefault()}
-          sideOffset={indicator === 'arrow' ? 7 : 14}
+          className={clsx(ActionbarCSS.className, 'rekorder-actionbar-popover-content')}
         >
           {content}
-          {indicator === 'arrow' ? (
-            <PopoverArrow asChild>
-              <div className={clsx(ActionbarCSS.className, 'rekorder-actionbar-popover-arrow')} />
-            </PopoverArrow>
-          ) : null}
         </PopoverContent>
       </PopoverPortal>
     </Popover>

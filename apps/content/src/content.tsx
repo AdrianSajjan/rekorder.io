@@ -16,7 +16,7 @@ import { PluginToolbar } from './components/toolbar/toolbar';
 
 import { recorder } from './store/recorder';
 import { useCloseExtensionListener } from './hooks/use-close-extension';
-import { SAFE_AREA_PADDING } from './constants/layout';
+import { SAFE_AREA_PADDING_SMALL } from './constants/layout';
 
 const RecorderCSS = css.resolve`
   * {
@@ -60,8 +60,8 @@ const Content = observer(() => {
           <CameraPreview />
           <TimerCountdown />
         </div>
-        <Permission />
-        <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING} />
+        {/* <Permission /> */}
+        <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING_SMALL} />
       </section>
     </ThemeProvider>
   );

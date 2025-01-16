@@ -27,9 +27,9 @@ export function useCloseExtensionListener() {
   );
 
   useEffect(() => {
-    chrome.runtime.onMessage.addListener(handleRuntimeMessage);
+    // chrome.runtime.onMessage.addListener(handleRuntimeMessage);
     return () => {
-      chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
+      // chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
       handleDispose();
     };
   }, [handleRuntimeMessage, handleDispose]);

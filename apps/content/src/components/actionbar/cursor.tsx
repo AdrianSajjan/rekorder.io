@@ -21,20 +21,21 @@ const CursorActionbarCSS = css.resolve`
   .rekorder-cursor-actionbar-container {
     pointer-events: auto;
     position: relative;
-    font-family: ${theme.fonts.default};
 
     display: flex;
     align-items: center;
     width: fit-content;
-    gap: ${theme.space(1)};
 
-    height: ${theme.space(11)};
+    gap: ${theme.space(1)};
     border-radius: ${theme.space(3)};
-    padding: ${theme.space(2)} ${theme.space(3)};
+    font-family: ${theme.fonts.default};
   }
 
   .rekorder-cursor-actionbar-divider {
+    width: 1px !important;
     height: ${theme.space(6)} !important;
+    background-color: ${theme.alpha(theme.colors.borders.input, 0.3)} !important;
+
     margin-left: ${theme.space(2)};
     margin-right: ${theme.space(2)};
   }

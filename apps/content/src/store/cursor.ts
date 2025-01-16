@@ -7,12 +7,15 @@ class Cursor {
   clientX: number;
   clientY: number;
 
+  private _handleMouseMove = this.__handleMouseMove.bind(this);
+
   constructor() {
     this.clientX = 0;
     this.clientY = 0;
+    
     this.mode = 'default-cursor';
-
     this.__setupEvents();
+
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -28,7 +31,7 @@ class Cursor {
   }
 
   private __setupEvents() {
-    document.addEventListener('mousemove', this.__handleMouseMove);
+    document.addEventListener('mousemove', this._handleMouseMove);
   }
 
   update(mode: CursorMode) {
@@ -36,7 +39,7 @@ class Cursor {
   }
 
   dispose() {
-    document.removeEventListener('mousemove', this.__handleMouseMove);
+    document.removeEventListener('mousemove', this._handleMouseMove);
   }
 }
 

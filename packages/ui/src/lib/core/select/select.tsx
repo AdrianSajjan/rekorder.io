@@ -253,13 +253,12 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
       [options]
     );
 
-    const Portal = portal ? SelectPrimitive.Portal : React.Fragment;
     const container = isBoolean(portal) || isNil(portal) ? null : portal;
 
     return (
       <React.Fragment>
         {SelectCSS.styles}
-        <Portal container={container}>
+        <SelectPrimitive.Portal container={container}>
           <SelectPrimitive.Content
             className={clsx(SelectCSS.className, 'rekorder-content', theme.createClassName(size))}
             position={position}
@@ -271,7 +270,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
             <SelectPrimitive.Viewport ref={viewport}>{options ? options.map(renderOption) : children}</SelectPrimitive.Viewport>
             <SelectPrimitive.ScrollDownButton />
           </SelectPrimitive.Content>
-        </Portal>
+        </SelectPrimitive.Portal>
       </React.Fragment>
     );
   }

@@ -8,16 +8,21 @@ import { recorder } from '../../store/recorder';
 
 const RecordTimerCSS = css.resolve`
   .timer {
+    height: 100%;
     display: flex;
     align-items: center;
+
     gap: ${theme.space(2)};
+    border-radius: ${theme.space(10)};
+    padding: ${theme.space(0.5)} ${theme.space(2.5)};
+    background-color: ${theme.alpha(theme.colors.accent.dark, 0.2)};
   }
 
   .time {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: ${theme.colors.background.text};
+    color: ${theme.colors.accent.main};
   }
 `;
 

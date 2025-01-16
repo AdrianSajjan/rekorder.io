@@ -1,6 +1,7 @@
-import { observer } from 'mobx-react';
-import { theme } from '@rekorder.io/ui';
 import { CSSProperties, useCallback, useEffect, useState } from 'react';
+import { observer } from 'mobx-react';
+
+import { theme } from '@rekorder.io/ui';
 import { cursor } from '../store/cursor';
 
 const Cursors = observer(() => {
