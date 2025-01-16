@@ -15,6 +15,10 @@ const OverlayCSS = css.resolve`
     z-index: 1;
     background-color: ${theme.alpha(theme.colors.core.black, 0.6)};
   }
+
+  .rekorder-overlay[data-state='paused'] {
+    border: 6px solid ${theme.alpha(theme.colors.destructive.main, 0.5)};
+  }
 `;
 
 const Overlay = observer(() => {
@@ -25,7 +29,7 @@ const Overlay = observer(() => {
   return (
     <Fragment>
       {OverlayCSS.styles}
-      <div className={clsx(OverlayCSS.className, 'rekorder-overlay')} />
+      <div data-state={recorder.status} className={clsx(OverlayCSS.className, 'rekorder-overlay')} />
     </Fragment>
   );
 });

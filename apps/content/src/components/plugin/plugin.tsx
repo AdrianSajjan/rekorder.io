@@ -43,8 +43,8 @@ const PluginCardCSS = css.resolve`
   }
 
   .rekorder-card-actions {
-    top: -12px;
-    right: -20px;
+    top: -15px;
+    right: -15px;
     position: absolute;
 
     display: flex;

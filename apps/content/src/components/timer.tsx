@@ -9,8 +9,14 @@ import { animations, theme } from '@rekorder.io/ui';
 import { RecorderConfig } from '@rekorder.io/constants';
 
 import { recorder } from '../store/recorder';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const TimerCSS = css.resolve`
+  * {
+    margin: 0;
+    box-sizing: border-box;
+  }
+
   .rekorder-timer-container {
     top: 50%;
     left: 50%;
@@ -27,7 +33,7 @@ const TimerCSS = css.resolve`
     transform: translate(-50%, -50%);
     background: linear-gradient(45deg, oklch(27.3% 0.09 275), oklch(31.1% 0.146 303), oklch(36.3% 0.127 308));
 
-    gap: ${theme.space(2)};
+    gap: ${theme.space(3)};
     width: ${theme.space(45)};
     height: ${theme.space(45)};
     border-radius: ${theme.space(45)};
@@ -59,7 +65,7 @@ const TimerCountdownHOC = observer(() => {
   if (recorder.status === 'countdown') {
     return <TimerCountdown />;
   } else {
-    return <TimerCountdown />;
+    return null;
   }
 });
 
@@ -70,7 +76,18 @@ const TimerCountdown = observer(() => {
     <Fragment>
       {TimerCSS.styles}
       <div className={clsx(TimerCSS.className, 'rekorder-timer-container')}>
-        <span className={clsx(TimerCSS.className, 'rekorder-timer-text')}>{time}</span>
+        <AnimatePresence>
+          <motion.h3
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40, x: 40, filter: 'blur(8px)', scale: 2, position: 'absolute' }}
+            transition={{ type: 'spring', stiffness: 100, damping: 10 }}
+            className={clsx(TimerCSS.className, 'rekorder-timer-text')}
+            key={time}
+          >
+            {time}
+          </motion.h3>
+        </AnimatePresence>
         <button className={clsx(TimerCSS.className, 'rekorder-timer-skip')}>Skip</button>
       </div>
     </Fragment>
