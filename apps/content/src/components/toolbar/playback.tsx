@@ -4,7 +4,7 @@ import css from 'styled-jsx/css';
 import { observer } from 'mobx-react';
 import { theme } from '@rekorder.io/ui';
 import { Fragment } from 'react/jsx-runtime';
-import { Pause, Play, Record, Trash } from '@phosphor-icons/react';
+import { Pause, Play, Trash } from '@phosphor-icons/react';
 
 import { recorder } from '../../store/recorder';
 import { ToolbarAction } from '../ui/toolbar-action';
@@ -12,7 +12,7 @@ import { ToolbarAction } from '../ui/toolbar-action';
 const disabled = ['idle', 'saving', 'countdown', 'pending', 'error'];
 
 const RecordControlCSS = css.resolve`
-  .timer {
+  .rekorder-timer-container {
     height: 100%;
     display: flex;
     align-items: center;
@@ -25,11 +25,22 @@ const RecordControlCSS = css.resolve`
     background-color: ${theme.alpha(theme.colors.text.muted, 0.1)};
   }
 
-  .time {
+  .rekorder-timer-time {
     font-size: 12px;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     color: ${theme.colors.accent.main};
+  }
+
+  .rekorder-save-icon {
+    width: ${theme.space(3.5)};
+    height: ${theme.space(3.5)};
+    border-radius: ${theme.space(1)};
+    background-color: ${theme.colors.text.muted};
+  }
+
+  .rekorder-save-icon[data-status='active'] {
+    background-color: ${theme.colors.destructive.main};
   }
 `;
 
@@ -38,11 +49,11 @@ const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivEl
     <Fragment>
       {RecordControlCSS.styles}
       <div {...props}>
-        <ToolbarAction tooltip="Save recording" disabled={disabled.includes(recorder.status)}>
-          <Record size={16} weight="fill" onClick={recorder.saveScreenCapture} />
+        <ToolbarAction tooltip="Save recording" onClick={recorder.saveScreenCapture} disabled={disabled.includes(recorder.status)}>
+          <div data-status={recorder.status} className={clsx(RecordControlCSS.className, 'rekorder-save-icon')} />
         </ToolbarAction>
-        <div className={clsx(RecordControlCSS.className, 'timer')}>
-          <span className={clsx(RecordControlCSS.className, 'time')}>{recorder.time}</span>
+        <div className={clsx(RecordControlCSS.className, 'rekorder-timer-container')}>
+          <span className={clsx(RecordControlCSS.className, 'rekorder-timer-time')}>{recorder.time}</span>
         </div>
         <ToolbarRecorderPlayPause />
         <ToolbarAction tooltip="Discard recording" disabled={disabled.includes(recorder.status)}>

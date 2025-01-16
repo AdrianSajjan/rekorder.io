@@ -26,11 +26,22 @@ const PluginToolbarCSS = css.resolve`
 
     font-family: ${theme.fonts.default};
     background-color: ${theme.colors.core.jetblack};
-    box-shadow: ${theme.ring({ ring: { width: 2.5, color: theme.alpha(theme.colors.core.white, 0.3) } })};
 
     height: ${theme.space(12)};
     padding: ${theme.space(3)} 0;
     border-radius: ${theme.space(12)};
+  }
+
+  @media (prefers-color-scheme: light) {
+    .rekorder-toolbar {
+      box-shadow: ${theme.ring({ ring: { width: 3, color: theme.alpha(theme.colors.core.white, 0.3) } })};
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .rekorder-toolbar {
+      box-shadow: ${theme.ring({ ring: { width: 3, color: theme.alpha(theme.colors.core.white, 0.3) } })};
+    }
   }
 
   .rekorder-toolbar-controls {

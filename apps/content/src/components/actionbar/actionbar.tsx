@@ -16,8 +16,8 @@ const ActionbarCSS = css.resolve`
   }
 
   .rekorder-actionbar-popover-content {
-    position: relative;
     display: flex;
+    position: relative;
     align-items: center;
     justify-content: center;
 
@@ -27,7 +27,18 @@ const ActionbarCSS = css.resolve`
 
     border-radius: ${theme.space(12)};
     background-color: ${theme.colors.core.jetblack};
-    box-shadow: ${theme.ring({ ring: { width: 2.5, color: theme.alpha(theme.colors.core.white, 0.3) } })};
+  }
+
+  @media (prefers-color-scheme: light) {
+    .rekorder-actionbar-popover-content {
+      box-shadow: ${theme.ring({ ring: { width: 3, color: theme.alpha(theme.colors.core.white, 0.3) } })};
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .rekorder-actionbar-popover-content {
+      box-shadow: ${theme.ring({ ring: { width: 3, color: theme.alpha(theme.colors.core.white, 0.3) } })};
+    }
   }
 
   .rekorder-actionbar-popover-content[data-state='open'] {
