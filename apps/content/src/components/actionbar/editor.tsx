@@ -67,7 +67,9 @@ const DrawingActionbarCSS = css.resolve`
   .rekorder-drawing-actionbar-color {
     width: ${theme.space(4)};
     height: ${theme.space(4)};
+
     border-radius: ${theme.space(4)};
+    border: 1px solid ${theme.alpha(theme.colors.borders.input, 0.3)};
   }
 
   .rekorder-drawing-actionbar-width-icon {

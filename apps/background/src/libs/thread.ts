@@ -111,7 +111,7 @@ class Thread {
    * TODO: Finish up the authentication system
    */
   private async __handleAuthenticateUser(tab: chrome.tabs.Tab) {
-    // return this.__handleInitializeExtension(tab);
+    return this.__handleInitializeExtension(tab);
     this.currentTab = tab;
     this.authenticationTab = await chrome.tabs.create({ url: 'http://localhost:4200/extension/login', active: true });
   }

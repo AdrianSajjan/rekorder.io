@@ -23,6 +23,6 @@
     "../../packages/ui/src/**/*",
     "../../packages/canvas/src/**/*",
     "../../packages/hooks/src/**/*",
-    "../../packages/types/src/**/*"
+    "../../packages/types/src/**/*", "eyedropper.d.ts",
   ]
 }
