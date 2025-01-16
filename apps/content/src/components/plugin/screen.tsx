@@ -14,7 +14,7 @@ const ScreenPluginCSS = css.resolve`
     display: flex;
     flex-direction: column;
 
-    gap: ${theme.space(4)};
+    gap: ${theme.space(5)};
     animation-name: ${animations['fade-in']};
 
     animation-duration: 300ms;
@@ -23,7 +23,6 @@ const ScreenPluginCSS = css.resolve`
 
   .rekorder-select-input {
     width: 100%;
-    margin-bottom: ${theme.space(1)};
   }
 
   .rekorder-toggle-control {

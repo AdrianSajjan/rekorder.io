@@ -18,7 +18,7 @@ const CameraPluginCSS = css.resolve`
     display: flex;
     flex-direction: column;
 
-    gap: ${theme.space(4)};
+    gap: ${theme.space(5)};
     animation-name: ${animations['fade-in']};
 
     animation-duration: 300ms;
@@ -27,14 +27,13 @@ const CameraPluginCSS = css.resolve`
 
   .rekorder-select-input {
     width: 100%;
-    margin-bottom: ${theme.space(1)};
   }
 
   .rekorder-select-value {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: ${theme.space(3)};
-    flex: 1;
   }
 
   .rekorder-select-value-label {
@@ -63,8 +62,12 @@ const CameraPlugin = observer(() => {
   const [isCameraSelectOpen, setCameraSelectOpen] = useState(false);
 
   const handleCameraSelectOpenChange = (open: boolean) => {
-    if (!open || permission !== 'denied') setCameraSelectOpen(open);
-    if (open && permission === 'denied') setAlertDialogOpen(true);
+    if (open) {
+      if (permission === 'denied') setAlertDialogOpen(true);
+      else setCameraSelectOpen(open);
+    } else {
+      setCameraSelectOpen(open);
+    }
   };
 
   return (

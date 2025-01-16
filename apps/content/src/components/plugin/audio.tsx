@@ -72,8 +72,12 @@ const AudioPlugin = observer(() => {
   const [isMicrophoneSelectOpen, setMicrophoneSelectOpen] = useState(false);
 
   const handleMicrophoneSelectOpenChange = (open: boolean) => {
-    if (!open || permission !== 'denied') setMicrophoneSelectOpen(open);
-    if (open && permission === 'denied') setAlertDialogOpen(true);
+    if (open) {
+      if (permission === 'denied') setAlertDialogOpen(true);
+      else setMicrophoneSelectOpen(open);
+    } else {
+      setMicrophoneSelectOpen(open);
+    }
   };
 
   return (
