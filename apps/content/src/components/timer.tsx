@@ -13,55 +13,45 @@ import { recorder } from '../store/recorder';
 const TimerCSS = css.resolve`
   .rekorder-timer-container {
     top: 50%;
-    position: absolute;
     left: 50%;
-
-    display: grid;
-    place-items: center;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
+    position: absolute;
 
     z-index: 250;
+    pointer-events: all;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    transform: translate(-50%, -50%);
+    background: linear-gradient(45deg, oklch(27.3% 0.09 275), oklch(31.1% 0.146 303), oklch(36.3% 0.127 308));
+
+    gap: ${theme.space(2)};
+    width: ${theme.space(45)};
+    height: ${theme.space(45)};
+    border-radius: ${theme.space(45)};
+
     font-family: ${theme.fonts.default};
     animation: ${animations['fade-in']} 200ms ease-out forwards;
   }
 
-  .rekorder-timer-shape {
-    width: auto;
-    grid-area: 1 / 1;
-
-    height: ${theme.space(40)};
-    animation: rekorder-timer-pulse 2s cubic-bezier(0.4, 0, 0.5, 1) infinite;
-  }
-
-  .rekorder-timer-container[data-state='hidden'] .rekorder-timer-shape {
-    animation-play-state: paused;
-  }
-
-  .rekorder-timer-container[data-state='visible'] .rekorder-timer-text {
-    animation-play-state: running;
-  }
-
   .rekorder-timer-text {
     font-size: 72px;
-    position: relative;
-    z-index: 10;
-
-    grid-area: 1 / 1;
     font-weight: bold;
-    color: ${theme.colors.core.black};
+    font-variant-numeric: tabular-nums;
+    color: ${theme.colors.core.white};
   }
 
-  @keyframes rekorder-timer-pulse {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(0.8);
-    }
-    100% {
-      transform: scale(1);
-    }
+  .rekorder-timer-skip {
+    all: unset;
+    cursor: pointer;
+    font-size: 14px;
+    color: ${theme.colors.core.white};
+  }
+
+  .rekorder-timer-skip:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -69,7 +59,7 @@ const TimerCountdownHOC = observer(() => {
   if (recorder.status === 'countdown') {
     return <TimerCountdown />;
   } else {
-    return null;
+    return <TimerCountdown />;
   }
 });
 
@@ -80,13 +70,8 @@ const TimerCountdown = observer(() => {
     <Fragment>
       {TimerCSS.styles}
       <div className={clsx(TimerCSS.className, 'rekorder-timer-container')}>
-        <svg className={clsx(TimerCSS.className, 'rekorder-timer-shape')} viewBox="0 0 830 930" fill="none">
-          <path
-            d="M126.5 263.5C333.224 159.786 336.5 -50.1667 486 13C535.5 33.9147 528.8 94.0998 652 88.4998C775.2 82.8998 815.333 275.5 785 411C750 579 854.246 482.865 827 719C785 1083 -125.687 917.5 126.5 719C149.833 693.333 -167.5 411 126.5 263.5Z"
-            fill={theme.colors.primary.light}
-          />
-        </svg>
         <span className={clsx(TimerCSS.className, 'rekorder-timer-text')}>{time}</span>
+        <button className={clsx(TimerCSS.className, 'rekorder-timer-skip')}>Skip</button>
       </div>
     </Fragment>
   );
