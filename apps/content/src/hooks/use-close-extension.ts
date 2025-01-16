@@ -5,9 +5,7 @@ import { RuntimeMessage } from '@rekorder.io/types';
 import { RECORDER_ROOT } from '../constants/layout';
 import { useDisposeEvents } from './use-dispose-events';
 
-/**
- * Comment chrome.runtime out during development
- */
+
 export function useCloseExtensionListener() {
   const handleDispose = useDisposeEvents();
 
@@ -27,7 +25,9 @@ export function useCloseExtensionListener() {
   );
 
   useEffect(() => {
+    if (import.meta.env.DEV) return;
     chrome.runtime.onMessage.addListener(handleRuntimeMessage);
+    
     return () => {
       chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
       handleDispose();

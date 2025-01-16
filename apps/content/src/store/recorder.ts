@@ -47,31 +47,27 @@ class Recorder {
     return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
   }
 
-  /**
-   * Uncomment the whole block during development
-   */
-  // private __setupState() {
-  //   runInAction(() => (this.initialized = true));
-  // }
-
-  /**
-   * Comment the whole block out during development
-   */
   private async __setupState() {
-    try {
-      const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
-      const state = result[StorageConfig.RecorderStatus] as RecordingState;
-      runInAction(() => {
-        this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
-        this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
-      });
-      if (this.status === 'active') this.__startTimer();
-    } catch (error) {
-      console.log('Error setting up state from storage', error);
-    } finally {
+    if (import.meta.env.DEV) {
       runInAction(() => {
         this.initialized = true;
       });
+    } else {
+      try {
+        const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
+        const state = result[StorageConfig.RecorderStatus] as RecordingState;
+        runInAction(() => {
+          this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
+          this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
+        });
+        if (this.status === 'active') this.__startTimer();
+      } catch (error) {
+        console.log('Error setting up state from storage', error);
+      } finally {
+        runInAction(() => {
+          this.initialized = true;
+        });
+      }
     }
   }
 
@@ -130,17 +126,13 @@ class Recorder {
     }
   }
 
-  /**
-   * Comment out during development - chrome.runtime.onMessage.addListener(this._runtimeEvents);
-   */
   private __setupEvents() {
+    if (import.meta.env.DEV) return;
     chrome.runtime.onMessage.addListener(this._runtimeEvents);
   }
 
-  /**
-   * Comment out during development - chrome.runtime.onMessage.removeListener(this._runtimeEvents);
-   */
   private __resetEvents() {
+    if (import.meta.env.DEV) return;
     chrome.runtime.onMessage.removeListener(this._runtimeEvents);
   }
 
