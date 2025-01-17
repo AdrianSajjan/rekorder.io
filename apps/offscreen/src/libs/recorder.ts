@@ -2,7 +2,7 @@ import exportWebmBlob from 'fix-webm-duration';
 
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { ExtensionOfflineDatabase } from '@rekorder.io/database';
-import { RecorderSurface } from '@rekorder.io/types';
+import { RecorderSurface, RuntimeMessage } from '@rekorder.io/types';
 import { nanoid } from 'nanoid';
 
 import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';
@@ -16,6 +16,10 @@ interface OffscreenRecorderStart {
 
   pushToTalk: boolean;
   surface: RecorderSurface;
+}
+
+interface ChromeLocalStorage {
+  [key: string]: any;
 }
 
 class OffscreenRecorder {
@@ -77,8 +81,23 @@ class OffscreenRecorder {
     this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState, [StorageConfig.RecorderTimestamp]: this.timestamp });
   }
 
+  private __getLocalStorage(keys?: string | number | (string | number)[]) {
+    return new Promise<ChromeLocalStorage>((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: EventConfig.GetLocalStorage, payload: keys }, (response: RuntimeMessage) => {
+        switch (response.type) {
+          case EventConfig.GetLocalStorageSuccess:
+            resolve(response.payload);
+            break;
+          case EventConfig.GetLocalStorageError:
+            reject(response.payload);
+            break;
+        }
+      });
+    });
+  }
+
   private async __initialize() {
-    const result = await chrome.storage.local.get([StorageConfig.AudioDeviceId, StorageConfig.AudioPushToTalk, StorageConfig.AudioMuted, StorageConfig.DesktopAudioEnabled]);
+    const result = await this.__getLocalStorage([StorageConfig.AudioDeviceId, StorageConfig.AudioPushToTalk, StorageConfig.AudioMuted, StorageConfig.DesktopAudioEnabled]);
     this.microphoneId = result[StorageConfig.AudioDeviceId] ?? 'n/a';
     this.displaySurface = result[StorageConfig.DisplaySurface] ?? 'tab';
     this.countdownEnabled = result[StorageConfig.CountdownEnabled] ?? true;

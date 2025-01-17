@@ -324,34 +324,25 @@ try {
     inherits: false,
   });
 } catch {
-  console.warn('CSS.registerProperty is not supported or property already exists');
+  console.log('CSS.registerProperty is not supported or property already exists');
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ asChild, children, color = 'primary', size = 'medium', variant = 'solid', className, ...rest }, forwardedRef) => {
-    const Component = asChild ? Slot : 'button';
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ asChild, children, color = 'primary', size = 'medium', variant = 'solid', className, ...rest }, forwardedRef) => {
+  const Component = asChild ? Slot : 'button';
 
-    return (
-      <React.Fragment>
-        <ResolvedStyle>{ButtonCSS}</ResolvedStyle>
-        <Component
-          ref={forwardedRef}
-          className={clsx(
-            ButtonCSS.className,
-            'rekorder-button',
-            theme.createClassName(variant),
-            theme.createClassName(color),
-            theme.createClassName(size),
-            className
-          )}
-          {...rest}
-        >
-          {children}
-        </Component>
-      </React.Fragment>
-    );
-  }
-);
+  return (
+    <React.Fragment>
+      <ResolvedStyle>{ButtonCSS}</ResolvedStyle>
+      <Component
+        ref={forwardedRef}
+        className={clsx(ButtonCSS.className, 'rekorder-button', theme.createClassName(variant), theme.createClassName(color), theme.createClassName(size), className)}
+        {...rest}
+      >
+        {children}
+      </Component>
+    </React.Fragment>
+  );
+});
 
 Button.displayName = 'Button';
 

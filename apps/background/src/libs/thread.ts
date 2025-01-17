@@ -122,8 +122,6 @@ class Thread {
     this.authenticationTab = await chrome.tabs.create({ url: AUTHENTICATION_URL, active: true });
   }
 
-  
-
   private __handleAuthenticationSuccess(message: RuntimeMessage) {
     switch (this.authenticationMode) {
       case 'script':
@@ -385,6 +383,34 @@ class Thread {
             respond({ type: EventConfig.GetSessionStorageError, payload: { error: chrome.runtime.lastError } });
           } else {
             respond({ type: EventConfig.GetSessionStorageSuccess, payload: result });
+          }
+        });
+        return true;
+      }
+
+      /**
+       * Set the local storage, can be requested by the content script or the offscreen document
+       */
+      case EventConfig.SetLocalStorage: {
+        chrome.storage.local.set(message.payload, () => {
+          if (chrome.runtime.lastError) {
+            respond({ type: EventConfig.SetLocalStorageError, payload: { error: chrome.runtime.lastError } });
+          } else {
+            respond({ type: EventConfig.SetLocalStorageSuccess, payload: message.payload });
+          }
+        });
+        return true;
+      }
+
+      /**
+       * Get the local storage, can be requested by the content script or the offscreen document
+       */
+      case EventConfig.GetLocalStorage: {
+        chrome.storage.local.get(message.payload, (result) => {
+          if (chrome.runtime.lastError) {
+            respond({ type: EventConfig.GetLocalStorageError, payload: { error: chrome.runtime.lastError } });
+          } else {
+            respond({ type: EventConfig.GetLocalStorageSuccess, payload: result });
           }
         });
         return true;

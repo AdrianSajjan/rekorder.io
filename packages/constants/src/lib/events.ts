@@ -51,6 +51,14 @@ export const EventConfig = {
   GetSessionStorageSuccess: 'get.session.storage.success',
   GetSessionStorageError: 'get.session.storage.error',
 
+  SetLocalStorage: 'set.local.storage',
+  SetLocalStorageSuccess: 'set.local.storage.success',
+  SetLocalStorageError: 'set.local.storage.error',
+
+  GetLocalStorage: 'get.local.storage',
+  GetLocalStorageSuccess: 'get.local.storage.success',
+  GetLocalStorageError: 'get.local.storage.error',
+
   AuthenticateEditor: 'authenticate.editor',
   AuthenticateSuccess: 'authenticate.success',
   AuthenticateError: 'authenticate.error',
