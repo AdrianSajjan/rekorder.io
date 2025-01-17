@@ -1,23 +1,10 @@
-import {
-  CaretRight,
-  CloudArrowUp,
-  Crop,
-  Download,
-  MagnifyingGlassPlus,
-  MusicNotes,
-  Panorama,
-  Scissors,
-  ShareFat,
-  Subtitles,
-  Translate,
-  UserFocus,
-  UserSound,
-} from '@phosphor-icons/react';
-import { useMutation } from '@tanstack/react-query';
 import { forwardRef } from 'react';
 import { toast } from 'sonner';
+import { observer } from 'mobx-react';
+import { CaretRight, CloudArrowUp, Crop, Download, MagnifyingGlassPlus, MusicNotes, Panorama, Scissors, ShareFat, Subtitles, Translate, UserFocus, UserSound } from '@phosphor-icons/react';
+import { useMutation } from '@tanstack/react-query';
 
-import { supabase } from '@rekorder.io/database';
+import { BlobStorage, supabase } from '@rekorder.io/database';
 import { StorageResponse } from '@rekorder.io/types';
 import { Brand, CrownIcon, Spinner, theme } from '@rekorder.io/ui';
 import { cn, createFilePath, extractVideoFileThumbnail, unwrapError } from '@rekorder.io/utils';
@@ -25,6 +12,7 @@ import { cn, createFilePath, extractVideoFileThumbnail, unwrapError } from '@rek
 import { editor } from '../../store/editor';
 import { useAuthenticatedSession } from '../../context/authentication';
 import { PremiumFeatureDialog } from '../modal/premium-feature';
+import { fileDownloadBlob } from '../../lib/utils';
 
 interface CloudUploadProps {
   original_file: StorageResponse;
@@ -33,7 +21,12 @@ interface CloudUploadProps {
   modified_thumbnail?: StorageResponse;
 }
 
-export function Sidebar() {
+const SidebarHOC = observer(() => {
+  if (!editor.video) return <SidebarPlaceholder />;
+  return <Sidebar video={editor.video} />;
+});
+
+const Sidebar = observer(({ video }: { video: BlobStorage }) => {
   const { user } = useAuthenticatedSession();
 
   const handleUploadVideo = async (blob: Blob) => {
@@ -51,24 +44,23 @@ export function Sidebar() {
 
   const handleCloudUpload = useMutation({
     mutationFn: async () => {
-      if (!editor.video) throw new Error('Unable to retrieve video file from storage');
       const response = {} as CloudUploadProps;
 
-      if (editor.video.original_blob) {
+      if (video.original_blob) {
         await Promise.all([
-          handleUploadVideo(editor.video.original_blob).then((data) => (response.original_file = data)),
-          handleUploadThumbnail(editor.video.original_blob).then((data) => (response.original_thumbnail = data)),
+          handleUploadVideo(video.original_blob).then((data) => (response.original_file = data)),
+          handleUploadThumbnail(video.original_blob).then((data) => (response.original_thumbnail = data)),
         ]);
       }
 
-      if (editor.video.modified_blob) {
+      if (video.modified_blob) {
         await Promise.all([
-          handleUploadVideo(editor.video.modified_blob).then((data) => (response.modified_file = data)),
-          handleUploadThumbnail(editor.video.modified_blob).then((data) => (response.modified_thumbnail = data)),
+          handleUploadVideo(video.modified_blob).then((data) => (response.modified_file = data)),
+          handleUploadThumbnail(video.modified_blob).then((data) => (response.modified_thumbnail = data)),
         ]);
       }
 
-      const { error } = await supabase
+      await supabase
         .from('recordings')
         .insert({
           name: editor.name,
@@ -77,8 +69,8 @@ export function Sidebar() {
           modified_file: response.modified_file ? response.modified_file.id : null,
           modified_thumbnail: response.modified_thumbnail ? response.modified_thumbnail.id : null,
         })
-        .select();
-      if (error) throw error;
+        .select()
+        .throwOnError();
     },
     onSuccess: () => {
       toast.success('The recording has been uploaded to cloud');
@@ -88,27 +80,15 @@ export function Sidebar() {
     },
   });
 
-  if (!editor.video) {
-    return (
-      <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col px-5">
-        <div className="h-16 flex flex-col items-start justify-center shrink-0">
-          <Brand mode="expanded" height={30} className="w-fit" />
-        </div>
-        <div className="flex flex-col gap-8 py-6 shrink-0">
-          {Array.from({ length: 3 }, (_, key) => {
-            return (
-              <div className="flex flex-col gap-3" key={key}>
-                <div className="h-4 w-24 rounded-md bg-background-main animate-pulse" />
-                {Array.from({ length: 4 }, (_, key) => {
-                  return <div className="h-16 bg-background-main rounded-2xl animate-pulse" key={key} />;
-                })}
-              </div>
-            );
-          })}
-        </div>
-      </aside>
-    );
-  }
+  const handleDownloadMP4 = useMutation({
+    mutationFn: () => editor.convertToMP4(),
+    onSuccess: (blob) => fileDownloadBlob(blob, editor.name, '.mp4'),
+    onError: (error) => toast.error(unwrapError(error, 'Oops! Something went wrong while converting your video')),
+  });
+
+  const handleDownloadWEBM = () => {
+    fileDownloadBlob(video.original_blob, editor.name, '.webm');
+  };
 
   return (
     <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col px-5">
@@ -125,8 +105,14 @@ export function Sidebar() {
             loading={handleCloudUpload.isPending}
             onClick={() => handleCloudUpload.mutate()}
           />
-          <SidebarAction icon={<Download weight="bold" />} title="Export as MP4" description="Download your video in .mp4 format" />
-          <SidebarAction icon={<Download weight="bold" />} title="Export as WEBM" description="Download your video in .webm format" />
+          <SidebarAction icon={<Download weight="bold" />} title="Export as WEBM" description="Download your video in .webm format" onClick={() => handleDownloadWEBM()} />
+          <SidebarAction
+            icon={<Download weight="bold" />}
+            title="Export as MP4"
+            description="Download your video in .mp4 format"
+            loading={handleDownloadMP4.isPending}
+            onClick={() => handleDownloadMP4.mutate()}
+          />
           <PremiumFeatureDialog>
             <SidebarAction premium icon={<ShareFat weight="fill" />} title="Share video" description="Share the link of this video with others" />
           </PremiumFeatureDialog>
@@ -161,7 +147,7 @@ export function Sidebar() {
       </div>
     </aside>
   );
-}
+});
 
 interface SidebarActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   title: string;
@@ -171,28 +157,48 @@ interface SidebarActionProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   icon: React.ReactNode;
 }
 
-const SidebarAction = forwardRef<HTMLButtonElement, SidebarActionProps>(
-  ({ icon, title, description, loading, className, premium, disabled, ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(
-          'text-start flex items-center gap-4 rounded-2xl bg-card-background border border-borders-input px-5 py-3.5 hover:bg-background-light transition-colors',
-          'disabled:hover:bg-card-background disabled:cursor-not-allowed',
-          className
-        )}
-        disabled={disabled || loading}
-        {...props}
-      >
-        <span>{icon}</span>
-        <div className="flex flex-col gap-1">
-          <h3 className="text-xs font-semibold">{title}</h3>
-          <p className="text-xs text-accent-dark/80">{description}</p>
-        </div>
-        <span className="ml-auto">
-          {premium ? <CrownIcon className="text-xl" /> : loading ? <Spinner color={theme.colors.core.black} /> : <CaretRight size={14} weight="bold" />}
-        </span>
-      </button>
-    );
-  }
-);
+const SidebarAction = forwardRef<HTMLButtonElement, SidebarActionProps>(({ icon, title, description, loading, className, premium, disabled, ...props }, ref) => {
+  return (
+    <button
+      ref={ref}
+      className={cn(
+        'text-start flex items-center gap-4 rounded-2xl bg-card-background border border-borders-input px-5 py-3.5 hover:bg-background-light transition-colors',
+        'disabled:hover:bg-card-background disabled:cursor-not-allowed',
+        className
+      )}
+      disabled={disabled || loading}
+      {...props}
+    >
+      <span>{icon}</span>
+      <div className="flex flex-col gap-1">
+        <h3 className="text-xs font-semibold">{title}</h3>
+        <p className="text-xs text-accent-dark/80">{description}</p>
+      </div>
+      <span className="ml-auto">{premium ? <CrownIcon className="text-xl" /> : loading ? <Spinner color={theme.colors.core.black} /> : <CaretRight size={14} weight="bold" />}</span>
+    </button>
+  );
+});
+
+function SidebarPlaceholder() {
+  return (
+    <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col px-5">
+      <div className="h-16 flex flex-col items-start justify-center shrink-0">
+        <Brand mode="expanded" height={30} className="w-fit" />
+      </div>
+      <div className="flex flex-col gap-8 py-6 shrink-0">
+        {Array.from({ length: 3 }, (_, key) => {
+          return (
+            <div className="flex flex-col gap-3" key={key}>
+              <div className="h-4 w-24 rounded-md bg-background-main animate-pulse" />
+              {Array.from({ length: 4 }, (_, key) => {
+                return <div className="h-16 bg-background-main rounded-2xl animate-pulse" key={key} />;
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </aside>
+  );
+}
+
+export { SidebarHOC as Sidebar };

@@ -13,6 +13,10 @@ export default defineConfig({
   server: {
     port: 4300,
     host: true,
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
   },
   preview: {
     port: 4300,
@@ -29,6 +33,9 @@ export default defineConfig({
   ],
   define: {
     'process.env': {},
+  },
+  optimizeDeps: {
+    exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
   },
   build: {
     outDir: '../../dist/apps/editor',

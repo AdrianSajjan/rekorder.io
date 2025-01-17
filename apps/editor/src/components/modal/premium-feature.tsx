@@ -49,8 +49,8 @@ export function PremiumFeatureDialog({ children, ...props }: Dialog.DialogProps)
             <article className="mt-8 space-y-8">
               {steps.map(({ title, description }, index) => {
                 return (
-                  <div className="relative">
-                    <div className="flex items-start gap-4" key={index}>
+                  <div className="relative" key={index}>
+                    <div className="flex items-start gap-4">
                       <span className="h-2 w-2 rounded-sm bg-gradient-to-br from-primary-light to-primary-main ring ring-primary-main/20 shrink-0 translate-y-2" />
                       <div className="space-y-1">
                         <h5 className="text-sm font-medium">{title}</h5>

@@ -1,7 +1,9 @@
 import { debounce } from 'lodash';
+import { nanoid } from 'nanoid';
 import { makeAutoObservable, runInAction } from 'mobx';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { toBlobURL } from '@ffmpeg/util';
+
+import { FFmpeg, LogEvent, ProgressEvent } from '@ffmpeg/ffmpeg';
+import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
@@ -12,14 +14,17 @@ type EditorStatus = 'idle' | 'pending' | 'initialized' | 'error';
 class Editor {
   name: string;
   status: EditorStatus;
-
-  blobURL: string | null;
   video: BlobStorage | null;
+
+  original: Blob | null;
+  modified: Blob | null;
 
   private _ffmpeg: FFmpeg;
   private _offlineDatabase: ExtensionOfflineDatabase;
 
+  private _ffmpegLogsHandler = this.__ffmpegLogsHandler.bind(this);
   private _runtimeEventHandler = this.__runtimeEventHandler.bind(this);
+  private _ffmpegProgressHandler = this.__ffmpegProgressHandler.bind(this);
   private _saveNameOfflineDatabaseDebounced = debounce(this.__saveNameOfflineDatabase, 500);
 
   constructor() {
@@ -27,22 +32,37 @@ class Editor {
     this.status = 'idle';
 
     this.video = null;
-    this.blobURL = null;
+    this.original = null;
+    this.modified = null;
 
     this._ffmpeg = new FFmpeg();
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
     this.__setupEvents();
+    this.__initializeState();
+    this.__initializeFFmpeg();
+
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  get recording() {
+    if (this.modified) return this.modified;
+    return this.original;
+  }
+
+  get recordingOrThrow() {
+    if (!this.recording) throw new Error('No recording file found');
+    return this.recording;
   }
 
   private async __initializeFFmpeg() {
     this.status = 'pending';
     try {
-      const base = 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm';
+      const base = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm';
       await this._ffmpeg.load({
-        coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'application/javascript'),
         wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
+        coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'application/javascript'),
+        workerURL: await toBlobURL(`${base}/ffmpeg-core.worker.js`, 'text/javascript'),
       });
       this.status = 'initialized';
     } catch (error) {
@@ -51,11 +71,24 @@ class Editor {
     }
   }
 
+  private async __initializeState() {
+    if (!import.meta.env.DEV) return;
+    const blobURL = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4';
+    fetch(blobURL)
+      .then((response) => response.blob())
+      .then((blob) => {
+        runInAction(() => {
+          this.name = 'Big Buck Bunny';
+          this.video = { id: 1, uuid: nanoid(), name: this.name, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null } as BlobStorage;
+          this.original = blob;
+        });
+      });
+  }
+
   private __saveNameOfflineDatabase(name: string) {
-    if (this.video) {
-      console.log('Saving name to offline database', name);
-      this._offlineDatabase.blobs.update(this.video.id, { name });
-    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Circular dependency error
+    if (this.video) this._offlineDatabase.blobs.update(this.video.id, { name });
   }
 
   private async __runtimeEventHandler(message: RuntimeMessage) {
@@ -66,7 +99,6 @@ class Editor {
           runInAction(() => {
             this.video = blob;
             this.name = blob.name;
-            this.blobURL = URL.createObjectURL(blob.original_blob);
           });
         }
         break;
@@ -74,13 +106,40 @@ class Editor {
     }
   }
 
+  private __ffmpegProgressHandler(event: ProgressEvent) {
+    console.log('Time:', event.time);
+    console.log('Progress:', event.progress);
+  }
+
+  private __ffmpegLogsHandler(event: LogEvent) {
+    console.log('Log:', event.message, event.type);
+  }
+
   private __setupEvents() {
-    if (import.meta.env.DEV) return;
-    chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
+    this._ffmpeg.on('log', this._ffmpegLogsHandler);
+    this._ffmpeg.on('progress', this._ffmpegProgressHandler);
+    if (!import.meta.env.DEV) chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
+  }
+
+  private __removeEvents() {
+    this._ffmpeg.off('log', this._ffmpegLogsHandler);
+    this._ffmpeg.off('progress', this._ffmpegProgressHandler);
+    if (!import.meta.env.DEV) chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
   }
 
   static createInstance() {
     return new Editor();
+  }
+
+  async convertToMP4() {
+    const input = await fetchFile(this.recordingOrThrow);
+    this._ffmpeg.writeFile('input.webm', input);
+
+    await this._ffmpeg.exec(['-i', 'input.webm', '-preset', 'ultrafast', '-c:v', 'libx264', '-c:a', 'aac', 'output.mp4']);
+    const output = await this._ffmpeg.readFile('output.mp4');
+
+    const data = output as Uint8Array;
+    return new Blob([data.buffer], { type: 'video/mp4' });
   }
 
   updateName(name: string) {
@@ -89,11 +148,8 @@ class Editor {
   }
 
   dispose() {
-    if (this.blobURL) URL.revokeObjectURL(this.blobURL);
-    if (!import.meta.env.DEV) chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
-
+    this.__removeEvents();
     this.video = null;
-    this.blobURL = null;
   }
 }
 

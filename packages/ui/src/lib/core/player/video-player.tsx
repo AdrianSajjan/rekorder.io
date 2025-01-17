@@ -393,7 +393,7 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
 
 function VideoTimelineSeeker(props: SliderProps) {
   return (
-    <Slider step={0.1} {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
+    <Slider step={0.01} {...props} className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider')}>
       <SliderTrack className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-track')}>
         <SliderRange className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-slider-range')} />
       </SliderTrack>
