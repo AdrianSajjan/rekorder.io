@@ -256,8 +256,6 @@ class OffscreenRecorder {
       audio: { deviceId: this.microphoneId },
     });
 
-    console.log('Capturing user microphone audio', this.microphoneId, this.muted, this.audio);
-
     if (!this.audio.getAudioTracks().length) {
       throw new Error(`No audio tracks found in the created audio media stream: ${this.microphoneId}`);
     }

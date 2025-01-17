@@ -48,6 +48,10 @@ const ScreenPlugin = observer(() => {
             <Switch checked={recorder.audio} onCheckedChange={recorder.changeDesktopAudio} />
           </div>
         ) : null}
+        <div className={clsx('rekorder-toggle-control', ScreenPluginCSS.className)}>
+          <SwitchLabel>Show Countdown</SwitchLabel>
+          <Switch checked={recorder.countdown} onCheckedChange={recorder.toggleCountdown} />
+        </div>
       </div>
     </Tooltip.Provider>
   );

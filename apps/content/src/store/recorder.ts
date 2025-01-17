@@ -14,6 +14,7 @@ type RecorderStatus = 'idle' | 'countdown' | 'pending' | 'active' | 'paused' | '
 class Recorder {
   audio: boolean;
   timestamp: number;
+  countdown: boolean;
   initialized: boolean;
 
   status: RecorderStatus;
@@ -24,12 +25,13 @@ class Recorder {
   private _runtimeEvents = this.__runtimeEvents.bind(this);
 
   constructor() {
-    this.initialized = false;
     this.status = 'idle';
+    this.initialized = false;
 
     this.audio = true;
     this.timestamp = 0;
     this.surface = 'tab';
+    this.countdown = true;
 
     this._interval = null;
     this._timeout = null;
@@ -54,13 +56,22 @@ class Recorder {
       });
     } else {
       try {
-        const result = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
-        const state = result[StorageConfig.RecorderStatus] as RecordingState;
+        const session = await chrome.storage.session.get([StorageConfig.RecorderStatus, StorageConfig.RecorderTimestamp]);
+        const local = await chrome.storage.local.get([StorageConfig.DisplaySurface, StorageConfig.DesktopAudioEnabled, StorageConfig.CountdownEnabled]);
+
         runInAction(() => {
+          const state = session[StorageConfig.RecorderStatus] as RecordingState;
           this.status = state === 'recording' ? 'active' : state === 'paused' ? 'paused' : 'idle';
-          this.timestamp = result[StorageConfig.RecorderTimestamp] ?? 0;
+          this.timestamp = session[StorageConfig.RecorderTimestamp] ?? 0;
+
+          this.surface = local[StorageConfig.DisplaySurface] ?? 'tab';
+          this.audio = local[StorageConfig.DesktopAudioEnabled] ?? true;
+          this.countdown = local[StorageConfig.CountdownEnabled] ?? true;
         });
-        if (this.status === 'active') this.__startTimer();
+
+        if (this.status === 'active') {
+          this.__startTimer();
+        }
       } catch (error) {
         console.log('Error setting up state from storage', error);
       } finally {
@@ -87,14 +98,20 @@ class Recorder {
     });
   }
 
+  private __startRecording() {
+    runInAction(() => (this.status = 'pending'));
+    setTimeout(() => chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecording }), RecorderConfig.TimerOffsetMs);
+  }
+
   private __runtimeEvents(message: RuntimeMessage) {
     switch (message.type) {
       case EventConfig.StartStreamCaptureSuccess: {
-        runInAction(() => (this.status = 'countdown'));
-        setTimeout(() => {
-          runInAction(() => (this.status = 'pending'));
-          setTimeout(() => chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecording }), RecorderConfig.TimerOffsetMs);
-        }, RecorderConfig.TimerCountdownMs);
+        if (this.countdown) {
+          runInAction(() => (this.status = 'countdown'));
+          setTimeout(() => this.__startRecording(), RecorderConfig.TimerCountdownMs);
+        } else {
+          this.__startRecording();
+        }
         break;
       }
 
@@ -139,13 +156,7 @@ class Recorder {
   startScreenCapture() {
     chrome.runtime.sendMessage({
       type: this.surface !== 'tab' ? EventConfig.StartDisplayStreamCapture : EventConfig.StartTabStreamCapture,
-      payload: {
-        surface: this.surface,
-        countdownEnabled: true,
-        microphoneId: microphone.device,
-        captureDeviceAudio: this.audio,
-        pushToTalk: microphone.pushToTalk,
-      },
+      payload: { surface: this.surface, countdownEnabled: true, microphoneId: microphone.device, captureDeviceAudio: this.audio, pushToTalk: microphone.pushToTalk },
     });
   }
 
@@ -194,6 +205,11 @@ class Recorder {
   changeDesktopAudio(audio?: boolean) {
     this.audio = isUndefined(audio) ? !this.audio : audio;
     chrome.storage.local.set({ [StorageConfig.DesktopAudioEnabled]: this.audio });
+  }
+
+  toggleCountdown(countdown?: boolean) {
+    this.countdown = isUndefined(countdown) ? !this.countdown : countdown;
+    chrome.storage.local.set({ [StorageConfig.CountdownEnabled]: this.countdown });
   }
 
   changeDisplaySurface(surface: RecorderSurface) {

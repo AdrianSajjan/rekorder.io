@@ -5,7 +5,7 @@ import { StorageConfig, EventConfig } from '@rekorder.io/constants';
 class Camera {
   flip: boolean;
   enabled: boolean;
-  
+
   effect: CameraEffects;
   device: Autocomplete<'n/a'>;
 
@@ -25,6 +25,7 @@ class Camera {
   }
 
   private __initialize() {
+    if (import.meta.env.DEV) return;
     chrome.storage.local.get([StorageConfig.CameraFlip, StorageConfig.CameraEffect, StorageConfig.CameraDeviceId], (result) => {
       this.flip = result[StorageConfig.CameraFlip] || true;
       this.effect = result[StorageConfig.CameraEffect] || 'none';
