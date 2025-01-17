@@ -2,10 +2,12 @@ import { toast } from 'sonner';
 import { makeAutoObservable, runInAction } from 'mobx';
 import { isUndefined } from 'lodash';
 
+import { unwrapError } from '@rekorder.io/utils';
 import { EventConfig, RecorderConfig, StorageConfig } from '@rekorder.io/constants';
 import { RecorderSurface, RuntimeMessage } from '@rekorder.io/types';
-import { unwrapError } from '@rekorder.io/utils';
+
 import { microphone } from './microphone';
+import { formatTime } from '../lib/utils';
 
 type RecorderStatus = 'idle' | 'countdown' | 'pending' | 'active' | 'paused' | 'saving' | 'error';
 
@@ -42,9 +44,7 @@ class Recorder {
   }
 
   get time() {
-    const minutes = Math.floor(this.timestamp / 60);
-    const seconds = this.timestamp % 60;
-    return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    return formatTime(this.timestamp);
   }
 
   private async __setupState() {

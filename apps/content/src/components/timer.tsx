@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 
 import { useCountdown } from '@rekorder.io/hooks';
 import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';
@@ -62,10 +62,11 @@ const TimerCSS = css.resolve`
 `;
 
 const TimerCountdownHOC = observer(() => {
-  if (recorder.status === 'countdown') {
-    return <TimerCountdown />;
-  } else {
-    return null;
+  switch (recorder.status) {
+    case 'countdown':
+      return <TimerCountdown />;
+    default:
+      return null;
   }
 });
 
@@ -76,15 +77,8 @@ const TimerCountdown = observer(() => {
     <Fragment>
       <ResolvedStyle>{TimerCSS}</ResolvedStyle>
       <div className={clsx(TimerCSS.className, 'rekorder-timer-container')}>
-        <AnimatePresence>
-          <motion.h3
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -40, x: 40, filter: 'blur(8px)', scale: 2, position: 'absolute' }}
-            transition={{ type: 'spring', stiffness: 100, damping: 10 }}
-            className={clsx(TimerCSS.className, 'rekorder-timer-text')}
-            key={time}
-          >
+        <AnimatePresence initial={false}>
+          <motion.h3 key={time} variants={variants} initial="initial" animate="animate" exit="exit" transition={transition} className={clsx(TimerCSS.className, 'rekorder-timer-text')}>
             {time}
           </motion.h3>
         </AnimatePresence>
@@ -93,5 +87,30 @@ const TimerCountdown = observer(() => {
     </Fragment>
   );
 });
+
+const variants: Variants = {
+  initial: {
+    y: 10,
+    opacity: 0,
+  },
+  animate: {
+    y: 0,
+    opacity: 1,
+  },
+  exit: {
+    x: 40,
+    y: -40,
+    scale: 2,
+    opacity: 0,
+    filter: 'blur(8px)',
+    position: 'absolute',
+  },
+};
+
+const transition = {
+  type: 'spring',
+  stiffness: 100,
+  damping: 10,
+};
 
 export { TimerCountdownHOC as TimerCountdown };
