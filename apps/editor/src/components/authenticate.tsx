@@ -18,6 +18,7 @@ export function Authenticate() {
   }, []);
 
   useEffect(() => {
+    if (import.meta.env.DEV) return;
     chrome.runtime.onMessage.addListener(handleRuntimeMessage);
     return () => chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
   }, [handleRuntimeMessage]);

@@ -47,10 +47,8 @@ class Editor {
     }
   }
 
-  /**
-   * Comment out the runtime event listener during development
-   */
   private __setupEvents() {
+    if (import.meta.env.DEV) return;
     chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
   }
 
@@ -63,12 +61,9 @@ class Editor {
     this._saveNameOfflineDatabaseDebounced(name);
   }
 
-  /**
-   * Comment out the runtime event listener during development
-   */
   dispose() {
-    chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
     if (this.blobURL) URL.revokeObjectURL(this.blobURL);
+    if (!import.meta.env.DEV) chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
 
     this.video = null;
     this.blobURL = null;

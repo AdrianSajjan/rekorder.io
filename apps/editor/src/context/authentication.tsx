@@ -18,11 +18,16 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     try {
-      chrome.storage.local.get(StorageConfig.Authentication, (result) => {
-        const session = result[StorageConfig.Authentication] as Session | null;
-        if (!session) throw new Error('Unable to retrieve authenticated session');
-        supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token });
-      });
+      if (import.meta.env.DEV) {
+        setStatus('authenticated');
+        setSession({ user: null } as any);
+      } else {
+        chrome.storage.local.get(StorageConfig.Authentication, (result) => {
+          const session = result[StorageConfig.Authentication] as Session | null;
+          if (!session) throw new Error('Unable to retrieve authenticated session');
+          supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token });
+        });
+      }
     } catch {
       setStatus('unauthenticated');
       setSession(null);
@@ -30,6 +35,8 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
   }, []);
 
   useEffect(() => {
+    if (import.meta.env.DEV) return;
+
     const listener = supabase.auth.onAuthStateChange((_, session) => {
       if (session) {
         setStatus('authenticated');
