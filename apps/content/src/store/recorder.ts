@@ -193,10 +193,12 @@ class Recorder {
 
   changeDesktopAudio(audio?: boolean) {
     this.audio = isUndefined(audio) ? !this.audio : audio;
+    chrome.storage.local.set({ [StorageConfig.DesktopAudioEnabled]: this.audio });
   }
 
   changeDisplaySurface(surface: RecorderSurface) {
     this.surface = surface;
+    chrome.storage.local.set({ [StorageConfig.DisplaySurface]: this.surface });
   }
 
   dispose() {

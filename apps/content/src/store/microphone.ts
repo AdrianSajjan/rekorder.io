@@ -16,6 +16,8 @@ class Microphone {
     this.device = 'n/a';
     this.enabled = true;
     this.pushToTalk = false;
+
+    this.__initialize();
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -26,6 +28,14 @@ class Microphone {
   private get _waveform() {
     const iframe = shadowRootElementById('rekorder-waveform-iframe') as HTMLIFrameElement | null;
     return iframe?.contentWindow ?? window;
+  }
+
+  private __initialize() {
+    chrome.storage.local.get([StorageConfig.AudioMuted, StorageConfig.AudioPushToTalk, StorageConfig.AudioDeviceId], (result) => {
+      this.muted = result[StorageConfig.AudioMuted] || false;
+      this.pushToTalk = result[StorageConfig.AudioPushToTalk] || false;
+      this.device = result[StorageConfig.AudioDeviceId] || 'n/a';
+    });
   }
 
   private __setupEvents() {

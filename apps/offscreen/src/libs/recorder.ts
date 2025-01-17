@@ -30,13 +30,13 @@ class OffscreenRecorder {
 
   captureDeviceAudio: boolean;
   countdownEnabled: boolean;
+  recordingState: RecordingState;
 
   audio: MediaStream | null;
   video: MediaStream | null;
   stream: MediaStream | null;
   recorder: MediaRecorder | null;
 
-  recordingState: RecordingState;
   timerInterval: NodeJS.Timer | null;
   helperAudioContext: AudioContext | null;
   offlineDatabase: ExtensionOfflineDatabase;
@@ -51,8 +51,9 @@ class OffscreenRecorder {
     this.microphoneId = 'n/a';
     this.displaySurface = 'tab';
 
-    this.captureDeviceAudio = false;
-    this.countdownEnabled = false;
+    this.countdownEnabled = true;
+    this.captureDeviceAudio = true;
+    this.recordingState = 'inactive';
 
     this.video = null;
     this.audio = null;
@@ -61,7 +62,6 @@ class OffscreenRecorder {
 
     this.timerInterval = null;
     this.helperAudioContext = null;
-    this.recordingState = 'inactive';
     this.offlineDatabase = ExtensionOfflineDatabase.createInstance();
   }
 
@@ -75,6 +75,15 @@ class OffscreenRecorder {
 
   private __resetSessionStorage() {
     this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState, [StorageConfig.RecorderTimestamp]: this.timestamp });
+  }
+
+  private async __initialize() {
+    const result = await chrome.storage.local.get([StorageConfig.AudioDeviceId, StorageConfig.AudioPushToTalk, StorageConfig.AudioMuted, StorageConfig.DesktopAudioEnabled]);
+    this.microphoneId = result[StorageConfig.AudioDeviceId] ?? 'n/a';
+    this.displaySurface = result[StorageConfig.DisplaySurface] ?? 'tab';
+    this.countdownEnabled = result[StorageConfig.CountdownEnabled] ?? true;
+    this.captureDeviceAudio = result[StorageConfig.DesktopAudioEnabled] ?? true;
+    this.muted = result[StorageConfig.AudioMuted] ?? result[StorageConfig.AudioPushToTalk] ?? false;
   }
 
   private __resetState() {
@@ -92,6 +101,7 @@ class OffscreenRecorder {
     this.streamId = '';
     this.microphoneId = 'n/a';
     this.captureDeviceAudio = false;
+    this.recordingState = 'inactive';
 
     this.video = null;
     this.audio = null;
@@ -100,7 +110,6 @@ class OffscreenRecorder {
 
     this.timerInterval = null;
     this.helperAudioContext = null;
-    this.recordingState = 'inactive';
     this.__resetSessionStorage();
   }
 
@@ -202,11 +211,7 @@ class OffscreenRecorder {
     chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureSuccess, payload: null });
     const mimeType = MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type)) ?? DEFAULT_MIME_TYPE;
 
-    const combined = [
-      ...this.video.getVideoTracks(),
-      ...(this.audio ? this.audio.getAudioTracks() : []),
-      ...(this.captureDeviceAudio ? this.video.getAudioTracks() : []),
-    ];
+    const combined = [...this.video.getVideoTracks(), ...(this.audio ? this.audio.getAudioTracks() : []), ...(this.captureDeviceAudio ? this.video.getAudioTracks() : [])];
 
     this.stream = new MediaStream(combined);
     this.recorder = new MediaRecorder(this.stream, { mimeType });
@@ -262,18 +267,17 @@ class OffscreenRecorder {
     }
   }
 
-  capture({ captureDeviceAudio, microphoneId, pushToTalk, surface, countdownEnabled, streamId = '' }: OffscreenRecorderStart) {
-    this.streamId = streamId;
-    this.microphoneId = microphoneId;
-
-    this.muted = pushToTalk;
-    this.displaySurface = surface;
-
-    this.countdownEnabled = countdownEnabled;
-    this.captureDeviceAudio = captureDeviceAudio;
-
-    const promises = [this.__captureDisplayVideoStream(), this.__captureUserMicrophoneAudio()];
-    Promise.all(promises).then(this.__captureStreamSuccess.bind(this)).catch(this.__captureStreamError.bind(this));
+  capture({ streamId = '' }: OffscreenRecorderStart) {
+    this.__initialize().then(
+      () => {
+        this.streamId = streamId;
+        const promises = [this.__captureDisplayVideoStream(), this.__captureUserMicrophoneAudio()];
+        Promise.all(promises).then(this.__captureStreamSuccess.bind(this)).catch(this.__captureStreamError.bind(this));
+      },
+      (error) => {
+        this.__captureStreamError(error);
+      }
+    );
   }
 
   start() {

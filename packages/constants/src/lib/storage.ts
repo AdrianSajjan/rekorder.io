@@ -1,4 +1,5 @@
 export const StorageConfig = {
+  AudioMuted: 'audio-muted',
   AudioDevices: 'audio-devices',
   AudioPermission: 'audio-permission',
   AudioDeviceId: 'audio-device-id',
@@ -12,8 +13,10 @@ export const StorageConfig = {
 
   RecorderStatus: 'recorder-status',
   RecorderTimestamp: 'recorder-timestamp',
-  RecorderUserAudioEnabled: 'recorder-user-audio-enabled',
-  RecorderDesktopAudioEnabled: 'recorder-desktop-audio-enabled',
+
+  DisplaySurface: 'display-surface',
+  DesktopAudioEnabled: 'desktop-audio-enabled',
+  CountdownEnabled: 'countdown-enabled',
 
   Authentication: 'authentication',
 };
