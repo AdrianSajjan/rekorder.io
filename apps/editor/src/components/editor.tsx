@@ -1,6 +1,5 @@
-import { Spinner } from '@phosphor-icons/react';
 import { observer } from 'mobx-react';
-import { animate, VideoPlayer } from '@rekorder.io/ui';
+import { Spinner, VideoPlayer } from '@rekorder.io/ui';
 
 import { editor } from '../store/editor';
 import { Sidebar } from './layout/sidebar';
@@ -21,7 +20,7 @@ const OfflineEditor = observer(() => {
               <VideoPlayer src={editor.blobURL} container="h-auto! w-full! max-w-4xl!" className="h-auto! w-full! max-w-4xl!" />
             ) : (
               <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <Spinner size={32} weight="bold" color="black" className="mx-auto" style={{ animation: animate.spin }} />
+                <Spinner size={32} color="black" className="mx-auto" />
                 <p className="font-medium text-sm text-black mt-2">Processing the recorded video...</p>
               </span>
             )}

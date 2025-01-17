@@ -1,5 +1,3 @@
-import { toast } from 'sonner';
-import { forwardRef } from 'react';
 import {
   CaretRight,
   CloudArrowUp,
@@ -10,19 +8,19 @@ import {
   Panorama,
   Scissors,
   ShareFat,
-  Spinner,
   Subtitles,
   Translate,
   UserFocus,
   UserSound,
 } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
+import { forwardRef } from 'react';
+import { toast } from 'sonner';
 
 import { supabase } from '@rekorder.io/database';
 import { StorageResponse } from '@rekorder.io/types';
-import { animate, Brand, CrownIcon } from '@rekorder.io/ui';
-import { cn, createFilePath, unwrapError } from '@rekorder.io/utils';
-import { extractVideoFileThumbnail } from '@rekorder.io/utils';
+import { Brand, CrownIcon, Spinner, theme } from '@rekorder.io/ui';
+import { cn, createFilePath, extractVideoFileThumbnail, unwrapError } from '@rekorder.io/utils';
 
 import { editor } from '../../store/editor';
 import { useAuthenticatedSession } from '../../context/authentication';
@@ -175,10 +173,6 @@ interface SidebarActionProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const SidebarAction = forwardRef<HTMLButtonElement, SidebarActionProps>(
   ({ icon, title, description, loading, className, premium, disabled, ...props }, ref) => {
-    const style = {
-      animation: animate.spin,
-    };
-
     return (
       <button
         ref={ref}
@@ -196,7 +190,7 @@ const SidebarAction = forwardRef<HTMLButtonElement, SidebarActionProps>(
           <p className="text-xs text-accent-dark/80">{description}</p>
         </div>
         <span className="ml-auto">
-          {premium ? <CrownIcon className="text-xl" /> : loading ? <Spinner weight="bold" style={style} /> : <CaretRight size={14} weight="bold" />}
+          {premium ? <CrownIcon className="text-xl" /> : loading ? <Spinner color={theme.colors.core.black} /> : <CaretRight size={14} weight="bold" />}
         </span>
       </button>
     );

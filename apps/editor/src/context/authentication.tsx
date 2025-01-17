@@ -1,10 +1,9 @@
-import { Spinner } from '@phosphor-icons/react';
 import { Session } from '@supabase/supabase-js';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 import { StorageConfig, theme } from '@rekorder.io/constants';
 import { supabase } from '@rekorder.io/database';
-import { animate } from '@rekorder.io/ui';
+import { Spinner } from '@rekorder.io/ui';
 
 interface IAuthenticationContext {
   session: Session | null;
@@ -50,7 +49,7 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
     case 'pending':
       return (
         <main className="h-screen w-screen bg-card-background flex items-center justify-center">
-          <Spinner size={32} weight="bold" style={{ animation: animate.spin }} color={theme.colors.primary.main} />
+          <Spinner size={32} color={theme.colors.primary.main} />
         </main>
       );
 

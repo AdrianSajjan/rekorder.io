@@ -2,6 +2,7 @@ export * from './brand/brand';
 export * from './style/resolved-styled';
 
 export * from './button/button';
+export * from './spinner/spinner';
 export * from './button/loading-button';
 
 export * from './select/select';

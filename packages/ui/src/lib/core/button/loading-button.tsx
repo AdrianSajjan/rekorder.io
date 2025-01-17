@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { Spinner } from '@phosphor-icons/react';
 import { Button, type ButtonProps } from './button';
 import { Fragment } from 'react/jsx-runtime';
 
 import { ResolvedStyle } from '../style/resolved-styled';
+import { Spinner } from '../spinner/spinner';
 
 interface LoadingButtonProps extends ButtonProps {
   loading?: boolean;
@@ -27,15 +27,9 @@ const LoadingButtonCSS = css.resolve`
   .rekorder-loading-button-spinner-container {
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-
     z-index: 10;
     position: absolute;
-    display: flex;
-  }
-
-  .rekorder-loading-button-spinner-icon {
-    animation: spin 2.25s linear infinite;
+    transform: translate(-50%, -50%);
   }
 
   @keyframes spin {
@@ -57,11 +51,7 @@ const LoadingButton = ({ loading, children, className, ...props }: LoadingButton
       <ResolvedStyle>{LoadingButtonCSS}</ResolvedStyle>
       <Button className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button', className)} {...props} data-loading={loading}>
         <span className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button-content')}>{children}</span>
-        {loading ? (
-          <span className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button-spinner-container')}>
-            <Spinner size={20} weight="bold" className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button-spinner-icon')} />
-          </span>
-        ) : null}
+        {loading ? <Spinner className={clsx(LoadingButtonCSS.className, 'rekorder-loading-button-spinner-container')} /> : null}
       </Button>
     </Fragment>
   );

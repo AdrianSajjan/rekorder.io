@@ -2,9 +2,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
 import { createRootRoute, Outlet } from '@tanstack/react-router';
 
-import { Spinner } from '@phosphor-icons/react';
 import { supabase } from '@rekorder.io/database';
-import { animate, theme } from '@rekorder.io/ui';
+import { Spinner, theme } from '@rekorder.io/ui';
 
 import { useAuthenticationStore } from '../store/authentication';
 
@@ -58,7 +57,7 @@ function OutletComponent() {
   if (isPending) {
     return (
       <main className="h-screen w-screen flex items-center justify-center p-8">
-        <Spinner size={32} weight="bold" style={{ animation: animate.spin }} color={theme.colors.primary.main} />
+        <Spinner size={32} color={theme.colors.primary.main} />
       </main>
     );
   }
