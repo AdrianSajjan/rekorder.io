@@ -52,6 +52,11 @@ const GlobalResetCSS = css.resolve`
     overflow-wrap: break-word;
   }
 
+  button,
+  iframe {
+    border: none;
+  }
+
   p {
     text-wrap: pretty;
   }

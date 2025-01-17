@@ -56,6 +56,7 @@ const AudioPluginCSS = css.resolve`
 
   .rekorder-waveform {
     width: 100%;
+    border: none;
     height: ${theme.space(10)};
   }
 `;
