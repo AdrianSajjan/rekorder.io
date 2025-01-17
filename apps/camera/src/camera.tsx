@@ -1,6 +1,8 @@
-import { theme } from '@rekorder.io/ui';
+import { reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useRef, useState } from 'react';
+
+import { theme } from '@rekorder.io/ui';
 import { camera } from './store/camera';
 
 const CAMERA_DIMENTIONS = 1024;
@@ -34,11 +36,27 @@ const CameraPreview = observer(() => {
 
   useEffect(() => {
     if (!video$.current || !canvas$.current) return;
-
     camera.initialize(video$.current, canvas$.current);
-    camera.start();
+  }, []);
 
-    return () => camera.dispose();
+  useEffect(() => {
+    const dispose = reaction(
+      () => {
+        return {
+          device: camera.device,
+          initialized: camera.initialized,
+        };
+      },
+      ({ initialized }) => {
+        if (!initialized) return;
+        camera.stop();
+        camera.start();
+      },
+      { fireImmediately: true }
+    );
+    return () => {
+      dispose();
+    };
   }, []);
 
   useEffect(() => {

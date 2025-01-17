@@ -44,6 +44,9 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/utils'],
+  },
   test: {
     watch: false,
     globals: true,

@@ -1,27 +1,54 @@
 import { debounce } from 'lodash';
 import { makeAutoObservable, runInAction } from 'mobx';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { toBlobURL } from '@ffmpeg/util';
 
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
 
+type EditorStatus = 'idle' | 'pending' | 'initialized' | 'error';
+
 class Editor {
   name: string;
+  status: EditorStatus;
+
   blobURL: string | null;
   video: BlobStorage | null;
 
+  private _ffmpeg: FFmpeg;
   private _offlineDatabase: ExtensionOfflineDatabase;
+
   private _runtimeEventHandler = this.__runtimeEventHandler.bind(this);
   private _saveNameOfflineDatabaseDebounced = debounce(this.__saveNameOfflineDatabase, 500);
 
   constructor() {
     this.name = '';
+    this.status = 'idle';
+
     this.video = null;
     this.blobURL = null;
+
+    this._ffmpeg = new FFmpeg();
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
     this.__setupEvents();
     makeAutoObservable(this, {}, { autoBind: true });
+  }
+
+  private async __initializeFFmpeg() {
+    this.status = 'pending';
+    try {
+      const base = 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm';
+      await this._ffmpeg.load({
+        coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'application/javascript'),
+        wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
+      });
+      this.status = 'initialized';
+    } catch (error) {
+      this.status = 'error';
+      console.log('Failed to initialize FFmpeg', error);
+    }
   }
 
   private __saveNameOfflineDatabase(name: string) {

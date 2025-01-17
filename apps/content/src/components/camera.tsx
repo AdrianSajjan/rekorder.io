@@ -24,6 +24,7 @@ const CameraPreviewCSS = css.resolve`
   .rekorder-camera-container {
     position: absolute;
     pointer-events: all;
+    user-select: none;
   }
 
   .rekorder-close-button,
@@ -81,6 +82,7 @@ const CameraPreviewCSS = css.resolve`
   }
 
   .rekorder-camera-controls {
+    z-index: 2;
     position: absolute;
     pointer-events: none;
   }
@@ -91,8 +93,10 @@ const CameraPreviewCSS = css.resolve`
 
     width: 100%;
     height: 100%;
+    border-radius: 100%;
 
     z-index: 1;
+    border: none;
     position: absolute;
     pointer-events: none;
   }
@@ -125,11 +129,13 @@ const CameraPreviewHOC = observer(() => {
 
 const CameraPreview = observer(() => {
   const [cameraSize, setCameraSize] = useState(200);
+
   const drag = useDragControls<HTMLDivElement>({ position: 'top-left' });
 
   const styles = useMemo(() => {
     const size = cameraSize / Math.sqrt(2);
     const position = (cameraSize - size) / 2;
+
     return theme.createStyles({
       handle: { width: cameraSize, height: cameraSize },
       control: { width: size, height: size, top: position, left: position },

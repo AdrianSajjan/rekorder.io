@@ -9,6 +9,7 @@ class Camera {
   effect: CameraEffects;
   device: Autocomplete<'n/a'>;
 
+  initialized: boolean;
   stream: MediaStream | null;
   status: 'idle' | 'pending' | 'initialized' | 'error';
 
@@ -21,6 +22,8 @@ class Camera {
 
   constructor() {
     this.stream = null;
+    this.initialized = false;
+
     this.device = 'n/a';
     this.effect = 'none';
     this.status = 'idle';
@@ -155,33 +158,34 @@ class Camera {
   private __cancelStream() {
     if (this.tick) this.video.cancelVideoFrameCallback(this.tick);
     if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
-
     this.tick = null;
     this.stream = null;
-
-    this.video = null!;
-    this.canvas = null!;
-    this.preview = null!;
   }
 
   initialize(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
     this.video = video;
     this.canvas = canvas;
     this.preview = document.createElement('canvas');
+    this.initialized = true;
   }
 
   start() {
     if (this.device !== 'n/a') {
       this.status = 'pending';
-      const options: MediaStreamConstraints = {
-        video: {
-          deviceId: this.device,
-          frameRate: { ideal: 30, max: 30, min: 24 },
-        },
-        audio: false,
-      };
-      navigator.mediaDevices.getUserMedia(options).then(this.__createStreamSuccess).catch(this.__createSteamError);
+      navigator.mediaDevices
+        .getUserMedia({
+          video: {
+            deviceId: this.device,
+            frameRate: { ideal: 30, max: 30, min: 24 },
+          },
+          audio: false,
+        })
+        .then(this.__createStreamSuccess, this.__createSteamError);
     }
+  }
+
+  stop() {
+    this.__cancelStream();
   }
 
   dispose() {
