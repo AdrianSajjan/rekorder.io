@@ -1,12 +1,12 @@
 import clsx from 'clsx';
-import Draggable from 'react-draggable';
 import css from 'styled-jsx/css';
+import Draggable from 'react-draggable';
 
 import { observer } from 'mobx-react';
 import { Fragment, useMemo, useState } from 'react';
 
 import { ArrowsOutSimple, X } from '@phosphor-icons/react';
-import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';
+import { animations, ResolvedStyle, Spinner, theme } from '@rekorder.io/ui';
 
 import { useDragControls } from '../hooks/use-drag-controls';
 import { camera } from '../store/camera';
@@ -41,19 +41,20 @@ const CameraPreviewCSS = css.resolve`
 
     opacity: 0;
     pointer-events: none;
-    transition: background-color 0.2s ease-out;
+    --camera-control-scale: 0.8;
+    transition: background-color 200ms ease, opacity 200ms ease-out, transform 200ms ease-out;
   }
 
   .rekorder-close-button {
     top: 0;
     left: 0;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(var(--camera-control-scale));
   }
 
   .rekorder-resize-button {
     right: 0;
     bottom: 0;
-    transform: translate(50%, 50%) rotate(90deg);
+    transform: translate(50%, 50%) rotate(90deg) scale(var(--camera-control-scale));
   }
 
   .rekorder-close-button:hover,
@@ -65,6 +66,7 @@ const CameraPreviewCSS = css.resolve`
   .rekorder-camera-container:hover .rekorder-resize-button {
     opacity: 1;
     pointer-events: auto;
+    --camera-control-scale: 1;
   }
 
   .rekorder-camera-handle {
@@ -75,6 +77,7 @@ const CameraPreviewCSS = css.resolve`
 
     animation: ${animations['zoom-in-fade-in']} 300ms;
     box-shadow: ${theme.shadow(theme.alpha(theme.colors.core.black, 0.05)).xl};
+    background-color: ${theme.colors.core.black};
   }
 
   .rekorder-camera-controls {
@@ -85,10 +88,22 @@ const CameraPreviewCSS = css.resolve`
   .rekorder-camera-iframe {
     top: 50%;
     left: 50%;
+
     width: 100%;
     height: 100%;
+
+    z-index: 1;
     position: absolute;
     pointer-events: none;
+  }
+
+  .rekorder-camera-spinner {
+    top: 50%;
+    left: 50%;
+
+    z-index: 0;
+    position: absolute;
+    transform: translate(-50%, -50%);
   }
 
   .rekorder-camera-iframe[data-flip='true'] {
@@ -135,13 +150,14 @@ const CameraPreview = observer(() => {
               className={clsx(CameraPreviewCSS.className, 'rekorder-camera-iframe')}
               data-flip={String(camera.flip)}
             />
+            <Spinner size={24} color={theme.colors.core.white} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-spinner')} />
           </div>
           <div className={clsx(CameraPreviewCSS.className, 'rekorder-camera-controls')} style={styles.control}>
             <button onClick={() => camera.changeDevice('n/a')} className={clsx(CameraPreviewCSS.className, 'rekorder-close-button')}>
-              <X size={16} weight="bold" color={theme.colors.core.white} />
+              <X size={14} weight="bold" color={theme.colors.core.white} />
             </button>
             <button className={clsx(CameraPreviewCSS.className, 'rekorder-resize-button')} onClick={() => setCameraSize(cameraSize === 200 ? 300 : 200)}>
-              <ArrowsOutSimple weight="bold" size={16} color={theme.colors.core.white} />
+              <ArrowsOutSimple weight="bold" size={14} color={theme.colors.core.white} />
             </button>
           </div>
         </div>

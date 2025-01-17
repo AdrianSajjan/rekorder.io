@@ -42,15 +42,15 @@ const ActionbarCSS = css.resolve`
   }
 
   .rekorder-actionbar-popover-content[data-state='open'] {
-    animation-name: ${animations['zoom-in-fade-in']};
+    animation-name: ${animations['slide-up-fade-in']};
     animation-timing-function: ease-out;
-    animation-duration: 300ms;
+    animation-duration: 200ms;
   }
 
   .rekorder-actionbar-popover-content[data-state='closed'] {
-    animation-name: ${animations['zoom-out-fade-out']};
+    animation-name: ${animations['slide-down-fade-out']};
     animation-timing-function: ease-out;
-    animation-duration: 200ms;
+    animation-duration: 150ms;
   }
 `;
 
