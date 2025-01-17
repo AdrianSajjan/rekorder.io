@@ -17,6 +17,7 @@ const RecordControlCSS = css.resolve`
   .rekorder-timer-container {
     height: 100%;
     display: flex;
+    user-select: none;
 
     align-items: center;
     justify-content: center;
