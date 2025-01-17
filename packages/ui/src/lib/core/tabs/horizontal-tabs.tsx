@@ -9,7 +9,7 @@ import { LayoutGroup, motion } from 'framer-motion';
 import { useStateObserver } from '@rekorder.io/hooks';
 
 import { theme } from '../../theme';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 const HorizontalTabsCSS = css.resolve`
   *,

@@ -10,7 +10,7 @@ import { forwardRef, Fragment, useCallback, useEffect, useRef, useState } from '
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface VideoPlayerProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   container?: string;

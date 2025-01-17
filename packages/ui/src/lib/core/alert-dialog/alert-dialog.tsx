@@ -7,7 +7,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import { theme } from '../../theme';
 import { animations } from '../../animations';
 import { Button, ButtonProps } from '../button/button';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 const AlertDialogCSS = css.resolve`
   * {

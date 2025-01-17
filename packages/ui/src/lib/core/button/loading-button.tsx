@@ -4,7 +4,7 @@ import css from 'styled-jsx/css';
 import { Button, type ButtonProps } from './button';
 import { Fragment } from 'react/jsx-runtime';
 
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 import { Spinner } from '../spinner/spinner';
 
 interface LoadingButtonProps extends ButtonProps {

@@ -9,7 +9,7 @@ import { CaretDown, CheckCircle } from '@phosphor-icons/react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface ISelectContext {
   size: 'small' | 'medium' | 'large';

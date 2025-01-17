@@ -2,24 +2,19 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { RecorderSurface } from '@rekorder.io/types';
-import { animations, ResolvedStyle, Select, Switch, theme, Tooltip } from '@rekorder.io/ui';
+import { ResolvedStyle, Select, Switch, theme, Tooltip } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 
 import { recorder } from '../../store/recorder';
-import { RECORD_SURFACE_OPTIONS } from '../../constants/recorder';
 import { SwitchLabel } from '../ui/switch-label';
 import { shadowRootElementById } from '../../lib/utils';
+import { RECORD_SURFACE_OPTIONS } from '../../constants/recorder';
 
 const ScreenPluginCSS = css.resolve`
   .rekorder-screen-container {
     display: flex;
     flex-direction: column;
-
     gap: ${theme.space(5)};
-    animation-name: ${animations['fade-in']};
-
-    animation-duration: 300ms;
-    animation-timing-function: ease-out;
   }
 
   .rekorder-select-input {
@@ -53,10 +48,6 @@ const ScreenPlugin = observer(() => {
             <Switch checked={recorder.audio} onCheckedChange={recorder.changeDesktopAudio} />
           </div>
         ) : null}
-        <div className={clsx('rekorder-toggle-control', ScreenPluginCSS.className)}>
-          <SwitchLabel>Zoom on Click</SwitchLabel>
-          <Switch />
-        </div>
       </div>
     </Tooltip.Provider>
   );

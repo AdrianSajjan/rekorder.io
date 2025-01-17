@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 const SpinnerCSS = css.resolve`
   .rekorder-spinner-wrapper {

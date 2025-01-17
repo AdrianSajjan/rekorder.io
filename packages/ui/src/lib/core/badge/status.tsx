@@ -1,8 +1,11 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
+
 import { forwardRef, Fragment } from 'react';
 import { Slot } from '@radix-ui/react-slot';
+
 import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface StatusBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
@@ -100,24 +103,22 @@ const StatusBadgeCSS = css.resolve`
   }
 `;
 
-const StatusBadge = forwardRef<HTMLDivElement, StatusBadgeProps>(
-  ({ asChild, variant = 'default', indicator = 'dot', children, className, ...props }, ref) => {
-    const Component = asChild ? Slot : 'div';
+const StatusBadge = forwardRef<HTMLDivElement, StatusBadgeProps>(({ asChild, variant = 'default', indicator = 'dot', children, className, ...props }, ref) => {
+  const Component = asChild ? Slot : 'div';
 
-    return (
-      <Fragment>
-        {StatusBadgeCSS.styles}
-        <Component ref={ref} className={clsx(StatusBadgeCSS.className, 'root', variant, className)} {...props}>
-          {indicator === 'dot' ? (
-            <span className={clsx(StatusBadgeCSS.className, 'dot', variant)} aria-hidden="true" />
-          ) : (
-            <span className={clsx(StatusBadgeCSS.className, 'icon', variant)} aria-hidden="true"></span>
-          )}
-          <span>{children}</span>
-        </Component>
-      </Fragment>
-    );
-  }
-);
+  return (
+    <Fragment>
+      <ResolvedStyle>{StatusBadgeCSS}</ResolvedStyle>
+      <Component ref={ref} className={clsx(StatusBadgeCSS.className, 'root', variant, className)} {...props}>
+        {indicator === 'dot' ? (
+          <span className={clsx(StatusBadgeCSS.className, 'dot', variant)} aria-hidden="true" />
+        ) : (
+          <span className={clsx(StatusBadgeCSS.className, 'icon', variant)} aria-hidden="true"></span>
+        )}
+        <span>{children}</span>
+      </Component>
+    </Fragment>
+  );
+});
 
 export { StatusBadge, type StatusBadgeProps };

@@ -15,3 +15,9 @@ export function shadowRootElementById(id: string) {
   if (!root || !root.shadowRoot) return null;
   return root.shadowRoot.getElementById(id);
 }
+
+export function framerMotionParentDOM() {
+  const root= document.getElementById(RECORDER_ROOT);
+  if(!root||!root.shadowRoot) return document.head;
+  return root.shadowRoot;
+}

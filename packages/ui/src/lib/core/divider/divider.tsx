@@ -1,8 +1,9 @@
 import clsx from 'clsx';
-import { forwardRef, Fragment } from 'react';
 import css from 'styled-jsx/css';
+import { forwardRef, Fragment } from 'react';
 
 import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: 'horizontal' | 'vertical';
@@ -51,7 +52,7 @@ const Divider = forwardRef<HTMLDivElement, DividerProps>(({ className, orientati
   const mode = children ? 'text' : 'line';
   return (
     <Fragment>
-      {DividerCSS.styles}
+      <ResolvedStyle>{DividerCSS}</ResolvedStyle>
       <div ref={ref} role="separator" className={clsx(DividerCSS.className, 'divider', orientation, mode, className)} {...props}>
         {children}
       </div>

@@ -3,7 +3,8 @@ import css from 'styled-jsx/css';
 import Draggable from 'react-draggable';
 
 import { observer } from 'mobx-react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 
 import { DotsThree, QuestionMark, X } from '@phosphor-icons/react';
 import { EventConfig } from '@rekorder.io/constants';
@@ -14,7 +15,9 @@ import { ScreenPlugin } from './screen';
 import { CameraPlugin } from './camera';
 
 import { recorder } from '../../store/recorder';
+import { framerMotionParentDOM } from '../../lib/utils';
 import { RECORDER_ROOT } from '../../constants/layout';
+
 import { useDragControls } from '../../hooks/use-drag-controls';
 import { useDisposeEvents } from '../../hooks/use-dispose-events';
 
@@ -82,13 +85,14 @@ const PluginCardCSS = css.resolve`
   }
 
   .rekorder-horizontal-panel {
+    position: relative;
     background-color: ${theme.colors.background.light};
   }
 
   .rekorder-horizontal-panel-content {
+    overflow-y: auto;
     padding: ${theme.space(6)};
     max-height: ${theme.space(56)};
-    overflow-y: auto;
   }
 
   .rekorder-footer {
@@ -115,6 +119,8 @@ const PluginCardCSS = css.resolve`
   }
 `;
 
+const TabOrder = ['screen', 'camera', 'audio'];
+
 const PluginCardHOC = observer(() => {
   if (recorder.status === 'idle' || recorder.status === 'countdown' || recorder.status === 'error') {
     return <PluginCard />;
@@ -127,6 +133,9 @@ const PluginCard = observer(() => {
   const handleDisposeEvents = useDisposeEvents();
   const drag = useDragControls<HTMLDivElement>({ position: 'top-right', dimension: { height: 380, width: 350 } });
 
+  const [tab, setTab] = useState<'screen' | 'camera' | 'audio'>('screen');
+  const [direction, setDirection] = useState<-1 | 0 | 1>(0);
+
   const handleScreenCapture = () => {
     switch (recorder.status) {
       case 'countdown':
@@ -137,6 +146,11 @@ const PluginCard = observer(() => {
         recorder.startScreenCapture();
         break;
     }
+  };
+
+  const handleTabChange = (value: string) => {
+    setTab(value as 'screen' | 'camera' | 'audio');
+    setDirection(TabOrder.indexOf(value) > TabOrder.indexOf(tab) ? 1 : -1);
   };
 
   const handleCloseExtension = () => {
@@ -166,24 +180,35 @@ const PluginCard = observer(() => {
                 <X weight="bold" size={14} />
               </button>
             </div>
-            <HorizontalTabs defaultValue="screen">
+            <HorizontalTabs value={tab} onValueChange={handleTabChange}>
               <HorizontalTabs.List>
                 <HorizontalTabs.Trigger value="screen">Screen</HorizontalTabs.Trigger>
                 <HorizontalTabs.Trigger value="camera">Camera</HorizontalTabs.Trigger>
                 <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
               </HorizontalTabs.List>
               <AnimateHeight className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel')}>
-                <div className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel-content')}>
-                  <HorizontalTabs.Panel value="screen">
-                    <ScreenPlugin />
-                  </HorizontalTabs.Panel>
-                  <HorizontalTabs.Panel value="camera">
-                    <CameraPlugin />
-                  </HorizontalTabs.Panel>
-                  <HorizontalTabs.Panel value="audio">
-                    <AudioPlugin />
-                  </HorizontalTabs.Panel>
-                </div>
+                <AnimatePresence mode="popLayout" initial={false} custom={direction} parentDom={framerMotionParentDOM()}>
+                  <motion.div
+                    key={tab}
+                    exit="exit"
+                    initial="initial"
+                    animate="active"
+                    custom={direction}
+                    variants={variants}
+                    transition={transition}
+                    className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel-content')}
+                  >
+                    <HorizontalTabs.Panel value="screen">
+                      <ScreenPlugin />
+                    </HorizontalTabs.Panel>
+                    <HorizontalTabs.Panel value="camera">
+                      <CameraPlugin />
+                    </HorizontalTabs.Panel>
+                    <HorizontalTabs.Panel value="audio">
+                      <AudioPlugin />
+                    </HorizontalTabs.Panel>
+                  </motion.div>
+                </AnimatePresence>
               </AnimateHeight>
             </HorizontalTabs>
             <div className={clsx(PluginCardCSS.className, 'rekorder-footer')}>
@@ -198,5 +223,30 @@ const PluginCard = observer(() => {
     </Fragment>
   );
 });
+
+const transition = {
+  duration: 0.5,
+  type: 'spring',
+  bounce: 0,
+};
+
+const variants: Variants = {
+  initial: (direction: number) => {
+    return {
+      opacity: 0,
+      x: 110 * direction + '%',
+    };
+  },
+  active: {
+    x: '0%',
+    opacity: 1,
+  },
+  exit: (direction: number) => {
+    return {
+      opacity: 0,
+      x: -110 * direction + '%',
+    };
+  },
+};
 
 export { PluginCardHOC as PluginCard };

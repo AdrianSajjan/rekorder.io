@@ -1,14 +1,15 @@
 import clsx from 'clsx';
-import { LayoutGroup, motion } from 'framer-motion';
 import css from 'styled-jsx/css';
 
 import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
 
 import { useStateObserver } from '@rekorder.io/hooks';
+import { LayoutGroup, motion } from 'framer-motion';
 import { isFunction } from 'lodash';
 
 import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-style';
 
 const SegmentedControlCSS = css.resolve`
   *,
@@ -136,7 +137,7 @@ const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRo
   ({ className, orientation = 'horizontal', size = 'medium', ...props }, ref) => {
     return (
       <React.Fragment>
-        {SegmentedControlCSS.styles}
+        <ResolvedStyle>{SegmentedControlCSS}</ResolvedStyle>
         <Tabs.Root
           ref={ref}
           orientation={orientation}

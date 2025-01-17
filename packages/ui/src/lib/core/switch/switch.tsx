@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { theme } from '../../theme';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface SwitchProps extends SwitchPrimitive.SwitchProps {
   thumb?: SwitchPrimitive.SwitchThumbProps;

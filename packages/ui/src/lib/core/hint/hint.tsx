@@ -1,9 +1,11 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
-import { forwardRef, Fragment } from 'react';
-import { theme } from '../../theme';
 import { Info } from '@phosphor-icons/react';
+import { forwardRef, Fragment } from 'react';
+
+import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-style';
 
 const HintCSS = css.resolve`
   * {
@@ -54,7 +56,7 @@ const Hint = forwardRef<HTMLDivElement, HintProps>(({ children, className, icon 
   const mode = invalid ? 'error' : 'default';
   return (
     <Fragment>
-      {HintCSS.styles}
+      <ResolvedStyle>{HintCSS}</ResolvedStyle>
       <div ref={ref} {...props} className={clsx('rekorder-hint', HintCSS.className, className, theme.createClassName(mode))}>
         {icon ? <span className={clsx(HintCSS.className, 'rekorder-hint-icon')}>{icon}</span> : null}
         {!invalid || !error ? children : error}

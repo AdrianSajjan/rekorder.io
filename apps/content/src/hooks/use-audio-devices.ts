@@ -22,10 +22,10 @@ export function useRequestAudioDevices() {
   }, []);
 
   useEffect(() => {
+    if (import.meta.env.DEV) return;
     chrome.storage.local.get([StorageConfig.AudioPermission, StorageConfig.AudioDevices]).then((result) => {
       const permission = result[StorageConfig.AudioPermission] as PermissionState;
       const devices = deserializeOrNull<UserMediaDevice[]>(result[StorageConfig.AudioDevices]);
-
       if (permission) setPermission(permission);
       if (devices) setDevices(devices.filter((device) => device.kind === 'audioinput' && !!device.deviceId));
     });

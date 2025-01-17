@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { FontsProvider } from '../fonts/provider';
 import { AnimationsProvider } from '../animations/provider';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface ThemeProviderProps {
   global?: boolean;

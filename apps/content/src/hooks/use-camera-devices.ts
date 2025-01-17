@@ -22,10 +22,10 @@ export function useRequestCameraDevices() {
   }, []);
 
   useEffect(() => {
+    if (import.meta.env.DEV) return;
     chrome.storage.local.get([StorageConfig.CameraPermission, StorageConfig.CameraDevices]).then((result) => {
       const permission = result[StorageConfig.CameraPermission] as PermissionState;
       const devices = deserializeOrNull<UserMediaDevice[]>(result[StorageConfig.CameraDevices]);
-
       if (permission) setPermission(permission);
       if (devices) setDevices(devices.filter((device) => device.kind === 'videoinput' && !!device.deviceId));
     });

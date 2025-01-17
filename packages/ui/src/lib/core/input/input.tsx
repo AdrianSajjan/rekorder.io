@@ -1,7 +1,10 @@
 import css from 'styled-jsx/css';
-import { theme } from '../../theme';
+
 import { forwardRef, Fragment, InputHTMLAttributes } from 'react';
 import { cn } from '@rekorder.io/utils';
+
+import { theme } from '../../theme';
+import { ResolvedStyle } from '../style/resolved-style';
 
 const InputCSS = css.resolve`
   * {
@@ -77,7 +80,7 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'>
 const Input = forwardRef<HTMLInputElement, InputProps>(({ className, size = 'medium', ...props }, ref) => {
   return (
     <Fragment>
-      {InputCSS.styles}
+      <ResolvedStyle>{InputCSS}</ResolvedStyle>
       <input ref={ref} className={cn(InputCSS.className, 'rekorder-input', theme.createClassName(size), className)} {...props} />
     </Fragment>
   );

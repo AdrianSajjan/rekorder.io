@@ -1,28 +1,23 @@
-import css from 'styled-jsx/css';
 import clsx from 'clsx';
+import css from 'styled-jsx/css';
 
 import { useState } from 'react';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { VideoCamera, VideoCameraSlash } from '@phosphor-icons/react';
-import { AlertDialog, animations, ResolvedStyle, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { AlertDialog, ResolvedStyle, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 
 import { camera } from '../../store/camera';
-import { openPermissionSettings, shadowRootElementById } from '../../lib/utils';
-import { useRequestCameraDevices } from '../../hooks/use-camera-devices';
 import { SwitchLabel } from '../ui/switch-label';
+import { useRequestCameraDevices } from '../../hooks/use-camera-devices';
+import { openPermissionSettings, shadowRootElementById } from '../../lib/utils';
 
 const CameraPluginCSS = css.resolve`
   .rekorder-camera-plugin-container {
     display: flex;
     flex-direction: column;
-
     gap: ${theme.space(5)};
-    animation-name: ${animations['fade-in']};
-
-    animation-duration: 300ms;
-    animation-timing-function: ease-out;
   }
 
   .rekorder-select-input {

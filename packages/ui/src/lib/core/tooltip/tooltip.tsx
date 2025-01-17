@@ -6,7 +6,7 @@ import * as React from 'react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface Tooltip extends React.ForwardRefExoticComponent<TooltipProps & React.RefAttributes<HTMLDivElement>> {
   Provider: typeof TooltipPrimitive.TooltipProvider;

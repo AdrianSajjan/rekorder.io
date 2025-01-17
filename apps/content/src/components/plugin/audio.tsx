@@ -2,27 +2,22 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
-import { Fragment } from 'react/jsx-runtime';
 import { useState } from 'react';
+import { Fragment } from 'react/jsx-runtime';
 
-import { AlertDialog, animations, ResolvedStyle, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
+import { AlertDialog, ResolvedStyle, Select, StatusBadge, Switch, theme } from '@rekorder.io/ui';
 import { Microphone, MicrophoneSlash } from '@phosphor-icons/react';
 
 import { SwitchLabel } from '../ui/switch-label';
 import { microphone } from '../../store/microphone';
-import { openPermissionSettings, shadowRootElementById } from '../../lib/utils';
 import { useRequestAudioDevices } from '../../hooks/use-audio-devices';
+import { openPermissionSettings, shadowRootElementById } from '../../lib/utils';
 
 const AudioPluginCSS = css.resolve`
   .rekorder-audio-container {
     display: flex;
     flex-direction: column;
-
     gap: ${theme.space(5)};
-    animation-name: ${animations['fade-in']};
-
-    animation-duration: 300ms;
-    animation-timing-function: ease-out;
   }
 
   .rekorder-select-input {

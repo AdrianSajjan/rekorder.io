@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 
 import { theme } from '../../theme';
-import { ResolvedStyle } from '../style/resolved-styled';
+import { ResolvedStyle } from '../style/resolved-style';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
