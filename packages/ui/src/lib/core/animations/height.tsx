@@ -1,5 +1,6 @@
 import { motion, Transition } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { theme } from '../../theme';
 
 interface AnimateHeightProps {
   className?: string;
@@ -28,16 +29,22 @@ export function AnimateHeight({ children, className, containerClassName, transit
   }, []);
 
   return (
-    <motion.div
-      id="animate-height-container"
-      animate={{ height }}
-      className={className}
-      style={{ overflow: 'hidden' }}
-      transition={{ type: 'spring', duration: 0.4, bounce: 0, ...transition }}
-    >
-      <div id="animate-height-content" className={containerClassName} ref={ref}>
+    <motion.div animate={{ height }} className={className} style={style.container} transition={Object.assign(settings, transition)}>
+      <div className={containerClassName} ref={ref}>
         {children}
       </div>
     </motion.div>
   );
 }
+
+const settings: Transition = {
+  type: 'spring',
+  duration: 0.4,
+  bounce: 0,
+};
+
+const style = theme.createStyles({
+  container: {
+    overflow: 'hidden',
+  },
+});
