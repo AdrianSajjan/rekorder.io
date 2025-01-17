@@ -16,16 +16,16 @@ class Editor {
   status: EditorStatus;
   video: BlobStorage | null;
 
+  ffmpeg: FFmpeg;
   original: Blob | null;
   modified: Blob | null;
 
-  private _ffmpeg: FFmpeg;
   private _offlineDatabase: ExtensionOfflineDatabase;
+  private _saveNameOfflineDatabaseDebounced = debounce(this.__saveNameOfflineDatabase, 500);
 
   private _ffmpegLogsHandler = this.__ffmpegLogsHandler.bind(this);
   private _runtimeEventHandler = this.__runtimeEventHandler.bind(this);
   private _ffmpegProgressHandler = this.__ffmpegProgressHandler.bind(this);
-  private _saveNameOfflineDatabaseDebounced = debounce(this.__saveNameOfflineDatabase, 500);
 
   constructor() {
     this.name = '';
@@ -35,7 +35,7 @@ class Editor {
     this.original = null;
     this.modified = null;
 
-    this._ffmpeg = new FFmpeg();
+    this.ffmpeg = new FFmpeg();
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
     this.__setupEvents();
@@ -59,7 +59,7 @@ class Editor {
     this.status = 'pending';
     try {
       const base = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm';
-      await this._ffmpeg.load({
+      await this.ffmpeg.load({
         wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
         coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'application/javascript'),
         workerURL: await toBlobURL(`${base}/ffmpeg-core.worker.js`, 'text/javascript'),
@@ -107,8 +107,7 @@ class Editor {
   }
 
   private __ffmpegProgressHandler(event: ProgressEvent) {
-    console.log('Time:', event.time);
-    console.log('Progress:', event.progress);
+    console.log('Time:', event.time, 'Progress:', event.progress);
   }
 
   private __ffmpegLogsHandler(event: LogEvent) {
@@ -116,14 +115,14 @@ class Editor {
   }
 
   private __setupEvents() {
-    this._ffmpeg.on('log', this._ffmpegLogsHandler);
-    this._ffmpeg.on('progress', this._ffmpegProgressHandler);
+    this.ffmpeg.on('log', this._ffmpegLogsHandler);
+    this.ffmpeg.on('progress', this._ffmpegProgressHandler);
     if (!import.meta.env.DEV) chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
   }
 
   private __removeEvents() {
-    this._ffmpeg.off('log', this._ffmpegLogsHandler);
-    this._ffmpeg.off('progress', this._ffmpegProgressHandler);
+    this.ffmpeg.off('log', this._ffmpegLogsHandler);
+    this.ffmpeg.off('progress', this._ffmpegProgressHandler);
     if (!import.meta.env.DEV) chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
   }
 
@@ -133,10 +132,10 @@ class Editor {
 
   async convertToMP4() {
     const input = await fetchFile(this.recordingOrThrow);
-    this._ffmpeg.writeFile('input.webm', input);
+    this.ffmpeg.writeFile('input.webm', input);
 
-    await this._ffmpeg.exec(['-i', 'input.webm', '-preset', 'ultrafast', '-c:v', 'libx264', '-c:a', 'aac', 'output.mp4']);
-    const output = await this._ffmpeg.readFile('output.mp4');
+    await this.ffmpeg.exec(['-i', 'input.webm', '-preset', 'ultrafast', '-c:v', 'libx264', '-c:a', 'aac', 'output.mp4']);
+    const output = await this.ffmpeg.readFile('output.mp4');
 
     const data = output as Uint8Array;
     return new Blob([data.buffer], { type: 'video/mp4' });

@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { toast } from 'sonner';
 import { observer } from 'mobx-react';
 import { CaretRight, CloudArrowUp, Crop, Download, MagnifyingGlassPlus, MusicNotes, Panorama, Scissors, ShareFat, Subtitles, Translate, UserFocus, UserSound } from '@phosphor-icons/react';
@@ -13,6 +13,8 @@ import { editor } from '../../store/editor';
 import { useAuthenticatedSession } from '../../context/authentication';
 import { PremiumFeatureDialog } from '../modal/premium-feature';
 import { fileDownloadBlob } from '../../lib/utils';
+import { CircularProgress } from '../ui/circular-progress';
+import { ProgressEvent } from '@ffmpeg/ffmpeg';
 
 interface CloudUploadProps {
   original_file: StorageResponse;
@@ -28,6 +30,8 @@ const SidebarHOC = observer(() => {
 
 const Sidebar = observer(({ video }: { video: BlobStorage }) => {
   const { user } = useAuthenticatedSession();
+
+  const [downloadMP4Progress, setDownloadMP4Progress] = useState<ProgressEvent>({ progress: 0, time: 0 });
 
   const handleUploadVideo = async (blob: Blob) => {
     const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(user, blob), blob);
@@ -81,9 +85,20 @@ const Sidebar = observer(({ video }: { video: BlobStorage }) => {
   });
 
   const handleDownloadMP4 = useMutation({
-    mutationFn: () => editor.convertToMP4(),
-    onSuccess: (blob) => fileDownloadBlob(blob, editor.name, '.mp4'),
-    onError: (error) => toast.error(unwrapError(error, 'Oops! Something went wrong while converting your video')),
+    mutationFn: () => {
+      editor.ffmpeg.on('progress', setDownloadMP4Progress);
+      return editor.convertToMP4();
+    },
+    onSuccess: (blob) => {
+      fileDownloadBlob(blob, editor.name, '.mp4');
+    },
+    onError: (error) => {
+      toast.error(unwrapError(error, 'Oops! Something went wrong while converting your video'));
+    },
+    onSettled: () => {
+      editor.ffmpeg.off('progress', setDownloadMP4Progress);
+      setDownloadMP4Progress({ progress: 0, time: 0 });
+    },
   });
 
   const handleDownloadWEBM = () => {
@@ -102,7 +117,7 @@ const Sidebar = observer(({ video }: { video: BlobStorage }) => {
             icon={<CloudArrowUp weight="bold" />}
             title="Upload to cloud"
             description="Get access to premium features"
-            loading={handleCloudUpload.isPending}
+            status={handleCloudUpload.isPending ? 'loading' : null}
             onClick={() => handleCloudUpload.mutate()}
           />
           <SidebarAction icon={<Download weight="bold" />} title="Export as WEBM" description="Download your video in .webm format" onClick={() => handleDownloadWEBM()} />
@@ -110,7 +125,8 @@ const Sidebar = observer(({ video }: { video: BlobStorage }) => {
             icon={<Download weight="bold" />}
             title="Export as MP4"
             description="Download your video in .mp4 format"
-            loading={handleDownloadMP4.isPending}
+            status={handleDownloadMP4.isPending ? 'progress' : null}
+            progress={downloadMP4Progress.progress * 100}
             onClick={() => handleDownloadMP4.mutate()}
           />
           <PremiumFeatureDialog>
@@ -150,14 +166,15 @@ const Sidebar = observer(({ video }: { video: BlobStorage }) => {
 });
 
 interface SidebarActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  title: string;
-  premium?: boolean;
-  loading?: boolean;
-  description: string;
   icon: React.ReactNode;
+  title: string;
+  description: string;
+  premium?: boolean;
+  progress?: number;
+  status?: 'loading' | 'progress' | null;
 }
 
-const SidebarAction = forwardRef<HTMLButtonElement, SidebarActionProps>(({ icon, title, description, loading, className, premium, disabled, ...props }, ref) => {
+const SidebarAction = forwardRef<HTMLButtonElement, SidebarActionProps>(({ icon, title, description, status, progress, className, premium, disabled, ...props }, ref) => {
   return (
     <button
       ref={ref}
@@ -166,18 +183,31 @@ const SidebarAction = forwardRef<HTMLButtonElement, SidebarActionProps>(({ icon,
         'disabled:hover:bg-card-background disabled:cursor-not-allowed',
         className
       )}
-      disabled={disabled || loading}
+      disabled={disabled || !!status}
       {...props}
     >
-      <span>{icon}</span>
+      <span className="flex">{icon}</span>
       <div className="flex flex-col gap-1">
         <h3 className="text-xs font-semibold">{title}</h3>
         <p className="text-xs text-accent-dark/80">{description}</p>
       </div>
-      <span className="ml-auto">{premium ? <CrownIcon className="text-xl" /> : loading ? <Spinner color={theme.colors.core.black} /> : <CaretRight size={14} weight="bold" />}</span>
+      <span className="ml-auto flex">
+        {premium ? <CrownIcon className="text-xl" /> : status ? <SidebarActionStatus status={status} progress={progress} /> : <CaretRight size={14} weight="bold" />}
+      </span>
     </button>
   );
 });
+
+function SidebarActionStatus({ status, progress }: { status: 'loading' | 'progress'; progress?: number }) {
+  switch (status) {
+    case 'loading':
+      return <Spinner color={theme.colors.core.black} />;
+    case 'progress':
+      return <CircularProgress progress={progress || 0} />;
+    default:
+      return null;
+  }
+}
 
 function SidebarPlaceholder() {
   return (
