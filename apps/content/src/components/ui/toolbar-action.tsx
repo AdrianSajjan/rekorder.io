@@ -5,6 +5,7 @@ import clsx from 'clsx';
 
 import { ResolvedStyle, theme, Tooltip } from '@rekorder.io/ui';
 import { Slot } from '@radix-ui/react-slot';
+import { shadowRootElementById } from '../../lib/utils';
 
 interface ToolbarActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   tooltip?: string;
@@ -69,7 +70,7 @@ function ToolbarAction({ tooltip, className, children, actionbarIndicator, asChi
     <React.Fragment>
       <ResolvedStyle>{ToolbarActionCSS}</ResolvedStyle>
       {tooltip ? (
-        <Tooltip content={tooltip} arrow={false} sideOffset={12}>
+        <Tooltip content={tooltip} arrow={false} sideOffset={16} portal={shadowRootElementById('rekorder-area')}>
           <div className="tooltip-area" aria-label={tooltip}>
             <Component
               aria-label={tooltip}

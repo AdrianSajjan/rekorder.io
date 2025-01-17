@@ -36,13 +36,14 @@ const TooltipCSS = css.resolve`
   }
 
   .content {
-    box-shadow: ${theme.shadow().md};
-    border-radius: ${theme.space(2)};
-    padding: ${theme.space(2)} ${theme.space(3)};
-    max-width: ${theme.space(80)};
-
     font-size: 13px;
     line-height: 1.4;
+
+    max-width: ${theme.space(80)};
+    border-radius: ${theme.space(2)};
+    padding: ${theme.space(2)} ${theme.space(3)};
+
+    box-shadow: ${theme.shadow().md};
     font-family: ${theme.fonts.default};
     z-index: ${theme.zIndex(300)};
 
@@ -100,37 +101,35 @@ const TooltipCSS = css.resolve`
 const TooltipRoot = React.forwardRef<HTMLDivElement, TooltipProps>(
   ({ content, arrow, portal, side, sideOffset = 4, align, alignOffset, colorScheme, ...props }, ref) => {
     return (
-      <React.Fragment>
+      <TooltipPrimitive.Root {...props}>
         <ResolvedStyle>{TooltipCSS}</ResolvedStyle>
-        <TooltipPrimitive.Root {...props}>
-          <TooltipPrimitive.Trigger asChild>{props.children}</TooltipPrimitive.Trigger>
-          <TooltipContent ref={ref} {...{ arrow, portal, side, align, sideOffset, alignOffset, colorScheme }}>
-            {content}
-          </TooltipContent>
-        </TooltipPrimitive.Root>
-      </React.Fragment>
+        <TooltipPrimitive.Trigger asChild>{props.children}</TooltipPrimitive.Trigger>
+        <TooltipContent ref={ref} {...{ arrow, portal, side, align, sideOffset, alignOffset, colorScheme }}>
+          {content}
+        </TooltipContent>
+      </TooltipPrimitive.Root>
     );
   }
 ) as Tooltip;
 
 interface ITooltopContentProps {
   arrow?: boolean;
-  portal?: boolean;
+  portal?: Element | DocumentFragment | null | undefined;
   colorScheme?: 'dark' | 'light';
 }
 
 interface TooltipContentProps extends TooltipPrimitive.TooltipContentProps, ITooltopContentProps {}
 
 const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
-  ({ children, arrow = true, portal = true, align = 'center', side = 'top', colorScheme = 'dark', ...props }, ref) => {
-    const TooltipPortal = portal ? TooltipPrimitive.Portal : React.Fragment;
+  ({ children, portal, arrow = true, align = 'center', side = 'top', colorScheme = 'dark', ...props }, ref) => {
     return (
-      <TooltipPortal>
+      <TooltipPrimitive.Portal container={portal}>
         <TooltipPrimitive.Content ref={ref} side={side} className={clsx(TooltipCSS.className, 'content', colorScheme)} align={align} {...props}>
           {children}
           {arrow ? <TooltipArrow /> : null}
+          <ResolvedStyle>{TooltipCSS}</ResolvedStyle>
         </TooltipPrimitive.Content>
-      </TooltipPortal>
+      </TooltipPrimitive.Portal>
     );
   }
 );
