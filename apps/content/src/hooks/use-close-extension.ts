@@ -2,9 +2,8 @@ import { useCallback, useEffect } from 'react';
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 
-import { RECORDER_ROOT } from '../constants/layout';
 import { useDisposeEvents } from './use-dispose-events';
-
+import { closeExtension } from '../lib/utils';
 
 export function useCloseExtensionListener() {
   const handleDispose = useDisposeEvents();
@@ -12,13 +11,8 @@ export function useCloseExtensionListener() {
   const handleRuntimeMessage = useCallback(
     (message: RuntimeMessage) => {
       if (message.type === EventConfig.CloseExtension) {
-        window.__rekorder__ = false;
-        console.log('Closing extension: Disposing events');
         handleDispose();
-        console.log('Closing extension: Current listener removed');
-        chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
-        console.log('Closing extension: Removing root element');
-        document.getElementById(RECORDER_ROOT)?.remove();
+        closeExtension();
       }
     },
     [handleDispose]
@@ -27,10 +21,6 @@ export function useCloseExtensionListener() {
   useEffect(() => {
     if (import.meta.env.DEV) return;
     chrome.runtime.onMessage.addListener(handleRuntimeMessage);
-    
-    return () => {
-      chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
-      handleDispose();
-    };
-  }, [handleRuntimeMessage, handleDispose]);
+    return () => chrome.runtime.onMessage.removeListener(handleRuntimeMessage);
+  }, [handleRuntimeMessage]);
 }

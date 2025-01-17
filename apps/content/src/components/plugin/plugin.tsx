@@ -15,8 +15,7 @@ import { ScreenPlugin } from './screen';
 import { CameraPlugin } from './camera';
 
 import { recorder } from '../../store/recorder';
-import { framerMotionParentDOM } from '../../lib/utils';
-import { RECORDER_ROOT } from '../../constants/layout';
+import { closeExtension, framerMotionParentDOM } from '../../lib/utils';
 
 import { useDragControls } from '../../hooks/use-drag-controls';
 import { useDisposeEvents } from '../../hooks/use-dispose-events';
@@ -156,8 +155,7 @@ const PluginCard = observer(() => {
   const handleCloseExtension = () => {
     handleDisposeEvents();
     chrome.runtime.sendMessage({ type: EventConfig.CloseExtension });
-    window.__rekorder__ = false;
-    document.getElementById(RECORDER_ROOT)?.remove();
+    closeExtension();
   };
 
   return (
