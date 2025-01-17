@@ -2,10 +2,10 @@ import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
 import { Pause, Play, Trash } from '@phosphor-icons/react';
+import { ResolvedStyle, theme } from '@rekorder.io/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
-import { ResolvedStyle, theme } from '@rekorder.io/ui';
 
 import { framerMotionParentDOM } from '../../lib/utils';
 import { recorder } from '../../store/recorder';
@@ -120,6 +120,10 @@ const variants = {
 const transition = {
   type: 'spring',
   bounce: 0.3,
+  filter: {
+    type: 'spring',
+    bounce: 0,
+  },
 };
 
 export { ToolbarRecordingControls };
