@@ -22,7 +22,7 @@ const OverlayCSS = css.resolve`
 `;
 
 const Overlay = observer(() => {
-  if (recorder.status === 'active') {
+  if (recorder.status === 'active' || recorder.status === 'pending') {
     return null;
   }
 
