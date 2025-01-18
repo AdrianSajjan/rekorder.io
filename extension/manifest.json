@@ -20,7 +20,6 @@
         {
             "resources": [
                 "build/*",
-                "assets/*",
                 "icons/*"
             ],
             "matches": [
