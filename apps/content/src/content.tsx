@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
+import sonner from 'sonner/dist/styles.css?inline';
 
 import { observer } from 'mobx-react';
 import { Toaster } from 'sonner';
@@ -50,6 +51,7 @@ const Content = observer(() => {
 
   return (
     <ThemeProvider>
+      <style>{sonner}</style>
       <ResolvedStyle>{RecorderCSS}</ResolvedStyle>
       <section id="rekorder-area" className={clsx(RecorderCSS.className, 'rekorder-area')}>
         <Overlay />

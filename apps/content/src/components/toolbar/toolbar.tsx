@@ -7,6 +7,7 @@ import { Fragment } from 'react';
 import { DotsSixVertical } from '@phosphor-icons/react';
 import { Divider, ResolvedStyle, theme, Tooltip } from '@rekorder.io/ui';
 
+import { ToolbarDeviceControls } from './devices';
 import { ToolbarActionbarControls } from './actionbar';
 import { ToolbarRecordingControls } from './playback';
 import { useDragControls } from '../../hooks/use-drag-controls';
@@ -80,7 +81,7 @@ const PluginToolbar = observer(() => {
   return (
     <Fragment>
       <ResolvedStyle>{PluginToolbarCSS}</ResolvedStyle>
-      <Draggable nodeRef={drag.ref} bounds={drag.bounds} position={drag.position} onStop={drag.onChangePosition}>
+      <Draggable handle="#rekorder-toolbar-handle" nodeRef={drag.ref} bounds={drag.bounds} position={drag.position} onStop={drag.onChangePosition}>
         <article ref={drag.ref} id="rekorder-toolbar" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar')}>
           <Tooltip.Provider disableHoverableContent delayDuration={500}>
             <div id="rekorder-toolbar-handle" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')}>
@@ -92,6 +93,8 @@ const PluginToolbar = observer(() => {
             <ToolbarRecordingControls className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')} />
             <Divider orientation="vertical" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-divider')} />
             <ToolbarActionbarControls className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')} />
+            <Divider orientation="vertical" className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-divider')} />
+            <ToolbarDeviceControls className={clsx(PluginToolbarCSS.className, 'rekorder-toolbar-controls')} />
           </Tooltip.Provider>
         </article>
       </Draggable>

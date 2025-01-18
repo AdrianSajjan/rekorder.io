@@ -5,12 +5,13 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 
+import { unwrapError } from '@rekorder.io/utils';
 import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';
 import { Popover, PopoverContent, PopoverPortal, PopoverProps, PopoverTrigger } from '@radix-ui/react-popover';
 import { Eyedropper } from '@phosphor-icons/react';
-import { unwrapError } from '@rekorder.io/utils';
 
 import { shadowRootElementById } from '../../lib/utils';
+import colorful from '../../styles/react-colorful.css?inline';
 
 const ColorfulPickerCSS = css.global`
   #rekorder-colorful-picker .react-colorful {
@@ -56,6 +57,8 @@ const ColorPickerCSS = css.resolve`
 
   .rekorder-color-wheel {
     position: relative;
+    transform: scale(0.8);
+
     width: ${theme.space(32)};
     height: ${theme.space(32)};
 
@@ -70,21 +73,21 @@ const ColorPickerCSS = css.resolve`
     left: 50%;
     transform: translate(-50%, -50%);
 
-    width: ${theme.space(14)};
-    height: ${theme.space(14)};
-    border-radius: ${theme.space(14)};
-    border: 3px solid ${theme.alpha(theme.colors.core.white, 0.3)};
+    width: ${theme.space(15)};
+    height: ${theme.space(15)};
+    border-radius: ${theme.space(15)};
+    border: 3px solid ${theme.colors.accent.dark};
   }
 
   @media (prefers-color-scheme: light) {
     .rekorder-color-wheel {
-      box-shadow: ${theme.ring({ ring: { width: 3, color: theme.alpha(theme.colors.core.white, 0.3) } })};
+      border: 3px solid ${theme.colors.accent.dark};
     }
   }
 
   @media (prefers-color-scheme: dark) {
     .rekorder-color-wheel {
-      box-shadow: ${theme.ring({ ring: { width: 3, color: theme.alpha(theme.colors.core.white, 0.3) } })};
+      border: 3px solid ${theme.colors.accent.dark};
     }
   }
 
@@ -99,10 +102,12 @@ const ColorPickerCSS = css.resolve`
     left: 50%;
     transform: translate(-50%, -50%);
 
-    width: ${theme.space(10)};
-    height: ${theme.space(10)};
-    border-radius: ${theme.space(10)};
+    width: ${theme.space(9)};
+    height: ${theme.space(9)};
+    border-radius: ${theme.space(9)};
+
     background-color: ${theme.colors.core.jetblack};
+    outline: 3px solid ${theme.colors.accent.dark};
   }
 
   .rekorder-color-eyedropper:hover {
@@ -212,17 +217,11 @@ export function ColorPicker({ children, color, onChange, ...props }: ColorPicker
   return (
     <Popover open={isOpen} onOpenChange={setOpen} {...props}>
       <ResolvedStyle>{ColorPickerCSS}</ResolvedStyle>
-      <style>{ColorfulPickerCSS}</style>
       <PopoverTrigger asChild>
         <div id="color-picker-trigger">{children}</div>
       </PopoverTrigger>
       <PopoverPortal container={shadowRootElementById('rekorder-area')}>
-        <PopoverContent
-          side="top"
-          sideOffset={20}
-          className={clsx(ColorPickerCSS.className, 'rekorder-color-picker')}
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
+        <PopoverContent side="top" sideOffset={-83} className={clsx(ColorPickerCSS.className, 'rekorder-color-picker')} onOpenAutoFocus={(e) => e.preventDefault()}>
           <div className={clsx(ColorPickerCSS.className, 'rekorder-color-wheel')}>
             <button onClick={handleEyeDropperClick} className={clsx(ColorPickerCSS.className, 'rekorder-color-eyedropper')}>
               <Eyedropper size={18} color={theme.colors.core.white} weight="fill" />
@@ -234,22 +233,19 @@ export function ColorPicker({ children, color, onChange, ...props }: ColorPicker
               <PopoverPortal container={shadowRootElementById('rekorder-toolbar')}>
                 <PopoverContent
                   side="top"
-                  sideOffset={20}
+                  sideOffset={16}
                   id="rekorder-colorful-picker"
                   onOpenAutoFocus={(e) => e.preventDefault()}
                   className={clsx(ColorPickerCSS.className, 'rekorder-colorful-picker')}
                 >
+                  <style>{colorful}</style>
                   <HexColorPicker color={color} onChange={onChange} />
+                  <style>{ColorfulPickerCSS}</style>
                 </PopoverContent>
               </PopoverPortal>
             </Popover>
             {highlighters.map((highlighter) => (
-              <button
-                key={highlighter}
-                onClick={handleSwatchClick(highlighter)}
-                style={{ backgroundColor: highlighter }}
-                className={clsx(ColorPickerCSS.className, 'rekorder-color-swatch')}
-              />
+              <button key={highlighter} onClick={handleSwatchClick(highlighter)} style={{ backgroundColor: highlighter }} className={clsx(ColorPickerCSS.className, 'rekorder-color-swatch')} />
             ))}
           </div>
         </PopoverContent>
