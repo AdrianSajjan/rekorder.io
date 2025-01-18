@@ -180,6 +180,7 @@ const VideoPlayerCSS = css.resolve`
   .rekorder-video-player-time {
     font-size: 11px;
     font-weight: 400;
+    flex-shrink: 0;
     font-variant-numeric: tabular-nums;
 
     margin-left: ${theme.space(1.5)};

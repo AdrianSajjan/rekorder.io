@@ -12,7 +12,7 @@ interface SidebarBaseProps {
 
 const SidebarBase = observer(({ back, children }: SidebarBaseProps) => {
   return (
-    <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col ">
+    <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col">
       <div className="h-16 flex w-full items-center justify-start shrink-0 gap-1 px-5">
         <MotionConfig transition={transition}>
           <LayoutGroup>

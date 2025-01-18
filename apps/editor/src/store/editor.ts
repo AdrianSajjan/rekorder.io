@@ -8,6 +8,7 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
+import { Cropper } from './cropper';
 
 export type EditorStatus = 'idle' | 'pending' | 'initialized' | 'error';
 export type SidebarMode = 'default' | 'crop' | 'audio';
@@ -21,6 +22,7 @@ class Editor {
   element: HTMLVideoElement | null;
 
   ffmpeg: FFmpeg;
+  cropper: Cropper;
   original: Blob | null;
   modified: Blob | null;
 
@@ -42,6 +44,7 @@ class Editor {
     this.modified = null;
 
     this.ffmpeg = new FFmpeg();
+    this.cropper = new Cropper(this);
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
     this.__setupEvents();
@@ -153,17 +156,21 @@ class Editor {
     return new Blob([data.buffer], { type: 'video/mp4' });
   }
 
+  modifyRecording(blob: Blob) {
+    this.modified = blob;
+  }
+
   initializeElement(element: HTMLVideoElement) {
     this.element = element;
+  }
+
+  changeSidebar(sidebar: SidebarMode) {
+    this.sidebar = sidebar;
   }
 
   changeName(name: string) {
     this.name = name;
     this._saveNameOfflineDatabaseDebounced(name);
-  }
-
-  changeSidebar(sidebar: SidebarMode) {
-    this.sidebar = sidebar;
   }
 
   dispose() {
