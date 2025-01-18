@@ -5,7 +5,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
 
 import { useStateObserver } from '@rekorder.io/hooks';
-import { LayoutGroup, motion } from 'framer-motion';
+import { LayoutGroup, motion } from 'motion/react';
 import { isFunction } from 'lodash';
 
 import { theme } from '../../theme';
@@ -133,21 +133,14 @@ interface SegmentedControlRootProps extends Tabs.TabsProps {
   size?: 'small' | 'medium' | 'large';
 }
 
-const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRootProps>(
-  ({ className, orientation = 'horizontal', size = 'medium', ...props }, ref) => {
-    return (
-      <React.Fragment>
-        <ResolvedStyle>{SegmentedControlCSS}</ResolvedStyle>
-        <Tabs.Root
-          ref={ref}
-          orientation={orientation}
-          className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control', orientation, size, className)}
-          {...props}
-        />
-      </React.Fragment>
-    );
-  }
-) as SegmenedControl;
+const SegmentedControlRoot = React.forwardRef<HTMLDivElement, SegmentedControlRootProps>(({ className, orientation = 'horizontal', size = 'medium', ...props }, ref) => {
+  return (
+    <React.Fragment>
+      <ResolvedStyle>{SegmentedControlCSS}</ResolvedStyle>
+      <Tabs.Root ref={ref} orientation={orientation} className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control', orientation, size, className)} {...props} />
+    </React.Fragment>
+  );
+}) as SegmenedControl;
 
 const SegmentedControlList = React.forwardRef<HTMLDivElement, Tabs.TabsListProps>(({ className, ...props }, ref) => {
   const id = React.useId();
@@ -184,9 +177,7 @@ const SegmentedControlTrigger = React.forwardRef<HTMLButtonElement, Tabs.TabsTri
   return (
     <Tabs.Trigger ref={handleAssignRefs} className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-trigger', className)} {...props}>
       <div className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-trigger-content')}>{children}</div>
-      {state === 'active' ? (
-        <motion.div layoutId="rekorder-segmented-controls-indicator" className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-indicator')} />
-      ) : null}
+      {state === 'active' ? <motion.div layoutId="rekorder-segmented-controls-indicator" className={clsx(SegmentedControlCSS.className, 'rekorder-segmented-control-indicator')} /> : null}
     </Tabs.Trigger>
   );
 });

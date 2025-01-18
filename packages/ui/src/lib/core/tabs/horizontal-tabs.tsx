@@ -5,7 +5,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 import * as React from 'react';
 
 import { isFunction } from 'lodash';
-import { LayoutGroup, motion } from 'framer-motion';
+import { LayoutGroup, motion } from 'motion/react';
 import { useStateObserver } from '@rekorder.io/hooks';
 
 import { theme } from '../../theme';
@@ -159,9 +159,7 @@ const HorizontalTabsTrigger = React.forwardRef<HTMLButtonElement, Tabs.TabsTrigg
   return (
     <Tabs.Trigger ref={handleAssignRefs} className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-trigger', className)} {...props}>
       <div className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-trigger-content')}>{children}</div>
-      {state === 'active' ? (
-        <motion.div layoutId="rekorder-segmented-controls-indicator" className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-indicator')} />
-      ) : null}
+      {state === 'active' ? <motion.div layoutId="rekorder-segmented-controls-indicator" className={clsx(HorizontalTabsCSS.className, 'rekorder-horizontal-tabs-indicator')} /> : null}
     </Tabs.Trigger>
   );
 });

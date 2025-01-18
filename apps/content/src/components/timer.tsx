@@ -3,7 +3,7 @@ import css from 'styled-jsx/css';
 
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'motion/react';
 
 import { useCountdown } from '@rekorder.io/hooks';
 import { animations, ResolvedStyle, theme } from '@rekorder.io/ui';

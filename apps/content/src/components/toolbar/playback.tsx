@@ -3,11 +3,11 @@ import css from 'styled-jsx/css';
 
 import { Pause, Play, Trash } from '@phosphor-icons/react';
 import { ResolvedStyle, theme } from '@rekorder.io/ui';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { observer } from 'mobx-react';
 import { Fragment } from 'react/jsx-runtime';
 
-import { framerMotionParentDOM } from '../../lib/utils';
+import { framerMotionRoot } from '../../lib/utils';
 import { recorder } from '../../store/recorder';
 import { ToolbarAction } from '../ui/toolbar-action';
 
@@ -70,7 +70,7 @@ const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivEl
 const ToolbarRecorderTimer = observer(() => {
   return (
     <div className={clsx(RecordControlCSS.className, 'rekorder-timer-container')}>
-      <AnimatePresence initial={false} mode="popLayout" parentDom={framerMotionParentDOM()}>
+      <AnimatePresence initial={false} mode="popLayout" root={framerMotionRoot()}>
         {recorder.time.split('').map((t, i) => (
           <motion.div key={t + i} variants={variants} initial="initial" animate="animate" exit="exit" transition={transition} className={clsx(RecordControlCSS.className, 'rekorder-timer-time')}>
             {t}

@@ -9,11 +9,13 @@ import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
 
-type EditorStatus = 'idle' | 'pending' | 'initialized' | 'error';
+export type EditorStatus = 'idle' | 'pending' | 'initialized' | 'error';
+export type SidebarMode = 'default' | 'crop' | 'audio';
 
 class Editor {
   name: string;
   status: EditorStatus;
+  sidebar: SidebarMode;
   video: BlobStorage | null;
 
   ffmpeg: FFmpeg;
@@ -30,6 +32,7 @@ class Editor {
   constructor() {
     this.name = '';
     this.status = 'idle';
+    this.sidebar = 'default';
 
     this.video = null;
     this.original = null;
@@ -141,9 +144,13 @@ class Editor {
     return new Blob([data.buffer], { type: 'video/mp4' });
   }
 
-  updateName(name: string) {
+  changeName(name: string) {
     this.name = name;
     this._saveNameOfflineDatabaseDebounced(name);
+  }
+
+  changeSidebar(sidebar: SidebarMode) {
+    this.sidebar = sidebar;
   }
 
   dispose() {

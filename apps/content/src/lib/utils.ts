@@ -16,7 +16,7 @@ export function shadowRootElementById(id: string) {
   return root.shadowRoot.getElementById(id);
 }
 
-export function framerMotionParentDOM() {
+export function framerMotionRoot() {
   const root = document.getElementById(RECORDER_ROOT);
   if (!root || !root.shadowRoot) return document.head;
   return root.shadowRoot;

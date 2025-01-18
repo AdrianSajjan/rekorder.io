@@ -4,7 +4,7 @@ import Draggable from 'react-draggable';
 
 import { observer } from 'mobx-react';
 import { Fragment, useState } from 'react';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'motion/react';
 
 import { DotsThree, QuestionMark, X } from '@phosphor-icons/react';
 import { EventConfig } from '@rekorder.io/constants';
@@ -15,7 +15,7 @@ import { ScreenPlugin } from './screen';
 import { CameraPlugin } from './camera';
 
 import { recorder } from '../../store/recorder';
-import { closeExtension, framerMotionParentDOM } from '../../lib/utils';
+import { closeExtension, framerMotionRoot } from '../../lib/utils';
 
 import { useDragControls } from '../../hooks/use-drag-controls';
 import { useDisposeEvents } from '../../hooks/use-dispose-events';
@@ -185,7 +185,7 @@ const PluginCard = observer(() => {
                 <HorizontalTabs.Trigger value="audio">Audio</HorizontalTabs.Trigger>
               </HorizontalTabs.List>
               <AnimateHeight className={clsx(PluginCardCSS.className, 'rekorder-horizontal-panel')}>
-                <AnimatePresence mode="popLayout" initial={false} custom={direction} parentDom={framerMotionParentDOM()}>
+                <AnimatePresence mode="popLayout" initial={false} custom={direction} root={framerMotionRoot()}>
                   <motion.div
                     key={tab}
                     exit="exit"
