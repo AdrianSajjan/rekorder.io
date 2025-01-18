@@ -25,13 +25,13 @@ export function PremiumFeatureDialog({ children, ...props }: Dialog.DialogProps)
       <Dialog.Portal>
         <Dialog.Overlay
           className={cn(
-            'fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm',
+            'fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-sm ease-out',
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
           )}
         >
           <Dialog.Content
             className={cn(
-              'relative w-full max-w-md rounded-2xl bg-card-background shadow-sm focus:outline-none px-8 py-7',
+              'relative w-full max-w-md rounded-2xl bg-card-background shadow-sm focus:outline-none px-8 py-7 ease-out',
               'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95'
             )}
           >

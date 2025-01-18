@@ -16,7 +16,9 @@ class Editor {
   name: string;
   status: EditorStatus;
   sidebar: SidebarMode;
+
   video: BlobStorage | null;
+  element: HTMLVideoElement | null;
 
   ffmpeg: FFmpeg;
   original: Blob | null;
@@ -35,6 +37,7 @@ class Editor {
     this.sidebar = 'default';
 
     this.video = null;
+    this.element = null;
     this.original = null;
     this.modified = null;
 
@@ -148,6 +151,10 @@ class Editor {
 
     const data = output as Uint8Array;
     return new Blob([data.buffer], { type: 'video/mp4' });
+  }
+
+  initializeElement(element: HTMLVideoElement) {
+    this.element = element;
   }
 
   changeName(name: string) {

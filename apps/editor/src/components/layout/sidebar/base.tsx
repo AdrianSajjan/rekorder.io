@@ -12,8 +12,8 @@ interface SidebarBaseProps {
 
 const SidebarBase = observer(({ back, children }: SidebarBaseProps) => {
   return (
-    <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col px-5">
-      <div className="h-16 flex w-full items-center justify-start shrink-0 gap-2">
+    <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col ">
+      <div className="h-16 flex w-full items-center justify-start shrink-0 gap-1 px-5">
         <MotionConfig transition={transition}>
           <LayoutGroup>
             <AnimatePresence mode="popLayout">
@@ -31,7 +31,7 @@ const SidebarBase = observer(({ back, children }: SidebarBaseProps) => {
           </LayoutGroup>
         </MotionConfig>
       </div>
-      {children}
+      <div className="relative overflow-x-hidden">{children}</div>
     </aside>
   );
 });
@@ -43,7 +43,7 @@ const variants = {
   },
   initial: {
     opacity: 0,
-    scale: 0.3,
+    scale: 0.4,
   },
   animate: {
     opacity: 1,

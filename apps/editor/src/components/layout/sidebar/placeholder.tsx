@@ -3,7 +3,7 @@ import { SidebarBase } from './base';
 export function SidebarPlaceholder() {
   return (
     <SidebarBase>
-      <div className="flex flex-col gap-8 py-6 shrink-0">
+      <div className="flex flex-col gap-8 py-6 px-5 shrink-0">
         {Array.from({ length: 3 }, (_, key) => {
           return (
             <div className="flex flex-col gap-3" key={key}>

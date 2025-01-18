@@ -1,0 +1,16 @@
+export function CropIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <g>
+        <path fillRule="evenodd" clipRule="evenodd" d="M8 17H6C4.89543 17 4 16.1046 4 15V6C4 4.89543 4.89543 4 6 4H15C16.1046 4 17 4.89543 17 6V8H8V17Z" fill="white" />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M8 17H6C4.89543 17 4 16.1046 4 15V6C4 4.89543 4.89543 4 6 4H15C16.1046 4 17 4.89543 17 6V8H16.5V6C16.5 5.17157 15.8284 4.5 15 4.5H6C5.17157 4.5 4.5 5.17157 4.5 6V15C4.5 15.8284 5.17157 16.5 6 16.5H8V17Z"
+          fill="#2563EB"
+          fillOpacity="1"
+        />
+      </g>
+    </svg>
+  );
+}
