@@ -7,7 +7,7 @@ export const Route = createFileRoute('/')({
 
     switch (authentication.status) {
       case 'authenticated':
-        return redirect({ to: '/dashboard/home' });
+        return redirect({ to: '/dashboard/library' });
 
       case 'unauthenticated':
         return redirect({ to: '/auth/login' });

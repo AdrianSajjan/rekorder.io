@@ -2,27 +2,27 @@ import { ChartDonut, GearSix, MonitorPlay, ShareFat } from '@phosphor-icons/reac
 
 export const navigations = [
   {
-    icon: ChartDonut,
-    label: 'Dashboard',
-    value: 'dashboard',
-    href: '/',
-  },
-  {
     icon: MonitorPlay,
     label: 'My Library',
     value: 'library',
-    href: '/library',
+    href: '/dashboard/library',
+  },
+  {
+    icon: ChartDonut,
+    label: 'Analytics',
+    value: 'analytics',
+    href: '/dashboard/analytics',
   },
   {
     icon: ShareFat,
     label: 'Shared Videos',
     value: 'shared',
-    href: '/shared',
+    href: '/dashboard/shared',
   },
   {
     icon: GearSix,
     label: 'Settings',
     value: 'settings',
-    href: '/settings',
+    href: '/dashboard/settings',
   },
 ];

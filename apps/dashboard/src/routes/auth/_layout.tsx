@@ -51,7 +51,7 @@ function AuthenticationLayout() {
         <main className="h-screen w-screen flex items-center justify-center p-8">
           <Spinner size={32} color={theme.colors.primary.main} />
           <p className="text-sm text-card-text font-medium mt-2">Initializing your dashboard...</p>
-          <Navigate to="/dashboard/home" />
+          <Navigate to="/dashboard/library" />
         </main>
       );
   }

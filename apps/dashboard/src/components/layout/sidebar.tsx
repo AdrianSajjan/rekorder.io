@@ -1,5 +1,6 @@
 import { Fragment } from 'react/jsx-runtime';
 import { CaretDown, CaretLeft, CaretUp, Icon, ListChecks } from '@phosphor-icons/react';
+import { Link, useLocation } from '@tanstack/react-router';
 import { Brand, Button } from '@rekorder.io/ui';
 import { cn } from '@rekorder.io/utils';
 
@@ -36,10 +37,12 @@ export function Sidebar() {
 }
 
 function SidebarNavigation({ mode }: { mode: SidebarMode }) {
+  const pathname = useLocation({ select: (state) => state.pathname });
+
   return (
     <nav className={cn('flex flex-col gap-1.5 py-6', mode === 'expanded' ? 'items-start' : 'items-center')}>
       {navigations.map((navigation) => (
-        <SidebarItem key={navigation.href} mode={mode} {...navigation} />
+        <SidebarItem key={navigation.href} mode={mode} active={pathname.includes(navigation.href)} {...navigation} />
       ))}
     </nav>
   );
@@ -47,18 +50,9 @@ function SidebarNavigation({ mode }: { mode: SidebarMode }) {
 
 function SidebarProfile({ mode }: { mode: SidebarMode }) {
   return (
-    <button
-      className={cn(
-        'flex items-center gap-3 hover:bg-background-main/70 rounded-b-lg transition-colors w-full',
-        mode === 'expanded' ? 'pl-4 py-3 pr-5' : 'p-3'
-      )}
-    >
+    <button className={cn('flex items-center gap-3 hover:bg-background-main/70 rounded-b-lg transition-colors w-full', mode === 'expanded' ? 'pl-4 py-3 pr-5' : 'p-3')}>
       <div className={cn('border-2 border-accent-light p-1 rounded-full', mode === 'expanded' ? 'h-12 w-12' : 'h-11 w-11 mx-auto')}>
-        <img
-          src="https://1.gravatar.com/avatar/f95d1d8685c31a02f6129d0976e73c06170ed0b919d612e84d1f8cab544c8e0e?size=256"
-          alt="Adrian Sajjan"
-          className="h-full w-full rounded-full"
-        />
+        <img src="https://1.gravatar.com/avatar/f95d1d8685c31a02f6129d0976e73c06170ed0b919d612e84d1f8cab544c8e0e?size=256" alt="Adrian Sajjan" className="h-full w-full rounded-full" />
       </div>
       {mode === 'expanded' ? (
         <Fragment>
@@ -78,12 +72,7 @@ function SidebarProfile({ mode }: { mode: SidebarMode }) {
 function SidebarChecklist({ mode }: { mode: SidebarMode }) {
   return (
     <div className={cn('py-5 mt-auto flex flex-col gap-3', mode === 'expanded' ? 'items-start' : 'items-center')}>
-      <Button
-        color="accent"
-        variant="outline"
-        size={mode === 'expanded' ? 'medium' : 'icon'}
-        className="w-full !bg-card-background hover:!bg-background-light !gap-2"
-      >
+      <Button color="accent" variant="outline" size={mode === 'expanded' ? 'medium' : 'icon'} className="w-full !bg-card-background hover:!bg-background-light !gap-2">
         <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png" alt="Chrome" className="h-6 w-auto shrink-0" />
         {mode === 'expanded' ? <span>Install chrome extension</span> : null}
       </Button>
@@ -126,10 +115,9 @@ interface SidebarItemProps {
 
 function SidebarItem({ icon: Icon, label, href, active, mode }: SidebarItemProps) {
   const weight = active ? 'fill' : 'regular';
-
   return (
-    <a
-      href={href}
+    <Link
+      to={href}
       className={cn(
         'inline-flex items-center gap-2 h-10 rounded-lg text-sm font-medium transition-colors',
         active ? 'text-primary-dark bg-primary-light/10 hover:bg-primary-light/10' : 'text-background-text bg-background-light hover:bg-background-main/70',
@@ -138,6 +126,6 @@ function SidebarItem({ icon: Icon, label, href, active, mode }: SidebarItemProps
     >
       <Icon size={20} weight={weight} />
       {mode === 'expanded' ? <span className="leading-relaxed">{label}</span> : null}
-    </a>
+    </Link>
   );
 }

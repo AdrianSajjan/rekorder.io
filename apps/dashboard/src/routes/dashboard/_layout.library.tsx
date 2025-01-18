@@ -2,11 +2,11 @@ import { VideoCamera } from '@phosphor-icons/react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Button, SegmentedControl } from '@rekorder.io/ui';
 
-export const Route = createFileRoute('/dashboard/_layout/home')({
-  component: HomePage,
+export const Route = createFileRoute('/dashboard/_layout/library')({
+  component: LibraryPage,
 });
 
-function HomePage() {
+function LibraryPage() {
   return (
     <div className="container w-full max-w-screen-xl mx-auto h-full">
       <div className="flex items-center w-full pt-10 gap-5">

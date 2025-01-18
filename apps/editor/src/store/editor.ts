@@ -59,7 +59,9 @@ class Editor {
   }
 
   private async __initializeFFmpeg() {
-    this.status = 'pending';
+    runInAction(() => {
+      this.status = 'pending';
+    });
     try {
       const base = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm';
       await this.ffmpeg.load({
@@ -67,9 +69,13 @@ class Editor {
         coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'application/javascript'),
         workerURL: await toBlobURL(`${base}/ffmpeg-core.worker.js`, 'text/javascript'),
       });
-      this.status = 'initialized';
+      runInAction(() => {
+        this.status = 'initialized';
+      });
     } catch (error) {
-      this.status = 'error';
+      runInAction(() => {
+        this.status = 'error';
+      });
       console.log('Failed to initialize FFmpeg', error);
     }
   }
