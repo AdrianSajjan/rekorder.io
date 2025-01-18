@@ -4,15 +4,14 @@ import { useEffect, useState } from 'react';
 
 import { editor } from '../store/editor';
 import { Sidebar } from './layout/sidebar';
+import { Header } from './layout/header';
 
 const OfflineEditor = observer(() => {
   return (
     <div className="h-screen w-screen bg-background-light flex">
       <Sidebar />
       <section className="flex-1 flex flex-col">
-        <header className="h-16 bg-card-background shrink-0 border-b border-borders-input flex items-center justify-center">
-          <input value={editor.name} onChange={(event) => editor.updateName(event.target.value)} className="text-center text-base font-medium w-96 rounded-md" />
-        </header>
+        <Header />
         <main className="flex-1 grid place-items-center p-10">
           <div className="h-auto w-full max-w-4xl relative">
             <Player blob={editor.recording} />
