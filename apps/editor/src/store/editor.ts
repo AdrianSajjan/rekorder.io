@@ -74,18 +74,14 @@ class Editor {
       this.status = 'pending';
     });
     try {
-      await this.ffmpeg.load({
-        coreURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.js' : chrome.runtime.getURL('build/vendor/ffmpeg/core.js'),
-        wasmURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.wasm' : chrome.runtime.getURL('build/vendor/ffmpeg/core.wasm'),
-      });
+      await this.initializeFFmpeg();
       runInAction(() => {
         this.status = 'initialized';
       });
-    } catch (error) {
+    } catch {
       runInAction(() => {
         this.status = 'error';
       });
-      console.log('Failed to initialize FFmpeg', error);
     }
   }
 
@@ -147,6 +143,13 @@ class Editor {
 
   static createInstance() {
     return new Editor();
+  }
+
+  async initializeFFmpeg() {
+    await this.ffmpeg.load({
+      coreURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.js' : chrome.runtime.getURL('build/vendor/ffmpeg/core.js'),
+      wasmURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.wasm' : chrome.runtime.getURL('build/vendor/ffmpeg/core.wasm'),
+    });
   }
 
   async convertToMP4() {

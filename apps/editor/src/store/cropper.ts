@@ -30,6 +30,7 @@ export class Cropper {
   originalDimensions: Pick<CropCoordinates, 'width' | 'height'>;
 
   private _editor: Editor;
+  private _controller: AbortController | null;
   private _ffmpegProgressHandler = this.__ffmpegProgressHandler.bind(this);
 
   constructor(editor: Editor) {
@@ -41,6 +42,7 @@ export class Cropper {
     this.originalDimensions = { width: 0, height: 0 };
 
     this._editor = editor;
+    this._controller = null;
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -57,24 +59,33 @@ export class Cropper {
   }
 
   private __ffmpegProgressHandler(event: ProgressEvent) {
-    this.progress = Math.round(event.progress * 100);
+    this.progress = Math.min(Math.round(event.progress * 100), 100);
   }
 
   async crop() {
+    this._controller = new AbortController();
     const { x, y, width, height } = this.coordinates;
     this._editor.ffmpeg.on('progress', this._ffmpegProgressHandler);
     runInAction(() => (this.status = 'processing'));
 
     try {
       const input = await fetchFile(this._editor.recordingOrThrow);
-      this._editor.ffmpeg.writeFile('input.webm', input);
+      await this._editor.ffmpeg.writeFile('input.webm', input);
 
-      await this._editor.ffmpeg.exec(['-i', 'input.webm', '-filter:v', `crop=${width}:${height}:${x}:${y}`, '-c:v', 'libvpx', '-crf', '10', '-b:v', '0', '-c:a', 'libvorbis', 'output.webm']);
+      const status = await this._editor.ffmpeg.exec(
+        ['-i', 'input.webm', '-filter:v', `crop=${width}:${height}:${x}:${y}`, '-c:v', 'libvpx', '-crf', '10', '-b:v', '0', '-c:a', 'libvorbis', 'output.webm'],
+        60 * 60 * 1000, // 60 minutes
+        { signal: this._controller.signal }
+      );
+
       const output = await this._editor.ffmpeg.readFile('output.webm');
       const data = output as Uint8Array;
 
+      if (status !== 0) throw new Error('Oops, something went wrong while cropping the video!');
+      this._controller.signal.throwIfAborted();
+
       runInAction(() => (this.status = 'completed'));
-      wait(1000).then(() => runInAction(() => (this.status = 'idle')));
+      wait(1500).then(() => runInAction(() => (this.status = 'idle')));
 
       this._editor.elementOrThrow.addEventListener(
         'loadeddata',
@@ -93,12 +104,18 @@ export class Cropper {
       this._editor.modifyRecording(blob);
     } catch (error) {
       runInAction(() => (this.status = 'error'));
-      wait(1000).then(() => runInAction(() => (this.status = 'idle')));
+      wait(1500).then(() => runInAction(() => (this.status = 'idle')));
       throw error;
     } finally {
       runInAction(() => (this.progress = 0));
       this._editor.ffmpeg.off('progress', this._ffmpegProgressHandler);
     }
+  }
+
+  abort() {
+    if (this._controller) this._controller.abort();
+    this._editor.ffmpeg.terminate();
+    this._editor.initializeFFmpeg();
   }
 
   initializePosition(position: CropPosition) {

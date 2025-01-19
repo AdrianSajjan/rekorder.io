@@ -1,13 +1,14 @@
-import { ChangeEvent } from 'react';
 import { observer } from 'mobx-react';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
+import { ChangeEvent } from 'react';
+import { toast } from 'sonner';
 
-import { CheckCircle, Pause, Play } from '@phosphor-icons/react';
+import { CheckCircle, Pause, Play, XCircle } from '@phosphor-icons/react';
 import { Slider, SliderRange, SliderThumb, SliderTrack } from '@radix-ui/react-slider';
 
-import { Button, Input } from '@rekorder.io/ui';
 import { useVideoControls } from '@rekorder.io/hooks';
-import { formatSecondsToMMSS } from '@rekorder.io/utils';
+import { Button, Input } from '@rekorder.io/ui';
+import { cn, formatSecondsToMMSS, unwrapError } from '@rekorder.io/utils';
 
 import { editor } from '../../../store/editor';
 import { MINIMUM_CROP_SIZE } from '../../../constants/crop';
@@ -38,6 +39,13 @@ const CropSidebar = observer(() => {
 
   const handleSeekVideo = ([value]: [number]) => {
     handleSeek(value);
+  };
+
+  const handleCropVideo = () => {
+    editor.cropper.crop().catch((error) => {
+      const message = unwrapError(error, 'Oops, something went wrong while cropping the video!');
+      toast.error(message.includes('abort') ? 'The process was aborted by the user' : message);
+    });
   };
 
   return (
@@ -74,28 +82,27 @@ const CropSidebar = observer(() => {
             />
           </div>
         </div>
-        <div className="mt-6">
+        <div className="mt-6 relative overflow-hidden">
           <button
-            onClick={editor.cropper.crop}
+            onClick={handleCropVideo}
             disabled={editor.cropper.status !== 'idle'}
-            className="h-10 w-full rounded-[0.62rem] bg-primary-main text-sm font-medium text-primary-text relative overflow-hidden hover:bg-primary-dark disabled:pointer-events-none disabled:bg-background-main transition-colors duration-300"
+            className={cn('h-10 w-full rounded-[0.62rem] text-sm font-medium text-primary-text relative overflow-hidden disabled:pointer-events-none transition-colors duration-300', {
+              'bg-success-main': editor.cropper.status === 'completed',
+              'bg-destructive-main': editor.cropper.status === 'error',
+              'bg-background-dark': editor.cropper.status === 'processing',
+              'bg-primary-main hover:bg-primary-dark': editor.cropper.status === 'idle',
+            })}
           >
             <MotionConfig transition={{ duration: 0.5, type: 'spring' }}>
               <AnimatePresence initial={false} mode="popLayout">
-                <motion.div
-                  className="relative z-10 h-full w-full flex items-center px-4"
-                  key={editor.cropper.status}
-                  initial={{ y: 40, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -40, opacity: 0 }}
-                >
+                <motion.div className="relative z-10 h-full w-full flex items-center px-4" key={editor.cropper.status} initial="initial" animate="animate" exit="exit" variants={variants}>
                   <CropButtonContent status={editor.cropper.status} progress={editor.cropper.progress} />
                 </motion.div>
               </AnimatePresence>
               <AnimatePresence initial={false}>
-                {editor.cropper.status !== 'idle' ? (
+                {editor.cropper.status === 'processing' ? (
                   <motion.div
-                    exit={{ y: 40, opacity: 0 }}
+                    exit={variants.exit}
                     animate={{ width: editor.cropper.status === 'processing' ? editor.cropper.progress + '%' : '100%' }}
                     className="z-0 absolute top-0 left-0 h-full bg-success-main"
                   />
@@ -103,6 +110,13 @@ const CropSidebar = observer(() => {
               </AnimatePresence>
             </MotionConfig>
           </button>
+          <AnimatePresence>
+            {editor.cropper.status === 'processing' ? (
+              <motion.button exit="exit" initial="initial" animate="animate" variants={variants} className="group absolute top-0 left-0 h-10 px-4 flex items-center" onClick={editor.cropper.abort}>
+                <span className="text-xs text-text-dark group-hover:underline">Cancel</span>
+              </motion.button>
+            ) : null}
+          </AnimatePresence>
         </div>
       </div>
       <div className="flex flex-col">
@@ -110,7 +124,7 @@ const CropSidebar = observer(() => {
           <h3 className="text-sm font-semibold">Video Controls</h3>
           <p className="text-text-muted text-xs leading-normal">Control the video playback state from here for more precise cropping and resizing</p>
         </div>
-        <div className="flex items-center gap-4 mt-5">
+        <div className="flex items-center gap-4 mt-6 relative">
           <Button size="icon" variant="outline" color="accent" onClick={handleTogglePlayback}>
             {controls.playing ? <Pause weight="fill" /> : <Play weight="fill" />}
           </Button>
@@ -135,10 +149,26 @@ const CropButtonContent = observer(({ status, progress }: { status: CropStatus; 
     case 'idle':
       return <div className="mx-auto">Crop Video</div>;
     case 'processing':
-      return <div className="ml-auto text-text-dark">{progress}%</div>;
+      return <div className="ml-auto text-text-dark text-xs">{progress}%</div>;
     case 'completed':
       return <CheckCircle size={24} weight="regular" className="mx-auto" />;
+    case 'error':
+      return <XCircle size={24} weight="regular" className="mx-auto" />;
   }
 });
+const variants = {
+  initial: {
+    y: 40,
+    opacity: 0,
+  },
+  animate: {
+    y: 0,
+    opacity: 1,
+  },
+  exit: {
+    y: -40,
+    opacity: 0,
+  },
+};
 
 export { CropSidebar };

@@ -11,6 +11,15 @@ interface SidebarBaseProps {
 }
 
 const SidebarBase = observer(({ back, children }: SidebarBaseProps) => {
+  const handleBack = () => {
+    switch (editor.sidebar) {
+      case 'crop':
+        if (editor.cropper.status === 'processing') editor.cropper.abort();
+        break;
+    }
+    editor.changeSidebar('default');
+  };
+
   return (
     <aside className="h-screen overflow-auto w-96 shrink-0 bg-card-background border-r border-borders-input flex flex-col">
       <div className="h-16 flex w-full items-center justify-start shrink-0 gap-1 px-5">
@@ -19,7 +28,7 @@ const SidebarBase = observer(({ back, children }: SidebarBaseProps) => {
             <AnimatePresence mode="popLayout">
               {back ? (
                 <motion.div layout variants={variants} initial="initial" animate="animate" exit="exit">
-                  <Button size="icon" variant="ghost" color="accent" className="!rounded-full !h-8 !w-8 !-ml-2.5 " onClick={() => editor.changeSidebar('default')}>
+                  <Button size="icon" variant="ghost" color="accent" className="!rounded-full !h-8 !w-8 !-ml-2.5 " onClick={handleBack}>
                     <CaretLeft weight="bold" size={18} />
                   </Button>
                 </motion.div>
