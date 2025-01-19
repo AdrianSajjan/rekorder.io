@@ -12,7 +12,9 @@
     "host_permissions": [
         "<all_urls>"
     ],
-    "action": {},
+    "action": {
+        "default_icon": "icons/icon48.png"
+    },
     "background": {
         "service_worker": "build/background.js"
     },
@@ -27,6 +29,10 @@
             ]
         }
     ],
+    "content_security_policy": {
+        "sandbox": "sandbox allow-scripts allow-modals allow-popups; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; object-src 'self';worker-src 'self' blob: ;",
+        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; media-src 'self' data: blob: *;"
+    },
     "permissions": [
         "tabs",
         "storage",
@@ -35,7 +41,7 @@
         "activeTab",
         "tabCapture",
         "webNavigation",
-        "downloads"
+        "unlimitedStorage"
     ],
     "externally_connectable": {
         "matches": [
@@ -43,9 +49,5 @@
             "http://localhost:4200/*"
         ],
         "accept_tls_channel_id": true
-    },
-    "content_security_policy": {
-        "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';",
-        "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; child-src 'self';"
     }
 }

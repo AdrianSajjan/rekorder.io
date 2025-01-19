@@ -59,7 +59,7 @@ const ToolbarRecordingControls = observer((props: React.HTMLAttributes<HTMLDivEl
         </ToolbarAction>
         <ToolbarRecorderTimer />
         <ToolbarRecorderPlayPause />
-        <ToolbarAction tooltip="Discard recording" disabled={disabled.includes(recorder.status)}>
+        <ToolbarAction tooltip="Discard recording" onClick={recorder.discardScreenCapture} disabled={disabled.includes(recorder.status)}>
           <Trash size={16} weight="bold" />
         </ToolbarAction>
       </div>

@@ -22,14 +22,16 @@ import { SAFE_AREA_PADDING_SMALL } from './constants/layout';
 const RecorderCSS = css.resolve`
   * {
     margin: 0;
-    box-sizing: border-box;
     padding: 0;
+    box-sizing: border-box;
   }
 
   .rekorder-area {
     inset: 0;
     opacity: 0;
     position: fixed;
+    pointer-events: none;
+
     z-index: ${theme.zIndex(1)};
     animation: ${animations['fade-in']} cubic-bezier(0.2, 0.5, 0.1, 0.8) 150ms forwards;
   }

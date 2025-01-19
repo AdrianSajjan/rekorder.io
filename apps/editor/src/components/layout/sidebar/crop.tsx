@@ -1,8 +1,10 @@
 import { ChangeEvent } from 'react';
 import { observer } from 'mobx-react';
-import { CheckCircle } from '@phosphor-icons/react';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
+
+import { CheckCircle } from '@phosphor-icons/react';
 import { Input } from '@rekorder.io/ui';
+import { Slider, SliderRange, SliderThumb, SliderTrack } from '@radix-ui/react-slider';
 
 import { MINIMUM_CROP_SIZE } from '../../../constants/crop';
 import { CropCoordinates, CropStatus } from '../../../store/cropper';
@@ -34,7 +36,9 @@ const CropSidebar = observer(() => {
       <div className="flex flex-col">
         <div className="space-y-0.5">
           <h3 className="text-sm font-semibold">Crop Video</h3>
-          <p className="text-text-muted text-xs leading-normal">Cropping a video may take some time, please be patient while we process your video</p>
+          <p className="text-text-muted text-xs leading-normal">
+            Cropping a video may take some time, please be patient while we process your video. Switch to our cloud editor to crop your video faster.
+          </p>
         </div>
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div className="space-y-px">
@@ -96,6 +100,14 @@ const CropSidebar = observer(() => {
         <div className="space-y-0.5">
           <h3 className="text-sm font-semibold">Video Controls</h3>
           <p className="text-text-muted text-xs leading-normal">Control the video playback state from here for more precise cropping and resizing</p>
+        </div>
+        <div className="bg-red w-full">
+          <Slider>
+            <SliderTrack>
+              <SliderRange />
+            </SliderTrack>
+            <SliderThumb />
+          </Slider>
         </div>
       </div>
     </div>

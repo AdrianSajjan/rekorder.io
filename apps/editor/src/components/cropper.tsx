@@ -7,12 +7,11 @@ import { editor } from '../store/editor';
 import { MINIMUM_CROP_SIZE } from '../constants/crop';
 
 const Cropper = observer(() => {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null!);
 
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   const handleResize = useCallback(() => {
-    if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     setDimensions({ width: rect.width, height: rect.height });
     editor.cropper.initializePosition({ top: 0, left: 0, bottom: rect.height, right: rect.width });
@@ -23,11 +22,11 @@ const Cropper = observer(() => {
     const rect = node.getBoundingClientRect();
     setDimensions({ width: rect.width, height: rect.height });
     editor.cropper.initializePosition({ top: 0, left: 0, bottom: rect.height, right: rect.width });
+    ref.current = node;
   }, []);
 
   useEffect(() => {
     const element = ref.current;
-    if (!element) return;
     const observer = new ResizeObserver(handleResize);
     observer.observe(element);
     return () => observer.disconnect();

@@ -233,7 +233,7 @@ class OffscreenRecorder {
     const combined = [...this.video.getVideoTracks(), ...(this.audio ? this.audio.getAudioTracks() : []), ...(this.captureDeviceAudio ? this.video.getAudioTracks() : [])];
 
     this.stream = new MediaStream(combined);
-    this.recorder = new MediaRecorder(this.stream, { mimeType });
+    this.recorder = new MediaRecorder(this.stream, { mimeType, videoBitsPerSecond: 1000000, audioBitsPerSecond: 128000 });
 
     this.recorder.addEventListener('stop', this.__recorderStopEvent.bind(this));
     this.recorder.addEventListener('error', this.__recorderErrorEvent.bind(this));

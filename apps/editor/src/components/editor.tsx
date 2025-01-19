@@ -1,4 +1,4 @@
-import { Spinner, VideoPlayer } from '@rekorder.io/ui';
+import { Spinner, theme, VideoPlayer } from '@rekorder.io/ui';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 
@@ -6,6 +6,7 @@ import { editor } from '../store/editor';
 import { Header } from './layout/header';
 import { Sidebar } from './layout/sidebar';
 import { Cropper } from './cropper';
+import { reaction } from 'mobx';
 
 const OfflineEditor = observer(() => {
   return (
@@ -15,7 +16,7 @@ const OfflineEditor = observer(() => {
         <Header />
         <main className="flex-1 grid place-items-center p-10">
           <div className="w-fit h-fit">
-            <Player blob={editor.recording} crop={editor.sidebar === 'crop'} />
+            <Player />
           </div>
         </main>
       </section>
@@ -23,33 +24,40 @@ const OfflineEditor = observer(() => {
   );
 });
 
-const Player = observer(({ blob, crop }: { blob: Blob | null; crop?: boolean }) => {
+const Player = observer(() => {
   const [source, setSource] = useState('');
 
   useEffect(() => {
-    if (!blob) return;
-
-    const url = URL.createObjectURL(blob);
-    setSource(url);
-
+    let url: string;
+    const dispose = reaction(
+      () => editor.recording,
+      (blob) => {
+        if (blob) {
+          url = URL.createObjectURL(blob);
+          setSource(url);
+        }
+      },
+      { fireImmediately: true }
+    );
     return () => {
-      URL.revokeObjectURL(url);
+      dispose();
+      if (url) URL.revokeObjectURL(url);
     };
-  }, [blob]);
+  }, []);
 
   if (!source) {
     return (
-      <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <Spinner size={32} color="black" className="mx-auto" />
-        <p className="font-medium text-sm text-black mt-2">Processing the recorded video...</p>
-      </span>
+      <div className="w-fit h-fit">
+        <Spinner size={32} color={theme.colors.primary.main} className="mx-auto" />
+        <p className="font-medium text-sm text-black mt-3">Processing the screen recording</p>
+      </div>
     );
   }
 
   return (
     <div className="relative w-fit h-fit">
       <VideoPlayer ref={editor.initializeElement} src={source} className="!h-auto !w-full !max-w-4xl" />
-      {crop ? <Cropper /> : null}
+      {editor.sidebar === 'crop' ? <Cropper /> : null}
     </div>
   );
 });

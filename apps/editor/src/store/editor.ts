@@ -2,8 +2,8 @@ import { debounce } from 'lodash';
 import { nanoid } from 'nanoid';
 import { makeAutoObservable, runInAction } from 'mobx';
 
+import { fetchFile } from '@ffmpeg/util';
 import { FFmpeg, LogEvent, ProgressEvent } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
@@ -69,11 +69,9 @@ class Editor {
       this.status = 'pending';
     });
     try {
-      const base = 'https://unpkg.com/@ffmpeg/core-mt@0.12.9/dist/esm';
       await this.ffmpeg.load({
-        wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm'),
-        coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, 'application/javascript'),
-        workerURL: await toBlobURL(`${base}/ffmpeg-core.worker.js`, 'text/javascript'),
+        coreURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.js' : chrome.runtime.getURL('build/vendor/ffmpeg/core.js'),
+        wasmURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.wasm' : chrome.runtime.getURL('build/vendor/ffmpeg/core.wasm'),
       });
       runInAction(() => {
         this.status = 'initialized';
@@ -88,8 +86,7 @@ class Editor {
 
   private async __initializeState() {
     if (!import.meta.env.DEV) return;
-    const blobURL = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4';
-    fetch(blobURL)
+    fetch('http://localhost:54321/storage/v1/object/public/assets/videos/sample.webm')
       .then((response) => response.blob())
       .then((blob) => {
         runInAction(() => {
@@ -114,6 +111,8 @@ class Editor {
           runInAction(() => {
             this.video = blob;
             this.name = blob.name;
+            this.original = blob.original_blob;
+            this.modified = blob.modified_blob;
           });
         }
         break;

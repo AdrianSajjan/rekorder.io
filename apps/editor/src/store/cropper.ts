@@ -1,8 +1,9 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { Editor } from './editor';
 import { fetchFile } from '@ffmpeg/util';
 import { ProgressEvent } from '@ffmpeg/ffmpeg';
+
 import { wait } from '@rekorder.io/utils';
+import { Editor } from './editor';
 
 export interface CropPosition {
   top: number;
@@ -18,7 +19,7 @@ export interface CropCoordinates {
   height: number;
 }
 
-export type CropStatus = 'idle' | 'processing' | 'completed';
+export type CropStatus = 'idle' | 'processing' | 'completed' | 'error';
 
 export class Cropper {
   progress: number;
@@ -65,49 +66,44 @@ export class Cropper {
   }
 
   async crop() {
-    runInAction(() => {
-      this.progress = 0;
-      this.status = 'processing';
-    });
-
     const { x, y, width, height } = this.coordinates;
     this._editor.ffmpeg.on('progress', this._ffmpegProgressHandler);
+    runInAction(() => (this.status = 'processing'));
 
-    const input = await fetchFile(this._editor.recordingOrThrow);
-    this._editor.ffmpeg.writeFile('input.webm', input);
+    try {
+      const input = await fetchFile(this._editor.recordingOrThrow);
+      this._editor.ffmpeg.writeFile('input.webm', input);
 
-    await this._editor.ffmpeg.exec(['-i', 'input.webm', '-filter:v', `crop=${width}:${height}:${x}:${y}`, '-preset', 'ultrafast', '-c:v', 'libx264', '-c:a', 'aac', 'output.mp4']);
-    const output = await this._editor.ffmpeg.readFile('output.mp4');
+      await this._editor.ffmpeg.exec(['-i', 'input.webm', '-filter:v', `crop=${width}:${height}:${x}:${y}`, '-c:v', 'libvpx', '-crf', '10', '-b:v', '0', '-c:a', 'libvorbis', 'output.webm']);
+      const output = await this._editor.ffmpeg.readFile('output.webm');
+      const data = output as Uint8Array;
 
-    const data = output as Uint8Array;
-    const blob = new Blob([data.buffer], { type: 'video/webm' });
+      runInAction(() => (this.status = 'completed'));
+      wait(1000).then(() => runInAction(() => (this.status = 'idle')));
 
-    runInAction(() => {
-      this.progress = 0;
-      this.status = 'completed';
-    });
+      this._elementOrThrow.addEventListener(
+        'loadeddata',
+        () => {
+          runInAction(() => {
+            const rect = this._elementOrThrow.getBoundingClientRect();
+            this.position = { top: 0, left: 0, bottom: rect.height, right: rect.width };
+            this.originalDimensions = { width: this._elementOrThrow.videoWidth, height: this._elementOrThrow.videoHeight };
+            this.scaledDimensions = { width: rect.width, height: rect.height };
+          });
+        },
+        { once: true }
+      );
 
-    wait(1000).then(() => {
-      runInAction(() => {
-        this.status = 'idle';
-      });
-    });
-
-    this._elementOrThrow.addEventListener(
-      'loadeddata',
-      () => {
-        runInAction(() => {
-          const rect = this._elementOrThrow.getBoundingClientRect();
-          this.position = { top: 0, left: 0, bottom: rect.height, right: rect.width };
-          this.originalDimensions = { width: this._elementOrThrow.videoWidth, height: this._elementOrThrow.videoHeight };
-          this.scaledDimensions = { width: rect.width, height: rect.height };
-        });
-      },
-      { once: true }
-    );
-
-    this._editor.ffmpeg.off('progress', this._ffmpegProgressHandler);
-    this._editor.modifyRecording(blob);
+      const blob = new Blob([data.buffer], { type: 'video/webm' });
+      this._editor.modifyRecording(blob);
+    } catch (error) {
+      runInAction(() => (this.status = 'error'));
+      wait(1000).then(() => runInAction(() => (this.status = 'idle')));
+      throw error;
+    } finally {
+      runInAction(() => (this.progress = 0));
+      this._editor.ffmpeg.off('progress', this._ffmpegProgressHandler);
+    }
   }
 
   initializePosition(position: CropPosition) {
