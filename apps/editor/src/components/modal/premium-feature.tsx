@@ -14,7 +14,7 @@ const steps = [
   },
   {
     title: 'Get access to premium features',
-    description: 'Unlock the power AI avatars, AI voices, Custom backgrounds, Sharing & Analytics and other premium features',
+    description: 'Unlock the power of AI avatars & voices, custom backgrounds, sharing & analytics and more premium features',
   },
 ];
 
