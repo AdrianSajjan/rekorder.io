@@ -32,8 +32,28 @@ const Cropper = observer(() => {
     return () => observer.disconnect();
   }, [handleResize]);
 
-  const handleDrag = (mode: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'body') => (_: any, value: DraggableData) => {
+  const handleDrag = (mode: 'top' | 'left' | 'right' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'body') => (_: any, value: DraggableData) => {
     switch (mode) {
+      case 'top': {
+        editor.cropper.changePosition('top', value.y);
+        break;
+      }
+
+      case 'left': {
+        editor.cropper.changePosition('left', value.x);
+        break;
+      }
+
+      case 'right': {
+        editor.cropper.changePosition('right', value.x);
+        break;
+      }
+
+      case 'bottom': {
+        editor.cropper.changePosition('bottom', value.y);
+        break;
+      }
+
       case 'top-left': {
         editor.cropper.changePosition('top', value.y);
         editor.cropper.changePosition('left', value.x);
@@ -111,6 +131,70 @@ const Cropper = observer(() => {
             {Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="absolute bg-core-white/30 w-full h-px " style={{ top: 25 * (index + 1) + '%' }} />
             ))}
+          </div>
+        </Draggable>
+        <Draggable
+          axis="y"
+          position={{
+            x: editor.cropper.position.left + (editor.cropper.position.right - editor.cropper.position.left) / 2,
+            y: editor.cropper.position.top,
+          }}
+          bounds={{
+            top: 0,
+            bottom: editor.cropper.position.bottom - MINIMUM_CROP_SIZE,
+          }}
+          onDrag={handleDrag('top')}
+        >
+          <div id="top" className="absolute top-0 left-0">
+            <div className="-translate-x-1/2 -translate-y-1/2 h-1.5 w-5 rounded-sm bg-card-background border border-primary-main" />
+          </div>
+        </Draggable>
+        <Draggable
+          axis="x"
+          position={{
+            x: editor.cropper.position.right,
+            y: editor.cropper.position.top + (editor.cropper.position.bottom - editor.cropper.position.top) / 2,
+          }}
+          bounds={{
+            left: editor.cropper.position.left + MINIMUM_CROP_SIZE,
+            right: dimensions.width,
+          }}
+          onDrag={handleDrag('right')}
+        >
+          <div id="right" className="absolute top-0 left-0">
+            <div className="-translate-x-1/2 -translate-y-1/2 h-5 w-1.5 rounded-sm bg-card-background border border-primary-main" />
+          </div>
+        </Draggable>
+        <Draggable
+          axis="y"
+          position={{
+            x: editor.cropper.position.left + (editor.cropper.position.right - editor.cropper.position.left) / 2,
+            y: editor.cropper.position.bottom,
+          }}
+          bounds={{
+            top: editor.cropper.position.top + MINIMUM_CROP_SIZE,
+            bottom: dimensions.height,
+          }}
+          onDrag={handleDrag('bottom')}
+        >
+          <div id="bottom" className="absolute top-0 left-0">
+            <div className="-translate-x-1/2 -translate-y-1/2 h-1.5 w-5 rounded-sm bg-card-background border border-primary-main" />
+          </div>
+        </Draggable>
+        <Draggable
+          axis="x"
+          position={{
+            x: editor.cropper.position.left,
+            y: editor.cropper.position.top + (editor.cropper.position.bottom - editor.cropper.position.top) / 2,
+          }}
+          bounds={{
+            left: 0,
+            right: editor.cropper.position.right - MINIMUM_CROP_SIZE,
+          }}
+          onDrag={handleDrag('left')}
+        >
+          <div id="left" className="absolute top-0 left-0">
+            <div className="-translate-x-1/2 -translate-y-1/2 h-5 w-1.5 rounded-sm bg-card-background border border-primary-main" />
           </div>
         </Draggable>
         <Draggable

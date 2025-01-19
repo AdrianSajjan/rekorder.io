@@ -35,7 +35,7 @@ const ButtonCSS = css.resolve`
     align-items: center;
     justify-content: center;
 
-    gap: ${theme.space(3)};
+    gap: ${theme.space(2.5)};
     font-family: ${theme.fonts.default};
 
     cursor: pointer;

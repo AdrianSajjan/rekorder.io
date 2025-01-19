@@ -1,30 +1,37 @@
-import { Spinner, theme, VideoPlayer } from '@rekorder.io/ui';
+import { reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
+import { Spinner, theme, VideoPlayer } from '@rekorder.io/ui';
 
-import { editor } from '../store/editor';
+import { Cropper } from './cropper';
+import { Footer } from './layout/footer';
 import { Header } from './layout/header';
 import { Sidebar } from './layout/sidebar';
-import { Cropper } from './cropper';
-import { reaction } from 'mobx';
+
+import { editor } from '../store/editor';
+import { FOOTER_HEIGHT, HEADER_HEIGHT, MAIN_PADDING, SIDEBAR_WIDTH } from '../constants/layout';
 
 const OfflineEditor = observer(() => {
+  const VISIBLE_FOOTER_HEIGHT = editor.footer === 'none' ? 0 : FOOTER_HEIGHT;
+
   return (
     <div className="h-screen w-screen bg-background-light flex">
       <Sidebar />
-      <section className="flex-1 flex flex-col">
+      <section className="flex-1 flex flex-col h-screen">
         <Header />
-        <main className="flex-1 grid place-items-center p-10">
-          <div className="w-fit h-fit">
-            <Player />
-          </div>
+        <main
+          className="flex items-center justify-center transition-all duration-300 ease-in-out"
+          style={{ padding: MAIN_PADDING, height: `calc(100vh - ${HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`, width: `calc(100vw - ${SIDEBAR_WIDTH}px)` }}
+        >
+          <Player style={{ maxWidth: `calc(100vw - ${MAIN_PADDING * 2 + SIDEBAR_WIDTH}px)`, maxHeight: `calc(100vh - ${MAIN_PADDING * 2 + HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)` }} />
         </main>
+        <Footer />
       </section>
     </div>
   );
 });
 
-const Player = observer(() => {
+const Player = observer(({ style }: { style: React.CSSProperties }) => {
   const [source, setSource] = useState('');
 
   useEffect(() => {
@@ -32,10 +39,10 @@ const Player = observer(() => {
     const dispose = reaction(
       () => editor.recording,
       (blob) => {
-        if (blob) {
-          url = URL.createObjectURL(blob);
-          setSource(url);
-        }
+        if (url) URL.revokeObjectURL(url);
+        if (!blob) return;
+        url = URL.createObjectURL(blob);
+        setSource(url);
       },
       { fireImmediately: true }
     );
@@ -55,8 +62,8 @@ const Player = observer(() => {
   }
 
   return (
-    <div className="relative w-fit h-fit">
-      <VideoPlayer ref={editor.initializeElement} src={source} className="!h-auto !w-full !max-w-4xl" />
+    <div className="relative h-fit w-fit max-w-full max-h-full">
+      <VideoPlayer controls={editor.sidebar === 'default'} ref={editor.initializeElement} src={source} className="transition-all duration-300 ease-in-out" style={style} />
       {editor.sidebar === 'crop' ? <Cropper /> : null}
     </div>
   );

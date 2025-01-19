@@ -12,11 +12,12 @@ import { Cropper } from './cropper';
 
 export type EditorStatus = 'idle' | 'pending' | 'initialized' | 'error';
 export type SidebarMode = 'default' | 'crop' | 'audio';
+export type FooterMode = 'none' | 'audio' | 'trim';
 
 class Editor {
   name: string;
-  status: EditorStatus;
   sidebar: SidebarMode;
+  status: EditorStatus;
 
   video: BlobStorage | null;
   element: HTMLVideoElement | null;
@@ -67,6 +68,15 @@ class Editor {
   get recordingOrThrow() {
     if (!this.recording) throw new Error('No recording file found');
     return this.recording;
+  }
+
+  get footer(): FooterMode {
+    switch (this.sidebar) {
+      case 'audio':
+        return 'audio';
+      default:
+        return 'none';
+    }
   }
 
   private async __initializeFFmpeg() {
