@@ -56,11 +56,6 @@ export class Cropper {
     };
   }
 
-  private get _elementOrThrow() {
-    if (!this._editor.element) throw new Error('Editor video element is not initialized');
-    return this._editor.element;
-  }
-
   private __ffmpegProgressHandler(event: ProgressEvent) {
     this.progress = Math.round(event.progress * 100);
   }
@@ -81,13 +76,13 @@ export class Cropper {
       runInAction(() => (this.status = 'completed'));
       wait(1000).then(() => runInAction(() => (this.status = 'idle')));
 
-      this._elementOrThrow.addEventListener(
+      this._editor.elementOrThrow.addEventListener(
         'loadeddata',
         () => {
           runInAction(() => {
-            const rect = this._elementOrThrow.getBoundingClientRect();
+            const rect = this._editor.elementOrThrow.getBoundingClientRect();
             this.position = { top: 0, left: 0, bottom: rect.height, right: rect.width };
-            this.originalDimensions = { width: this._elementOrThrow.videoWidth, height: this._elementOrThrow.videoHeight };
+            this.originalDimensions = { width: this._editor.elementOrThrow.videoWidth, height: this._editor.elementOrThrow.videoHeight };
             this.scaledDimensions = { width: rect.width, height: rect.height };
           });
         },
@@ -108,8 +103,8 @@ export class Cropper {
 
   initializePosition(position: CropPosition) {
     this.position = position;
-    this.originalDimensions = { width: this._elementOrThrow.videoWidth, height: this._elementOrThrow.videoHeight };
-    this.scaledDimensions = { width: this._elementOrThrow.getBoundingClientRect().width, height: this._elementOrThrow.getBoundingClientRect().height };
+    this.originalDimensions = { width: this._editor.elementOrThrow.videoWidth, height: this._editor.elementOrThrow.videoHeight };
+    this.scaledDimensions = { width: this._editor.elementOrThrow.getBoundingClientRect().width, height: this._editor.elementOrThrow.getBoundingClientRect().height };
   }
 
   changePosition(key: keyof CropPosition, value: number) {

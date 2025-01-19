@@ -59,6 +59,11 @@ class Editor {
     return this.original;
   }
 
+  get elementOrThrow() {
+    if (!this.element) throw new Error('No element found');
+    return this.element;
+  }
+
   get recordingOrThrow() {
     if (!this.recording) throw new Error('No recording file found');
     return this.recording;

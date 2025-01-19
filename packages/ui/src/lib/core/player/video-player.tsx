@@ -259,6 +259,14 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
     );
 
     video$.current.addEventListener(
+      'play',
+      () => {
+        setControls((state) => ({ ...state, playing: true }));
+      },
+      { signal: controller.signal }
+    );
+
+    video$.current.addEventListener(
       'durationchange',
       () => {
         setControls((state) => ({ ...state, duration: video$.current.duration }));
@@ -345,14 +353,9 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
   return (
     <Fragment>
       <ResolvedStyle>{VideoPlayerCSS}</ResolvedStyle>
-
       <div id="rekorder-video-player" ref={container$} className={clsx(container, 'rekorder-video-player-container', VideoPlayerCSS.className)}>
         <video ref={handleInitializeRefs} {...props} className={clsx(className, 'rekorder-video-player', VideoPlayerCSS.className)} controls={false} />
-        {!isControlsVisible || !controls.loaded ? null : !controls.started ? (
-          <button className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-start')} onClick={handlePlay}>
-            <Play weight="fill" size={24} color={theme.colors.card.background} />
-          </button>
-        ) : (
+        {!isControlsVisible || !controls.loaded ? null : controls.started || controls.playing ? (
           <div className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-controls')} data-pinned={controls.pinned}>
             <button className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-control')} onClick={handleTogglePlayback}>
               {controls.playing ? <Pause weight="fill" size={18} /> : <Play weight="fill" size={18} />}
@@ -386,6 +389,10 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
               {!controls.pinned ? <PushPinSlash size={18} weight="fill" /> : <PushPin size={18} weight="fill" />}
             </button>
           </div>
+        ) : (
+          <button className={clsx(VideoPlayerCSS.className, 'rekorder-video-player-start')} onClick={handlePlay}>
+            <Play weight="fill" size={24} color={theme.colors.card.background} />
+          </button>
         )}
       </div>
     </Fragment>

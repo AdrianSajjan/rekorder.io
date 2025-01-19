@@ -2,15 +2,20 @@ import { ChangeEvent } from 'react';
 import { observer } from 'mobx-react';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 
-import { CheckCircle } from '@phosphor-icons/react';
-import { Input } from '@rekorder.io/ui';
+import { CheckCircle, Pause, Play } from '@phosphor-icons/react';
 import { Slider, SliderRange, SliderThumb, SliderTrack } from '@radix-ui/react-slider';
 
+import { Button, Input } from '@rekorder.io/ui';
+import { useVideoControls } from '@rekorder.io/hooks';
+import { formatSecondsToMMSS } from '@rekorder.io/utils';
+
+import { editor } from '../../../store/editor';
 import { MINIMUM_CROP_SIZE } from '../../../constants/crop';
 import { CropCoordinates, CropStatus } from '../../../store/cropper';
-import { editor } from '../../../store/editor';
 
 const CropSidebar = observer(() => {
+  const { controls, handleTogglePlayback, handleSeek } = useVideoControls(editor.elementOrThrow);
+
   const handleChange = (key: keyof CropCoordinates) => (event: ChangeEvent<HTMLInputElement>) => {
     const value = +event.target.value;
     if (value < 0 || isNaN(value)) return;
@@ -29,6 +34,10 @@ const CropSidebar = observer(() => {
         break;
     }
     editor.cropper.changeCoordinate(key, value);
+  };
+
+  const handleSeekVideo = ([value]: [number]) => {
+    handleSeek(value);
   };
 
   return (
@@ -101,13 +110,20 @@ const CropSidebar = observer(() => {
           <h3 className="text-sm font-semibold">Video Controls</h3>
           <p className="text-text-muted text-xs leading-normal">Control the video playback state from here for more precise cropping and resizing</p>
         </div>
-        <div className="bg-red w-full">
-          <Slider>
-            <SliderTrack>
-              <SliderRange />
-            </SliderTrack>
-            <SliderThumb />
-          </Slider>
+        <div className="flex items-center gap-4 mt-5">
+          <Button size="icon" variant="outline" color="accent" onClick={handleTogglePlayback}>
+            {controls.playing ? <Pause weight="fill" /> : <Play weight="fill" />}
+          </Button>
+          <div className="flex items-center gap-3 w-full">
+            <p className="text-xs">{formatSecondsToMMSS(controls.seek)}</p>
+            <Slider min={0} step={0.01} max={controls.duration} value={[controls.seek]} onValueChange={handleSeekVideo} className="relative flex w-full touch-none select-none items-center">
+              <SliderTrack className="relative h-2 w-full grow overflow-hidden rounded-full bg-background-dark">
+                <SliderRange className="absolute h-full bg-primary-main" />
+              </SliderTrack>
+              <SliderThumb className="block h-5 w-5 rounded-full border-2 border-primary-main bg-card-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-main/30" />
+            </Slider>
+            <p className="text-xs">{formatSecondsToMMSS(controls.duration)}</p>
+          </div>
         </div>
       </div>
     </div>

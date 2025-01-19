@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import Draggable, { DraggableData } from 'react-draggable';
 
 import { CropIcon } from './icon/crop';
@@ -71,104 +71,118 @@ const Cropper = observer(() => {
   };
 
   return (
-    <div ref={handleInitialize} className="absolute inset-0">
-      <Draggable
-        position={{
-          x: editor.cropper.position.left,
-          y: editor.cropper.position.top,
-        }}
-        bounds={{
-          left: 0,
-          top: 0,
-          right: dimensions.width - (editor.cropper.position.right - editor.cropper.position.left),
-          bottom: dimensions.height - (editor.cropper.position.bottom - editor.cropper.position.top),
-        }}
-        onDrag={handleDrag('body')}
-      >
+    <Fragment>
+      <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute bg-black/60 border-2 border-core-white/60"
+          className="absolute"
           style={{
+            top: editor.cropper.position.top,
+            left: editor.cropper.position.left,
             width: editor.cropper.position.right - editor.cropper.position.left,
             height: editor.cropper.position.bottom - editor.cropper.position.top,
+            boxShadow: '0px 0px 0px 9999px rgba(0, 0, 0, 0.8)',
           }}
+        />
+      </div>
+      <div ref={handleInitialize} className="absolute inset-0">
+        <Draggable
+          position={{
+            x: editor.cropper.position.left,
+            y: editor.cropper.position.top,
+          }}
+          bounds={{
+            left: 0,
+            top: 0,
+            right: dimensions.width - (editor.cropper.position.right - editor.cropper.position.left),
+            bottom: dimensions.height - (editor.cropper.position.bottom - editor.cropper.position.top),
+          }}
+          onDrag={handleDrag('body')}
         >
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="absolute bg-core-white/30 h-full w-px " style={{ left: 25 * (index + 1) + '%' }} />
-          ))}
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="absolute bg-core-white/30 w-full h-px " style={{ top: 25 * (index + 1) + '%' }} />
-          ))}
-        </div>
-      </Draggable>
-      <Draggable
-        position={{
-          x: editor.cropper.position.left,
-          y: editor.cropper.position.top,
-        }}
-        bounds={{
-          left: 0,
-          top: 0,
-          right: editor.cropper.position.right - MINIMUM_CROP_SIZE,
-          bottom: editor.cropper.position.bottom - MINIMUM_CROP_SIZE,
-        }}
-        onDrag={handleDrag('top-left')}
-      >
-        <div id="top-left" className="absolute top-0 left-0">
-          <CropIcon className="rotate-0 -translate-x-1.5 -translate-y-1.5" />
-        </div>
-      </Draggable>
-      <Draggable
-        position={{
-          x: editor.cropper.position.right,
-          y: editor.cropper.position.top,
-        }}
-        bounds={{
-          top: 0,
-          left: editor.cropper.position.left + MINIMUM_CROP_SIZE,
-          bottom: editor.cropper.position.bottom - MINIMUM_CROP_SIZE,
-          right: dimensions.width,
-        }}
-        onDrag={handleDrag('top-right')}
-      >
-        <div id="top-right" className="absolute top-0 left-0">
-          <CropIcon className="rotate-90 -translate-x-3.5 -translate-y-1.5" />
-        </div>
-      </Draggable>
-      <Draggable
-        position={{
-          x: editor.cropper.position.left,
-          y: editor.cropper.position.bottom,
-        }}
-        bounds={{
-          left: 0,
-          top: editor.cropper.position.top + MINIMUM_CROP_SIZE,
-          right: editor.cropper.position.right - MINIMUM_CROP_SIZE,
-          bottom: dimensions.height,
-        }}
-        onDrag={handleDrag('bottom-left')}
-      >
-        <div id="bottom-left" className="absolute top-0 left-0">
-          <CropIcon className="-rotate-90 -translate-x-1.5 -translate-y-3.5" />
-        </div>
-      </Draggable>
-      <Draggable
-        position={{
-          x: editor.cropper.position.right,
-          y: editor.cropper.position.bottom,
-        }}
-        bounds={{
-          left: editor.cropper.position.left + MINIMUM_CROP_SIZE,
-          top: editor.cropper.position.top + MINIMUM_CROP_SIZE,
-          right: dimensions.width,
-          bottom: dimensions.height,
-        }}
-        onDrag={handleDrag('bottom-right')}
-      >
-        <div id="bottom-right" className="absolute top-0 left-0">
-          <CropIcon className="rotate-180 -translate-x-3.5 -translate-y-3.5" />
-        </div>
-      </Draggable>
-    </div>
+          <div
+            className="absolute bg-transparent border-2 border-core-white/60"
+            style={{
+              width: editor.cropper.position.right - editor.cropper.position.left,
+              height: editor.cropper.position.bottom - editor.cropper.position.top,
+            }}
+          >
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="absolute bg-core-white/30 h-full w-px " style={{ left: 25 * (index + 1) + '%' }} />
+            ))}
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="absolute bg-core-white/30 w-full h-px " style={{ top: 25 * (index + 1) + '%' }} />
+            ))}
+          </div>
+        </Draggable>
+        <Draggable
+          position={{
+            x: editor.cropper.position.left,
+            y: editor.cropper.position.top,
+          }}
+          bounds={{
+            left: 0,
+            top: 0,
+            right: editor.cropper.position.right - MINIMUM_CROP_SIZE,
+            bottom: editor.cropper.position.bottom - MINIMUM_CROP_SIZE,
+          }}
+          onDrag={handleDrag('top-left')}
+        >
+          <div id="top-left" className="absolute top-0 left-0">
+            <CropIcon className="rotate-0 -translate-x-1.5 -translate-y-1.5" />
+          </div>
+        </Draggable>
+        <Draggable
+          position={{
+            x: editor.cropper.position.right,
+            y: editor.cropper.position.top,
+          }}
+          bounds={{
+            top: 0,
+            left: editor.cropper.position.left + MINIMUM_CROP_SIZE,
+            bottom: editor.cropper.position.bottom - MINIMUM_CROP_SIZE,
+            right: dimensions.width,
+          }}
+          onDrag={handleDrag('top-right')}
+        >
+          <div id="top-right" className="absolute top-0 left-0">
+            <CropIcon className="rotate-90 -translate-x-3.5 -translate-y-1.5" />
+          </div>
+        </Draggable>
+        <Draggable
+          position={{
+            x: editor.cropper.position.left,
+            y: editor.cropper.position.bottom,
+          }}
+          bounds={{
+            left: 0,
+            top: editor.cropper.position.top + MINIMUM_CROP_SIZE,
+            right: editor.cropper.position.right - MINIMUM_CROP_SIZE,
+            bottom: dimensions.height,
+          }}
+          onDrag={handleDrag('bottom-left')}
+        >
+          <div id="bottom-left" className="absolute top-0 left-0">
+            <CropIcon className="-rotate-90 -translate-x-1.5 -translate-y-3.5" />
+          </div>
+        </Draggable>
+        <Draggable
+          position={{
+            x: editor.cropper.position.right,
+            y: editor.cropper.position.bottom,
+          }}
+          bounds={{
+            left: editor.cropper.position.left + MINIMUM_CROP_SIZE,
+            top: editor.cropper.position.top + MINIMUM_CROP_SIZE,
+            right: dimensions.width,
+            bottom: dimensions.height,
+          }}
+          onDrag={handleDrag('bottom-right')}
+        >
+          <div id="bottom-right" className="absolute top-0 left-0">
+            <CropIcon className="rotate-180 -translate-x-3.5 -translate-y-3.5" />
+          </div>
+        </Draggable>
+      </div>
+    </Fragment>
   );
 });
 
