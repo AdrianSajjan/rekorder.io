@@ -118,12 +118,7 @@ const EditorActionbar = observer(() => {
     <Fragment>
       <ResolvedStyle>{DrawingActionbarCSS}</ResolvedStyle>
       <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-container')}>
-        <ToggleGroup
-          type="single"
-          value={editor.mode}
-          onValueChange={handleValueChange}
-          className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-group')}
-        >
+        <ToggleGroup type="single" value={editor.mode} onValueChange={handleValueChange} className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-group')}>
           <ToolbarAction asChild tooltip="Delete objects">
             <ToggleGroupItem value="delete">
               <TrashSimple size={16} weight="bold" />
@@ -168,7 +163,7 @@ const EditorActionbar = observer(() => {
         </ToggleGroup>
         <Divider orientation="vertical" className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-divider')} />
         <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-group')}>
-          <ColorPicker color={editor.color} onChange={editor.updateColor}>
+          <ColorPicker color={editor.color} onChange={editor.updateColor} container={toolbarContainer}>
             <ToolbarAction tooltip="Color picker">
               <div className={clsx(DrawingActionbarCSS.className, 'rekorder-drawing-actionbar-color')} style={{ background: editor.color }} />
             </ToolbarAction>
