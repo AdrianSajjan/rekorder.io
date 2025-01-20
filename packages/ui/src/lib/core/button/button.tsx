@@ -304,7 +304,7 @@ const ButtonCSS = css.resolve`
 
     height: ${theme.space(9)};
     border-radius: ${theme.space(2)};
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .rekorder-button.rekorder-icon {

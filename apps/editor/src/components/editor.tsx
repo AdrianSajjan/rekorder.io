@@ -17,7 +17,7 @@ const OfflineEditor = observer(() => {
   return (
     <div className="h-screen w-screen bg-background-light flex">
       <Sidebar />
-      <section className="flex-1 flex flex-col h-screen">
+      <section className="flex-1 flex flex-col h-screen overflow-hidden">
         <Header />
         <main
           className="flex items-center justify-center transition-all duration-300 ease-in-out"

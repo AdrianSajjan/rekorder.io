@@ -5,13 +5,13 @@ import { editor } from '../../store/editor';
 
 const Header = observer(() => {
   return (
-    <header className="h-[4.5rem] bg-card-background shrink-0 border-b border-borders-input flex items-center justify-end gap-8 px-4 relative">
-      <div className="absolute left-1/2 -translate-x-1/2">
+    <header className="h-[4.5rem] bg-card-background shrink-0 border-b border-borders-input flex items-center justify-between gap-8 px-4 relative">
+      <div className="flex items-center">
         <input
           value={editor.name}
           placeholder="Project Name"
           onChange={(event) => editor.changeName(event.target.value)}
-          className="text-center text-sm font-medium w-fit p-1 rounded-md bg-transparent"
+          className="text-left text-sm font-medium w-fit py-1 px-2 rounded-md bg-transparent"
         />
       </div>
       <div className="flex items-center gap-3">
