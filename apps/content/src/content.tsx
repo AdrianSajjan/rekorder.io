@@ -57,16 +57,16 @@ const Content = observer(() => {
       <ResolvedStyle>{RecorderCSS}</ResolvedStyle>
       <section id="rekorder-area" className={clsx(RecorderCSS.className, 'rekorder-area')}>
         <Overlay />
-        <EditorArea />
-        <Cursors />
+        <Permission />
         <div className={clsx(RecorderCSS.className, 'rekorder-container')}>
           <PluginCard />
           <PluginToolbar />
           <CameraPreview />
           <TimerCountdown />
+          <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING_SMALL} />
         </div>
-        <Permission />
-        <Toaster position="bottom-right" richColors offset={SAFE_AREA_PADDING_SMALL} />
+        <Cursors />
+        <EditorArea />
       </section>
     </ThemeProvider>
   );

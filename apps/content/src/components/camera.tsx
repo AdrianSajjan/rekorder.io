@@ -23,8 +23,17 @@ const CameraPreviewCSS = css.resolve`
 
   .rekorder-camera-container {
     position: absolute;
-    pointer-events: all;
     user-select: none;
+  }
+
+  .rekorder-camera-container[data-enabled='true'] {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .rekorder-camera-container[data-enabled='false'] {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .rekorder-close-button,
@@ -120,7 +129,7 @@ const CameraPreviewCSS = css.resolve`
 `;
 
 const CameraPreviewHOC = observer(() => {
-  if (camera.device === 'n/a' || !camera.enabled) {
+  if (camera.device === 'n/a') {
     return null;
   } else {
     return <CameraPreview />;
@@ -146,7 +155,7 @@ const CameraPreview = observer(() => {
     <Fragment>
       <ResolvedStyle>{CameraPreviewCSS}</ResolvedStyle>
       <Draggable handle="#rekorder-camera-handle" nodeRef={drag.ref} position={drag.position} bounds={drag.bounds} onStop={drag.onChangePosition}>
-        <div ref={drag.ref} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
+        <div data-enabled={camera.enabled} ref={drag.ref} className={clsx(CameraPreviewCSS.className, 'rekorder-camera-container')}>
           <div id="rekorder-camera-handle" className={clsx(CameraPreviewCSS.className, 'rekorder-camera-handle')} style={styles.handle}>
             <iframe
               allow="camera"
