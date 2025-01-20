@@ -22,6 +22,7 @@ import { useDisposeEvents } from '../../hooks/use-dispose-events';
 
 const PluginCardCSS = css.resolve`
   .rekorder-plugin-container {
+    user-select: none;
     position: absolute;
     pointer-events: all;
     width: ${theme.space(85)};
