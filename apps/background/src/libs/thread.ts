@@ -8,12 +8,17 @@ const AUTHENTICATION_URL = 'http://localhost:4200/extension/login';
 
 class Thread {
   enabled: boolean;
+
   offscreenPromise: Promise<void> | null;
-  editorResolvers: PromiseWithResolvers<void> | null;
+  injectedTabs: Set<chrome.tabs.Tab>;
+
+  editorResolver: PromiseWithResolvers<void> | null;
+  recorderResolver: PromiseWithResolvers<void> | null;
 
   editorTab: chrome.tabs.Tab | null;
+  recorderTab: chrome.tabs.Tab | null;
+
   currentTab: chrome.tabs.Tab | null;
-  injectedTabs: Set<chrome.tabs.Tab>;
   originalTab: chrome.tabs.Tab | null;
 
   authenticationMode: 'script' | 'editor';
@@ -30,13 +35,17 @@ class Thread {
 
   constructor() {
     this.enabled = false;
-    this.editorResolvers = null;
+    this.editorResolver = null;
+    this.recorderResolver = null;
+
     this.offscreenPromise = null;
+    this.injectedTabs = new Set();
 
     this.editorTab = null;
+    this.recorderTab = null;
+
     this.currentTab = null;
     this.originalTab = null;
-    this.injectedTabs = new Set();
 
     this.authenticationTab = null;
     this.authenticationMode = 'script';
@@ -50,10 +59,13 @@ class Thread {
       console.warn('Error in background while closing offscreen document', error);
     }
 
-    this.enabled = false;
-    this.currentTab = null;
-    this.originalTab = null;
-    this.offscreenPromise = null;
+    if (this.recorderTab) {
+      try {
+        await chrome.tabs.remove(this.recorderTab.id!).catch((error) => console.log('Error in background while removing recorder tab', error));
+      } catch (error) {
+        console.warn('Error in background while removing recorder tab', error);
+      }
+    }
 
     this.injectedTabs.forEach((tab) => {
       if (tab.id) {
@@ -61,6 +73,12 @@ class Thread {
         console.log('Sent close extension message to tab:', tab.id, tab.url, tab.title);
       }
     });
+
+    this.enabled = false;
+    this.currentTab = null;
+    this.originalTab = null;
+    this.recorderTab = null;
+    this.offscreenPromise = null;
     this.injectedTabs.clear();
   }
 
@@ -79,6 +97,22 @@ class Thread {
       await this.offscreenPromise;
       this.offscreenPromise = null;
     }
+  }
+
+  private async __handleSetupRecorderTab() {
+    if (this.recorderTab) {
+      try {
+        await chrome.tabs.remove(this.recorderTab.id!);
+      } catch (error) {
+        console.warn('Error in background while removing recorder tab', error);
+      }
+    }
+
+    this.recorderResolver = Promise.withResolvers();
+    this.recorderTab = await chrome.tabs.create({ url: chrome.runtime.getURL(OFFSCREEN_PATH), pinned: true, index: 0 });
+    await this.recorderResolver.promise;
+
+    return this.recorderTab;
   }
 
   private __preventContentInjection(tab: chrome.tabs.Tab) {
@@ -160,16 +194,28 @@ class Thread {
   }
 
   private __handleTabChangeListener(tabId: number, change: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
-    if (change.status === 'complete') {
-      if (tabId === this.editorTab?.id) {
-        this.editorResolvers?.resolve();
-        this.editorResolvers = null;
-      } else {
+    if (change.status !== 'complete') return;
+
+    switch (tabId) {
+      case this.editorTab?.id: {
+        this.editorResolver?.resolve();
+        this.editorResolver = null;
+        break;
+      }
+
+      case this.recorderTab?.id: {
+        this.recorderResolver?.resolve();
+        this.recorderResolver = null;
+        break;
+      }
+
+      default: {
         if (this.enabled) {
           this.currentTab = tab;
           this.injectedTabs.add(tab);
           this.__injectContentScript();
         }
+        break;
       }
     }
   }
@@ -189,8 +235,8 @@ class Thread {
 
   private async __waitForEditorTabLoad(tab: chrome.tabs.Tab) {
     this.editorTab = tab;
-    this.editorResolvers = Promise.withResolvers();
-    await this.editorResolvers.promise;
+    this.editorResolver = Promise.withResolvers();
+    await this.editorResolver.promise;
   }
 
   private __handleRuntimeMessageListener(message: RuntimeMessage, sender: chrome.runtime.MessageSender, respond: (response: RuntimeMessage) => void) {
@@ -208,21 +254,23 @@ class Thread {
        * Sender Tab ID is the tab that the content script is injected into
        */
       case EventConfig.StartTabStreamCapture: {
-        chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, async (streamId) => {
-          if (chrome.runtime.lastError) {
-            const error = chrome.runtime.lastError;
+        this.__handleSetupRecorderTab().then(
+          (recorder) => {
+            console.log('Recorder tab created, getting media stream id', recorder, recorder.status);
+            chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, (streamId) => {
+              if (chrome.runtime.lastError) {
+                if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error: chrome.runtime.lastError } });
+                console.warn('Error in background while getting media stream id', chrome.runtime.lastError);
+              } else {
+                chrome.tabs.sendMessage(recorder.id!, { type: EventConfig.StartTabStreamCapture, payload: Object.assign({ streamId }, message.payload) });
+              }
+            });
+          },
+          (error) => {
             if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
-            console.warn('Error in background while getting media stream id', error);
-          } else {
-            try {
-              await this.__handleSetupOffscreenDocument();
-              chrome.runtime.sendMessage({ type: EventConfig.StartTabStreamCapture, payload: Object.assign({ streamId }, message.payload) });
-            } catch (error) {
-              if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error } });
-              console.warn('Error in background while starting tab stream capture', error);
-            }
+            console.warn('Error in background while starting tab stream capture', error);
           }
-        });
+        );
         return false;
       }
 
@@ -231,9 +279,10 @@ class Thread {
        * Sender Tab ID is the tab that the content script is injected into
        */
       case EventConfig.StartDisplayStreamCapture: {
-        this.__handleSetupOffscreenDocument().then(
-          () => {
-            chrome.runtime.sendMessage({ type: EventConfig.StartDisplayStreamCapture, payload: message.payload });
+        this.__handleSetupRecorderTab().then(
+          (recorder) => {
+            console.log('Recorder tab created, starting display stream capture', recorder, recorder.status);
+            chrome.tabs.sendMessage(recorder.id!, { type: EventConfig.StartDisplayStreamCapture, payload: message.payload });
             console.log('Offscreen document setup complete, starting display stream capture');
           },
           (error) => {

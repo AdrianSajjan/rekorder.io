@@ -17,6 +17,5 @@ export const StorageConfig = {
   DisplaySurface: 'display-surface',
   DesktopAudioEnabled: 'desktop-audio-enabled',
   CountdownEnabled: 'countdown-enabled',
-
   Authentication: 'authentication',
 };
