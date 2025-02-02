@@ -69,13 +69,13 @@ class Editor {
   }
 
   get mp4RecordingOrThrow() {
-    if (!this.modifiedMp4) throw new Error('No recording file found');
-    return this.modifiedMp4;
+    if (!this.mp4Recording) throw new Error('No recording file found');
+    return this.mp4Recording;
   }
 
   get webmRecordingOrThrow() {
-    if (!this.modifiedWebm) throw new Error('No recording file found');
-    return this.modifiedWebm;
+    if (!this.webmRecording) throw new Error('No recording file found');
+    return this.webmRecording;
   }
 
   get elementOrThrow() {

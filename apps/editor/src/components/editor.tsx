@@ -37,7 +37,7 @@ const Player = observer(({ style }: { style: React.CSSProperties }) => {
   useEffect(() => {
     let url: string;
     const dispose = reaction(
-      () => editor.recording,
+      () => editor.mp4Recording,
       (blob) => {
         if (url) URL.revokeObjectURL(url);
         if (!blob) return;
