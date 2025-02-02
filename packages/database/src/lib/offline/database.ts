@@ -7,7 +7,7 @@ class ExtensionOfflineDatabase extends Dexie {
   constructor() {
     super(DatabaseConfig.ExtensionOfflineDatabaseName);
     this.version(DatabaseConfig.ExtensionOfflineDatabaseVersion).stores({
-      blobs: '++id, uuid, original_blob, modified_blob, created_at, updated_at',
+      blobs: '++id, uuid, original_mp4, modified_mp4, original_webm, modified_webm, created_at, updated_at',
     });
     this.blobs.mapToClass(BlobStorage);
   }
@@ -21,12 +21,13 @@ class BlobStorage extends Entity<ExtensionOfflineDatabase> {
   id!: number;
   uuid!: string;
   name!: string;
-
-  original_blob!: Blob;
-  modified_blob!: Blob | null;
-
   created_at!: number;
   updated_at!: number | null;
+
+  original_mp4!: Blob;
+  modified_mp4!: Blob | null;
+  original_webm!: Blob;
+  modified_webm!: Blob | null;
 }
 
 export { ExtensionOfflineDatabase, BlobStorage };

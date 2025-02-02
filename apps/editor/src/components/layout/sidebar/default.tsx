@@ -1,22 +1,21 @@
-import { toast } from 'sonner';
 import { observer } from 'mobx-react';
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
+import { toast } from 'sonner';
 
 import { CaretRight, CloudArrowUp, Crop, Download, MagnifyingGlassPlus, MusicNotes, Panorama, Scissors, ShareFat, Subtitles, Translate, UserFocus, UserSound } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
-import { ProgressEvent } from '@ffmpeg/ffmpeg';
 
 import { supabase } from '@rekorder.io/database';
 import { StorageResponse } from '@rekorder.io/types';
 import { CrownIcon, Spinner, theme } from '@rekorder.io/ui';
 import { cn, createFilePath, extractVideoFileThumbnail, unwrapError } from '@rekorder.io/utils';
 
-import { editor } from '../../../store/editor';
 import { fileDownloadBlob } from '../../../lib/utils';
+import { editor } from '../../../store/editor';
 
+import { useAuthenticatedSession } from '../../../context/authentication';
 import { PremiumFeatureDialog } from '../../modal/premium-feature';
 import { CircularProgress } from '../../ui/circular-progress';
-import { useAuthenticatedSession } from '../../../context/authentication';
 
 interface CloudUploadProps {
   original_file: StorageResponse;
@@ -27,8 +26,6 @@ interface CloudUploadProps {
 
 const DefaultSidebar = observer(() => {
   const { user } = useAuthenticatedSession();
-
-  const [downloadMP4Progress, setDownloadMP4Progress] = useState<ProgressEvent>({ progress: 0, time: 0 });
 
   const handleUploadVideo = async (blob: Blob) => {
     const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(user, blob), blob);
@@ -47,17 +44,17 @@ const DefaultSidebar = observer(() => {
     mutationFn: async () => {
       const response = {} as CloudUploadProps;
 
-      if (editor.original) {
+      if (editor.originalMp4) {
         await Promise.all([
-          handleUploadVideo(editor.original).then((data) => (response.original_file = data)),
-          handleUploadThumbnail(editor.original).then((data) => (response.original_thumbnail = data)),
+          handleUploadVideo(editor.originalMp4).then((data) => (response.original_file = data)),
+          handleUploadThumbnail(editor.originalMp4).then((data) => (response.original_thumbnail = data)),
         ]);
       }
 
-      if (editor.modified) {
+      if (editor.modifiedMp4) {
         await Promise.all([
-          handleUploadVideo(editor.modified).then((data) => (response.modified_file = data)),
-          handleUploadThumbnail(editor.modified).then((data) => (response.modified_thumbnail = data)),
+          handleUploadVideo(editor.modifiedMp4).then((data) => (response.modified_file = data)),
+          handleUploadThumbnail(editor.modifiedMp4).then((data) => (response.modified_thumbnail = data)),
         ]);
       }
 
@@ -82,25 +79,17 @@ const DefaultSidebar = observer(() => {
   });
 
   const handleDownloadMP4 = useMutation({
-    mutationFn: () => {
-      editor.ffmpeg.on('progress', setDownloadMP4Progress);
-      return editor.convertToMP4();
-    },
-    onSuccess: (blob) => {
-      fileDownloadBlob(blob, editor.name, '.mp4');
+    mutationFn: async () => {
+      fileDownloadBlob(editor.mp4RecordingOrThrow, editor.name, '.mp4');
     },
     onError: (error) => {
       toast.error(unwrapError(error, 'Oops! Something went wrong while converting your video'));
-    },
-    onSettled: () => {
-      editor.ffmpeg.off('progress', setDownloadMP4Progress);
-      setDownloadMP4Progress({ progress: 0, time: 0 });
     },
   });
 
   const handleDownloadWEBM = useMutation({
     mutationFn: async () => {
-      fileDownloadBlob(editor.recordingOrThrow, editor.name, '.webm');
+      fileDownloadBlob(editor.webmRecordingOrThrow, editor.name, '.webm');
     },
     onError: (error) => {
       toast.error(unwrapError(error, 'Oops! Something went wrong while downloading your video'));
@@ -120,18 +109,17 @@ const DefaultSidebar = observer(() => {
         />
         <SidebarAction
           icon={<Download weight="bold" />}
+          title="Export as MP4"
+          description="Download your video in .mp4 format"
+          status={handleDownloadMP4.isPending ? 'progress' : null}
+          onClick={() => handleDownloadMP4.mutate()}
+        />
+        <SidebarAction
+          icon={<Download weight="bold" />}
           title="Export as WEBM"
           description="Download your video in .webm format"
           status={handleDownloadWEBM.isPending ? 'loading' : null}
           onClick={() => handleDownloadWEBM.mutate()}
-        />
-        <SidebarAction
-          icon={<Download weight="bold" />}
-          title="Export as MP4"
-          description="Download your video in .mp4 format"
-          status={handleDownloadMP4.isPending ? 'progress' : null}
-          progress={downloadMP4Progress.progress * 100}
-          onClick={() => handleDownloadMP4.mutate()}
         />
         <PremiumFeatureDialog>
           <SidebarAction premium icon={<ShareFat weight="fill" />} title="Share video" description="Share the link of this video with others" />

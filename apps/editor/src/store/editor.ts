@@ -1,8 +1,6 @@
 import { debounce } from 'lodash';
 import { nanoid } from 'nanoid';
 import { makeAutoObservable, runInAction } from 'mobx';
-
-import { fetchFile } from '@ffmpeg/util';
 import { FFmpeg, LogEvent, ProgressEvent } from '@ffmpeg/ffmpeg';
 
 import { EventConfig } from '@rekorder.io/constants';
@@ -24,8 +22,11 @@ class Editor {
 
   ffmpeg: FFmpeg;
   cropper: Cropper;
-  original: Blob | null;
-  modified: Blob | null;
+
+  originalMp4: Blob | null;
+  modifiedMp4: Blob | null;
+  originalWebm: Blob | null;
+  modifiedWebm: Blob | null;
 
   private _offlineDatabase: ExtensionOfflineDatabase;
   private _saveNameOfflineDatabaseDebounced = debounce(this.__saveNameOfflineDatabase, 500);
@@ -41,8 +42,11 @@ class Editor {
 
     this.video = null;
     this.element = null;
-    this.original = null;
-    this.modified = null;
+
+    this.originalMp4 = null;
+    this.modifiedMp4 = null;
+    this.originalWebm = null;
+    this.modifiedWebm = null;
 
     this.ffmpeg = new FFmpeg();
     this.cropper = new Cropper(this);
@@ -55,19 +59,29 @@ class Editor {
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
-  get recording() {
-    if (this.modified) return this.modified;
-    return this.original;
+  get mp4Recording() {
+    if (this.modifiedMp4) return this.modifiedMp4;
+    return this.originalMp4;
+  }
+
+  get webmRecording() {
+    if (this.modifiedWebm) return this.modifiedWebm;
+    return this.originalWebm;
+  }
+
+  get mp4RecordingOrThrow() {
+    if (!this.modifiedMp4) throw new Error('No recording file found');
+    return this.modifiedMp4;
+  }
+
+  get webmRecordingOrThrow() {
+    if (!this.modifiedWebm) throw new Error('No recording file found');
+    return this.modifiedWebm;
   }
 
   get elementOrThrow() {
     if (!this.element) throw new Error('No element found');
     return this.element;
-  }
-
-  get recordingOrThrow() {
-    if (!this.recording) throw new Error('No recording file found');
-    return this.recording;
   }
 
   get footer(): FooterMode {
@@ -102,9 +116,11 @@ class Editor {
       .then((response) => response.blob())
       .then((blob) => {
         runInAction(() => {
+          const uuid = nanoid();
           this.name = 'Big Buck Bunny';
-          this.video = { id: 1, uuid: nanoid(), name: this.name, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null } as BlobStorage;
-          this.original = blob;
+          this.video = { id: 1, uuid, name: this.name, original_mp4: blob, modified_mp4: null, original_webm: blob, modified_webm: null, created_at: Date.now(), updated_at: null } as BlobStorage;
+          this.originalMp4 = blob;
+          this.originalWebm = blob;
         });
       });
   }
@@ -123,8 +139,10 @@ class Editor {
           runInAction(() => {
             this.video = blob;
             this.name = blob.name;
-            this.original = blob.original_blob;
-            this.modified = blob.modified_blob;
+            this.originalMp4 = blob.original_mp4;
+            this.modifiedMp4 = blob.modified_mp4;
+            this.originalWebm = blob.original_webm;
+            this.modifiedWebm = blob.modified_webm;
           });
         }
         break;
@@ -163,19 +181,9 @@ class Editor {
     });
   }
 
-  async convertToMP4() {
-    const input = await fetchFile(this.recordingOrThrow);
-    this.ffmpeg.writeFile('input.webm', input);
-
-    await this.ffmpeg.exec(['-i', 'input.webm', '-preset', 'ultrafast', '-c:v', 'libx264', '-c:a', 'aac', 'output.mp4']);
-    const output = await this.ffmpeg.readFile('output.mp4');
-
-    const data = output as Uint8Array;
-    return new Blob([data.buffer], { type: 'video/mp4' });
-  }
-
-  modifyRecording(blob: Blob) {
-    this.modified = blob;
+  modifyRecording(mp4: Blob, webm: Blob) {
+    this.modifiedMp4 = mp4;
+    this.modifiedWebm = webm;
   }
 
   initializeElement(element: HTMLVideoElement) {

@@ -34,8 +34,8 @@ async function setupWorker() {
         const audios = data.audioReadableStream?.tee();
 
         Promise.all([
-          mp4.handleCaptureStream({ ...data, videoReadableStream: videos[0], audioReadableStream: audios?.[0] }),
-          webm.handleCaptureStream({ ...data, videoReadableStream: videos[1], audioReadableStream: audios?.[1] }),
+          mp4.handleCaptureStream(Object.assign(data, { videoReadableStream: videos[0], audioReadableStream: audios?.[0] })),
+          webm.handleCaptureStream(Object.assign(data, { videoReadableStream: videos[1], audioReadableStream: audios?.[1] })),
         ]).then(
           () => {
             self.postMessage({ type: ScreenRecorderEvents.CaptureStreamSuccess });

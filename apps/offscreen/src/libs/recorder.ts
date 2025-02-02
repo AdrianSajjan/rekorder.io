@@ -144,10 +144,14 @@ class OffscreenRecorder {
     return new Worker(new URL('../worker/recorder.ts', import.meta.url));
   }
 
-  private async __saveBlob(blob: Blob) {
+  private async __saveBlob(buffers: SaveStreamBuffer) {
     const uuid = nanoid();
     const name = 'Untitled Recording - ' + new Date().toLocaleString().split(',')[0];
-    const id = await this.offlineDatabase.blobs.add({ uuid, name, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null });
+
+    const mp4 = new Blob([buffers.mp4], { type: 'video/mp4' });
+    const webm = new Blob([buffers.webm], { type: 'video/webm' });
+
+    const id = await this.offlineDatabase.blobs.add({ uuid, name, original_mp4: mp4, modified_mp4: null, original_webm: webm, modified_webm: null, created_at: Date.now(), updated_at: null });
     chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
   }
 
@@ -311,13 +315,13 @@ class OffscreenRecorder {
   }
 
   async stop() {
+    if (this.recordingState === 'inactive') return;
+
     try {
       this.__resetState();
       this.worker.postMessage({ type: ScreenRecorderEvents.SaveStream });
-
       const buffer = await waitUnitWorkerEvent<SaveStreamBuffer>(this.worker, { success: ScreenRecorderEvents.SaveStreamSuccess, error: ScreenRecorderEvents.SaveStreamError });
-      const blob = new Blob([buffer.mp4], { type: 'video/mp4' });
-      this.__saveBlob(blob);
+      this.__saveBlob(buffer);
     } catch (error) {
       console.log('Error in offscreen recorder while stopping stream recording', error);
       chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamError, payload: { error } });
@@ -325,6 +329,8 @@ class OffscreenRecorder {
   }
 
   async delete() {
+    if (this.recordingState === 'inactive') return;
+
     try {
       this.__resetState();
       this.worker.postMessage({ type: ScreenRecorderEvents.DiscardStream });
@@ -371,6 +377,7 @@ class OffscreenRecorder {
 
   cancel() {
     this.__resetState();
+    chrome.runtime.sendMessage({ type: EventConfig.CancelStreamCaptureSuccess, payload: null });
   }
 
   mute(muted: boolean) {
