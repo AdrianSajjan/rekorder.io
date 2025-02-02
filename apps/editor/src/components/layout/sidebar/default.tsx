@@ -13,7 +13,6 @@ import { cn, createFilePath, extractVideoFileThumbnail, unwrapError } from '@rek
 import { fileDownloadBlob } from '../../../lib/utils';
 import { editor } from '../../../store/editor';
 
-import { useAuthenticatedSession } from '../../../context/authentication';
 import { PremiumFeatureDialog } from '../../modal/premium-feature';
 import { CircularProgress } from '../../ui/circular-progress';
 
@@ -25,17 +24,15 @@ interface CloudUploadProps {
 }
 
 const DefaultSidebar = observer(() => {
-  const { user } = useAuthenticatedSession();
-
   const handleUploadVideo = async (blob: Blob) => {
-    const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(user, blob), blob);
+    const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(null as any, blob), blob);
     if (error) throw error;
     return data;
   };
 
   const handleUploadThumbnail = async (blob: Blob) => {
     const thumbnail = await extractVideoFileThumbnail(blob);
-    const { data, error } = await supabase.storage.from('thumbnails').upload(createFilePath(user, thumbnail), thumbnail);
+    const { data, error } = await supabase.storage.from('thumbnails').upload(createFilePath(null as any, thumbnail), thumbnail);
     if (error) throw error;
     return data;
   };

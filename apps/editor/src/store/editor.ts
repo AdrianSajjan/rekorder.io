@@ -37,8 +37,8 @@ class Editor {
 
   constructor() {
     this.name = '';
-    this.status = 'idle';
     this.sidebar = 'default';
+    this.status = 'initialized';
 
     this.video = null;
     this.element = null;
@@ -54,7 +54,6 @@ class Editor {
 
     this.__setupEvents();
     this.__initializeState();
-    this.__initializeFFmpeg();
 
     makeAutoObservable(this, {}, { autoBind: true });
   }
@@ -90,23 +89,6 @@ class Editor {
         return 'audio';
       default:
         return 'none';
-    }
-  }
-
-  private async __initializeFFmpeg() {
-    runInAction(() => {
-      this.status = 'pending';
-    });
-    try {
-      await this.initializeFFmpeg();
-      runInAction(() => {
-        this.status = 'initialized';
-      });
-    } catch (error) {
-      console.log('Failed to initialize ffmpeg', error);
-      runInAction(() => {
-        this.status = 'error';
-      });
     }
   }
 
