@@ -124,6 +124,9 @@ importers:
       motion:
         specifier: ^11.18.1
         version: 11.18.1(patch_hash=x5skglzqubugnkwvlp3rcvuy7a)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      mp4-muxer:
+        specifier: ^5.1.5
+        version: 5.1.5
       nanoid:
         specifier: ^5.0.9
         version: 5.0.9
@@ -160,6 +163,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.3(ts-node@10.9.1(@swc/core@1.5.29(@swc/helpers@0.5.15))(@types/node@18.16.9)(typescript@5.6.3)))
+      webm-muxer:
+        specifier: ^5.0.3
+        version: 5.0.3
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -248,6 +254,12 @@ importers:
       '@types/chrome':
         specifier: ^0.0.287
         version: 0.0.287
+      '@types/dom-mediacapture-transform':
+        specifier: ^0.1.10
+        version: 0.1.10
+      '@types/dom-webcodecs':
+        specifier: ^0.1.13
+        version: 0.1.13
       '@types/lodash':
         specifier: ^4.17.13
         version: 4.17.13
@@ -3118,6 +3130,12 @@ packages:
   '@types/doctrine@0.0.9':
     resolution: {integrity: sha512-eOIHzCUSH7SMfonMG1LsC2f8vxBFtho6NGBznK41R84YzPuvSBzrhEps33IsQiOW9+VL6NQ9DbjQJznk/S4uRA==}
 
+  '@types/dom-mediacapture-transform@0.1.10':
+    resolution: {integrity: sha512-zUxMN2iShu7p3Fz5sqfvLp93qW/3sLs+RwXWWOkMb969hsuoVqUUokqrENjXqTMNmEEcVXKoHuMMbIGcWyrVVA==}
+
+  '@types/dom-webcodecs@0.1.13':
+    resolution: {integrity: sha512-O5hkiFIcjjszPIYyUSyvScyvrBoV3NOEEZx/pMlsu44TKzWNkLVBBxnxJz42in5n3QIolYOcBYFCPZZ0h8SkwQ==}
+
   '@types/eslint-scope@3.7.7':
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
 
@@ -3219,6 +3237,9 @@ packages:
 
   '@types/uuid@9.0.8':
     resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==}
+
+  '@types/wicg-file-system-access@2020.9.8':
+    resolution: {integrity: sha512-ggMz8nOygG7d/stpH40WVaNvBwuyYLnrg5Mbyf6bmsj/8+gb6Ei4ZZ9/4PNpcPNTT8th9Q8sM8wYmWGjMWLX/A==}
 
   '@types/ws@8.5.13':
     resolution: {integrity: sha512-osM/gWBTPKgHV8XkTunnegTRIsvF6owmf5w+JtAfOw472dptdm0dlGv4xCt6GwQRcC2XVOvvRE/0bAoQcL2QkA==}
@@ -6003,6 +6024,9 @@ packages:
       react-dom:
         optional: true
 
+  mp4-muxer@5.1.5:
+    resolution: {integrity: sha512-dRk4STKmR7sIx12kMBa21DaIxdMG0w4tYwOqi8+Z4NW03I1QloRBWSxU4kReztDGdz5gWp4jSwIKWOIaP9Ia+g==}
+
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
@@ -7603,6 +7627,9 @@ packages:
   webidl-conversions@7.0.0:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
+
+  webm-muxer@5.0.3:
+    resolution: {integrity: sha512-c2MevjFdvcVS1hth8zH0yegoczzQBjxCCZoIF83I8dX85NYjdXZjhg2stsml/bYACgnrYS0W8GT6CmYVmWk59Q==}
 
   webpack-sources@3.2.3:
     resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
@@ -11110,6 +11137,12 @@ snapshots:
 
   '@types/doctrine@0.0.9': {}
 
+  '@types/dom-mediacapture-transform@0.1.10':
+    dependencies:
+      '@types/dom-webcodecs': 0.1.13
+
+  '@types/dom-webcodecs@0.1.13': {}
+
   '@types/eslint-scope@3.7.7':
     dependencies:
       '@types/eslint': 9.6.1
@@ -11202,6 +11235,8 @@ snapshots:
   '@types/stack-utils@2.0.3': {}
 
   '@types/uuid@9.0.8': {}
+
+  '@types/wicg-file-system-access@2020.9.8': {}
 
   '@types/ws@8.5.13':
     dependencies:
@@ -14630,6 +14665,11 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
+  mp4-muxer@5.1.5:
+    dependencies:
+      '@types/dom-webcodecs': 0.1.13
+      '@types/wicg-file-system-access': 2020.9.8
+
   mrmime@2.0.0: {}
 
   ms@2.0.0: {}
@@ -16339,6 +16379,11 @@ snapshots:
   webidl-conversions@3.0.1: {}
 
   webidl-conversions@7.0.0: {}
+
+  webm-muxer@5.0.3:
+    dependencies:
+      '@types/dom-webcodecs': 0.1.13
+      '@types/wicg-file-system-access': 2020.9.8
 
   webpack-sources@3.2.3: {}
 

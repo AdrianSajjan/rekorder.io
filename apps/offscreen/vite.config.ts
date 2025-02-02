@@ -19,6 +19,10 @@ export default defineConfig({
   define: {
     'process.env': {},
   },
+  worker: {
+    format: 'es',
+    plugins: () => [nxViteTsPaths()],
+  },
   build: {
     outDir: '../../dist/apps/offscreen',
     emptyOutDir: true,

@@ -1,6 +1,7 @@
 export * from './lib/cn';
 export * from './lib/time';
 export * from './lib/wait';
+export * from './lib/assert';
 
 export * from './lib/files';
 export * from './lib/thumbnail';

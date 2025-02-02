@@ -88,7 +88,8 @@ class Editor {
       runInAction(() => {
         this.status = 'initialized';
       });
-    } catch {
+    } catch (error) {
+      console.log('Failed to initialize ffmpeg', error);
       runInAction(() => {
         this.status = 'error';
       });

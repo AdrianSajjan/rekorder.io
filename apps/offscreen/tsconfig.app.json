@@ -4,7 +4,9 @@
     "outDir": "../../dist/out-tsc",
     "types": [
       "node",
-      "@types/chrome"
+      "@types/chrome",
+      "@types/dom-webcodecs",
+      "@types/dom-mediacapture-transform"
     ],
     "composite": true,
     "declaration": true,
@@ -26,6 +28,7 @@
   ],
   "include": [
     "src/**/*.ts",
+
     "../../packages/utils/src/**/*",
     "../../packages/constants/src/**/*",
     "../../packages/ui/src/**/*",

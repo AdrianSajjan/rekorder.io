@@ -1,11 +1,13 @@
-import exportWebmBlob from 'fix-webm-duration';
+import { nanoid } from 'nanoid';
 
 import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { ExtensionOfflineDatabase } from '@rekorder.io/database';
 import { RecorderSurface, RuntimeMessage } from '@rekorder.io/types';
-import { nanoid } from 'nanoid';
+import { assert, waitUnitWorkerEvent } from '@rekorder.io/utils';
 
-import { DEFAULT_MIME_TYPE, MIME_TYPES } from '../constants/mime-types';
+import { ScreenRecorderEvents } from '../constants/events';
+
+type SaveStreamBuffer = Record<'webm' | 'mp4', ArrayBuffer>;
 
 interface OffscreenRecorderStart {
   streamId?: string;
@@ -23,11 +25,8 @@ interface ChromeLocalStorage {
 }
 
 class OffscreenRecorder {
-  chunks: Blob[];
   muted: boolean;
   timestamp: number;
-  discard: boolean;
-
   streamId: string;
   microphoneId: string;
   displaySurface: RecorderSurface;
@@ -38,24 +37,18 @@ class OffscreenRecorder {
 
   audio: MediaStream | null;
   video: MediaStream | null;
-  stream: MediaStream | null;
-  recorder: MediaRecorder | null;
+  context: AudioContext | null;
+  destination: MediaStreamAudioDestinationNode | null;
 
-  helperAudioGain: GainNode | null;
-  helperAudioContext: AudioContext | null;
-  helperInputAudioSource: MediaStreamAudioSourceNode | null;
-  helperOutputAudioSource: MediaStreamAudioSourceNode | null;
-  helperAudioDestination: MediaStreamAudioDestinationNode | null;
-
-  timerInterval: NodeJS.Timer | null;
+  worker: Worker;
   offlineDatabase: ExtensionOfflineDatabase;
+  timerInterval: NodeJS.Timer | null;
+
+  private readonly mSampleRate = 48000;
 
   constructor() {
-    this.chunks = [];
     this.timestamp = 0;
     this.muted = false;
-    this.discard = false;
-
     this.streamId = '';
     this.microphoneId = 'n/a';
     this.displaySurface = 'tab';
@@ -66,21 +59,24 @@ class OffscreenRecorder {
 
     this.video = null;
     this.audio = null;
-    this.stream = null;
-    this.recorder = null;
-
-    this.helperAudioGain = null;
-    this.helperAudioContext = null;
-    this.helperAudioDestination = null;
-    this.helperInputAudioSource = null;
-    this.helperOutputAudioSource = null;
+    this.context = null;
+    this.destination = null;
 
     this.timerInterval = null;
+    this.worker = this.__setupWorker();
     this.offlineDatabase = ExtensionOfflineDatabase.createInstance();
   }
 
   static createInstance() {
     return new OffscreenRecorder();
+  }
+
+  private get videoTrack() {
+    return this.video?.getVideoTracks()[0];
+  }
+
+  private get audioTrack() {
+    return this.destination?.stream.getAudioTracks()[0];
   }
 
   private __setSessionStorage(data: Record<string, unknown>) {
@@ -125,28 +121,34 @@ class OffscreenRecorder {
   private __resetState() {
     if (this.video) this.video.getTracks().forEach((track) => track.stop());
     if (this.audio) this.audio.getTracks().forEach((track) => track.stop());
-    if (this.stream) this.stream.getTracks().forEach((track) => track.stop());
-
-    if (this.helperAudioContext) this.helperAudioContext.close();
+    if (this.destination) this.destination.stream.getTracks().forEach((track) => track.stop());
+    if (this.context) this.context.close();
     if (this.timerInterval) clearInterval(this.timerInterval);
 
-    this.chunks = [];
-    this.timestamp = 0;
-    this.discard = false;
-
     this.streamId = '';
+    this.timestamp = 0;
     this.microphoneId = 'n/a';
     this.captureDeviceAudio = false;
     this.recordingState = 'inactive';
 
     this.video = null;
     this.audio = null;
-    this.stream = null;
-    this.recorder = null;
-
+    this.context = null;
+    this.destination = null;
     this.timerInterval = null;
-    this.helperAudioContext = null;
+
     this.__resetSessionStorage();
+  }
+
+  private __setupWorker() {
+    return new Worker(new URL('../worker/recorder.ts', import.meta.url));
+  }
+
+  private async __saveBlob(blob: Blob) {
+    const uuid = nanoid();
+    const name = 'Untitled Recording - ' + new Date().toLocaleString().split(',')[0];
+    const id = await this.offlineDatabase.blobs.add({ uuid, name, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null });
+    chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
   }
 
   private __startTimer() {
@@ -167,83 +169,68 @@ class OffscreenRecorder {
     }
   }
 
-  private __createCombinedStreamHelper(video: MediaStream, audio: MediaStream | null) {
-    this.helperAudioContext = new AudioContext();
-    this.helperAudioGain = this.helperAudioContext.createGain();
-    this.helperAudioDestination = this.helperAudioContext.createMediaStreamDestination();
+  private async __initializeWorkerStream() {
+    assert(this.videoTrack);
 
-    if (video.getAudioTracks().length) {
-      this.helperInputAudioSource = this.helperAudioContext.createMediaStreamSource(video);
-      this.helperInputAudioSource.connect(this.helperAudioGain).connect(this.helperAudioDestination);
-    }
+    const videoTrackSettings = this.videoTrack.getSettings();
+    const videoReadableStream = new MediaStreamTrackProcessor({ track: this.videoTrack }).readable;
 
-    if (audio?.getAudioTracks().length) {
-      this.helperOutputAudioSource = this.helperAudioContext.createMediaStreamSource(audio);
-      this.helperOutputAudioSource.connect(this.helperAudioGain).connect(this.helperAudioDestination);
-    }
+    if (!this.audioTrack) {
+      this.worker.postMessage(
+        {
+          type: ScreenRecorderEvents.CaptureStream,
+          payload: { videoTrackSettings, videoReadableStream },
+        },
+        [videoReadableStream]
+      );
 
-    this.stream = new MediaStream();
-    this.stream.addTrack(video.getVideoTracks()[0]);
-    if (video.getAudioTracks().length || audio?.getAudioTracks().length) this.stream.addTrack(this.helperAudioDestination.stream.getAudioTracks()[0]);
-  }
-
-  /**
-   * Save the blob to the offline database and send the uuid and id back to the content script
-   */
-  private async __exportWebmBlob(blob: Blob) {
-    try {
-      const uuid = nanoid();
-      const name = 'Untitled Recording - ' + new Date().toLocaleString().split(',')[0];
-      const id = await this.offlineDatabase.blobs.add({ uuid, name, original_blob: blob, modified_blob: null, created_at: Date.now(), updated_at: null });
-      chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamSuccess, payload: { uuid, id } });
-    } catch (error) {
-      console.log('Error in offscreen recorder while saving captured stream to offline database', error);
-      chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamError, payload: { error } });
-    }
-  }
-
-  private __recorderStopEvent() {
-    if (this.discard) {
-      this.__resetState();
-      chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCaptureSuccess, payload: null });
+      await waitUnitWorkerEvent(this.worker, {
+        success: ScreenRecorderEvents.CaptureStreamSuccess,
+        error: ScreenRecorderEvents.CaptureStreamError,
+      });
     } else {
-      const blob = new Blob(this.chunks, { type: 'video/webm' });
-      exportWebmBlob(blob, this.timestamp * 1000, (blob) => this.__exportWebmBlob(blob), { logger: false });
-      this.__resetState();
+      const audioTrackSettings = this.audioTrack.getSettings();
+      const audioReadableStream = new MediaStreamTrackProcessor({ track: this.audioTrack }).readable;
+
+      this.worker.postMessage(
+        {
+          type: ScreenRecorderEvents.CaptureStream,
+          payload: { videoTrackSettings, videoReadableStream, audioTrackSettings, audioReadableStream },
+        },
+        [videoReadableStream, audioReadableStream]
+      );
+
+      await waitUnitWorkerEvent(this.worker, {
+        success: ScreenRecorderEvents.CaptureStreamSuccess,
+        error: ScreenRecorderEvents.CaptureStreamError,
+      });
     }
   }
 
-  private __recorderDataAvailableEvent(event: BlobEvent) {
-    if (event.data.size > 0) {
-      this.chunks.push(event.data);
+  private __initializeAudioMixing() {
+    const desktopAudio = this.video?.getAudioTracks()[0];
+    const microphoneAudio = this.audio?.getAudioTracks()[0];
+
+    const desktopSampleRate = desktopAudio?.getSettings().sampleRate || this.mSampleRate;
+    const microphoneSampleRate = microphoneAudio?.getSettings().sampleRate || this.mSampleRate;
+    const sampleRate = Math.min(this.mSampleRate, desktopSampleRate, microphoneSampleRate);
+
+    this.context = new AudioContext({ sampleRate });
+    this.destination = this.context.createMediaStreamDestination();
+
+    if (desktopAudio) {
+      const desktopSource = this.context.createMediaStreamSource(new MediaStream([desktopAudio]));
+      const desktopGain = this.context.createGain();
+      desktopGain.gain.value = 0.7;
+      desktopSource.connect(desktopGain).connect(this.destination);
     }
-  }
 
-  private __recorderStartEvent() {
-    this.__startTimer();
-    this.recordingState = 'recording';
-    chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecordingSuccess, payload: null });
-    this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState });
-  }
-
-  private __recorderPauseEvent() {
-    this.__stopTimer();
-    this.recordingState = 'paused';
-    chrome.runtime.sendMessage({ type: EventConfig.PauseStreamCaptureSuccess, payload: null });
-    this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState });
-  }
-
-  private __recorderResumeEvent() {
-    this.__startTimer();
-    this.recordingState = 'recording';
-    chrome.runtime.sendMessage({ type: EventConfig.ResumeStreamCaptureSuccess, payload: null });
-    this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState });
-  }
-
-  private __recorderErrorEvent(error: unknown) {
-    this.__resetState();
-    chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecordingError, payload: { error } });
-    console.log('Error in recorder while recording stream', error);
+    if (microphoneAudio) {
+      const microphoneSource = this.context.createMediaStreamSource(new MediaStream([microphoneAudio]));
+      const microphoneGain = this.context.createGain();
+      microphoneGain.gain.value = 1.0;
+      microphoneSource.connect(microphoneGain).connect(this.destination);
+    }
   }
 
   private __captureStreamError(error: unknown) {
@@ -252,36 +239,32 @@ class OffscreenRecorder {
     console.log('Error in navigator while capturing stream', error);
   }
 
-  private __captureStreamSuccess() {
-    if (!this.video) return;
-
-    chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureSuccess, payload: null });
-    const mimeType = MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type)) ?? DEFAULT_MIME_TYPE;
-
-    this.__createCombinedStreamHelper(this.video, this.audio);
-    this.recorder = new MediaRecorder(this.stream!, { mimeType, videoBitsPerSecond: 8000000, audioBitsPerSecond: 192000 });
-
-    this.recorder.addEventListener('stop', this.__recorderStopEvent.bind(this));
-    this.recorder.addEventListener('error', this.__recorderErrorEvent.bind(this));
-    this.recorder.addEventListener('pause', this.__recorderPauseEvent.bind(this));
-    this.recorder.addEventListener('resume', this.__recorderResumeEvent.bind(this));
-    this.recorder.addEventListener('dataavailable', this.__recorderDataAvailableEvent.bind(this));
+  private async __captureStreamSuccess() {
+    if (this.video) {
+      this.__initializeAudioMixing();
+      await this.__initializeWorkerStream();
+      chrome.runtime.sendMessage({ type: EventConfig.StartStreamCaptureSuccess, payload: null });
+    }
   }
 
   private async __captureDisplayVideoStream() {
-    if (this.displaySurface === 'tab') {
-      if (!this.streamId) {
-        throw new Error('Selected display surface is tab, but unable to obtain a media stream id');
-      }
-      this.video = await navigator.mediaDevices.getUserMedia({
-        audio: this.captureDeviceAudio ? { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.streamId } } : false,
-        video: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.streamId, maxFrameRate: 30 } },
-      } as MediaStreamConstraints);
-    } else {
-      this.video = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: this.displaySurface },
-        audio: this.captureDeviceAudio,
-      } as DisplayMediaStreamOptions);
+    switch (this.displaySurface) {
+      case 'tab':
+        if (!this.streamId) {
+          throw new Error('Selected display surface is tab, but unable to obtain a media stream id');
+        }
+        this.video = await navigator.mediaDevices.getUserMedia({
+          audio: this.captureDeviceAudio ? { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.streamId } } : false,
+          video: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: this.streamId, maxFrameRate: 30 } },
+        } as MediaStreamConstraints);
+        break;
+
+      default:
+        this.video = await navigator.mediaDevices.getDisplayMedia({
+          video: { displaySurface: this.displaySurface },
+          audio: this.captureDeviceAudio,
+        } as DisplayMediaStreamOptions);
+        break;
     }
   }
 
@@ -310,34 +293,84 @@ class OffscreenRecorder {
     );
   }
 
-  start() {
-    if (!this.recorder || this.recorder.state !== 'inactive') return;
-    this.__recorderStartEvent();
-    this.recorder.start(3000);
+  async start() {
+    if (this.recordingState === 'recording') return;
+
+    try {
+      this.worker.postMessage({ type: ScreenRecorderEvents.RecordStream });
+      await waitUnitWorkerEvent(this.worker, { success: ScreenRecorderEvents.RecordStreamSuccess, error: ScreenRecorderEvents.RecordStreamError });
+      this.recordingState = 'recording';
+
+      this.__startTimer();
+      chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecordingSuccess, payload: null });
+      this.__setSessionStorage({ [StorageConfig.RecorderStatus]: this.recordingState });
+    } catch (error) {
+      console.log('Error in offscreen recorder while starting stream recording', error);
+      chrome.runtime.sendMessage({ type: EventConfig.StartStreamRecordingError, payload: { error } });
+    }
   }
 
-  stop() {
-    if (!this.recorder) return;
-    this.recorder.stop();
+  async stop() {
+    try {
+      this.__resetState();
+      this.worker.postMessage({ type: ScreenRecorderEvents.SaveStream });
+
+      const buffer = await waitUnitWorkerEvent<SaveStreamBuffer>(this.worker, { success: ScreenRecorderEvents.SaveStreamSuccess, error: ScreenRecorderEvents.SaveStreamError });
+      const blob = new Blob([buffer.mp4], { type: 'video/mp4' });
+      this.__saveBlob(blob);
+    } catch (error) {
+      console.log('Error in offscreen recorder while stopping stream recording', error);
+      chrome.runtime.sendMessage({ type: EventConfig.SaveCapturedStreamError, payload: { error } });
+    }
   }
 
-  delete() {
-    this.discard = true;
-    this.stop();
+  async delete() {
+    try {
+      this.__resetState();
+      this.worker.postMessage({ type: ScreenRecorderEvents.DiscardStream });
+
+      await waitUnitWorkerEvent(this.worker, { success: ScreenRecorderEvents.DiscardStreamSuccess, error: ScreenRecorderEvents.DiscardStreamError });
+      this.recordingState = 'inactive';
+      chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCaptureSuccess, payload: null });
+    } catch (error) {
+      console.log('Error in offscreen recorder while discarding stream recording', error);
+      chrome.runtime.sendMessage({ type: EventConfig.DiscardStreamCaptureError, payload: { error } });
+    }
+  }
+
+  async pause() {
+    if (this.recordingState !== 'recording') return;
+
+    try {
+      this.__stopTimer();
+      this.worker.postMessage({ type: ScreenRecorderEvents.PauseStream });
+
+      await waitUnitWorkerEvent(this.worker, { success: ScreenRecorderEvents.PauseStreamSuccess, error: ScreenRecorderEvents.PauseStreamError });
+      this.recordingState = 'paused';
+    } catch (error) {
+      console.log('Error in offscreen recorder while pausing stream recording', error);
+      chrome.runtime.sendMessage({ type: EventConfig.PauseStreamCaptureError, payload: { error } });
+    }
+  }
+
+  async resume() {
+    if (this.recordingState !== 'paused') return;
+
+    try {
+      this.worker.postMessage({ type: ScreenRecorderEvents.ResumeStream });
+      await waitUnitWorkerEvent(this.worker, { success: ScreenRecorderEvents.ResumeStreamSuccess, error: ScreenRecorderEvents.ResumeStreamError });
+
+      this.__startTimer();
+      this.recordingState = 'recording';
+      chrome.runtime.sendMessage({ type: EventConfig.ResumeStreamCaptureSuccess, payload: null });
+    } catch (error) {
+      console.log('Error in offscreen recorder while resuming stream recording', error);
+      chrome.runtime.sendMessage({ type: EventConfig.ResumeStreamCaptureError, payload: { error } });
+    }
   }
 
   cancel() {
     this.__resetState();
-  }
-
-  pause() {
-    if (!this.recorder || this.recorder.state !== 'recording') return;
-    this.recorder.pause();
-  }
-
-  resume() {
-    if (!this.recorder || this.recorder.state !== 'paused') return;
-    this.recorder.resume();
   }
 
   mute(muted: boolean) {

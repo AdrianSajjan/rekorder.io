@@ -256,7 +256,7 @@ class Thread {
       case EventConfig.StartTabStreamCapture: {
         this.__handleSetupRecorderTab().then(
           (recorder) => {
-            console.log('Recorder tab created, getting media stream id', recorder, recorder.status);
+            console.log('Recorder tab created, getting media stream id');
             chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, (streamId) => {
               if (chrome.runtime.lastError) {
                 if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error: chrome.runtime.lastError } });
@@ -281,7 +281,7 @@ class Thread {
       case EventConfig.StartDisplayStreamCapture: {
         this.__handleSetupRecorderTab().then(
           (recorder) => {
-            console.log('Recorder tab created, starting display stream capture', recorder, recorder.status);
+            console.log('Recorder tab created, starting display stream capture');
             chrome.tabs.sendMessage(recorder.id!, { type: EventConfig.StartDisplayStreamCapture, payload: message.payload });
             console.log('Offscreen document setup complete, starting display stream capture');
           },
@@ -290,14 +290,6 @@ class Thread {
             console.warn('Error in background while setting up offscreen document', error);
           }
         );
-        return false;
-      }
-
-      /**
-       * Start recording the stream in the offscreen document, sent from the content script
-       */
-      case EventConfig.StartStreamRecording: {
-        chrome.runtime.sendMessage(message);
         return false;
       }
 
@@ -334,14 +326,6 @@ class Thread {
       }
 
       /**
-       * Ask the offscreen document to save the captured stream, sent from the content script
-       */
-      case EventConfig.SaveCapturedStream: {
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
-
-      /**
        * Successfully saved the captured stream in the offscreen document, close the extension and offscreen document and open the editor
        */
       case EventConfig.SaveCapturedStreamSuccess: {
@@ -366,46 +350,6 @@ class Thread {
        */
       case EventConfig.SaveCapturedStreamError: {
         this.__sendMessageToContentScript(message);
-        return false;
-      }
-
-      /**
-       * Ask the offscreen document to pause the captured stream, sent from the content script
-       */
-      case EventConfig.PauseStreamCapture: {
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
-
-      /**
-       * Ask the offscreen document to resume the captured stream, sent from the content script
-       */
-      case EventConfig.ResumeStreamCapture: {
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
-
-      /**
-       * Ask the offscreen document to cancel the captured stream, sent from the content script
-       */
-      case EventConfig.DiscardStreamCapture: {
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
-
-      /**
-       * Message received from the content script relayed by background worker to toggle the push to talk activity
-       */
-      case EventConfig.ChangeAudioPushToTalkActivity: {
-        chrome.runtime.sendMessage(message);
-        return false;
-      }
-
-      /**
-       * Message received from the content script relayed by background worker to toggle the audio muted state
-       */
-      case EventConfig.ChangeAudioMutedState: {
-        chrome.runtime.sendMessage(message);
         return false;
       }
 
