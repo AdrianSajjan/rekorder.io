@@ -69,7 +69,7 @@ export class Cropper {
     runInAction(() => (this.status = 'processing'));
 
     try {
-      const input = await fetchFile(this._editor.recordingOrThrow);
+      const input = await fetchFile(this._editor.mp4RecordingOrThrow);
       await this._editor.ffmpeg.writeFile('input.webm', input);
 
       const status = await this._editor.ffmpeg.exec(
@@ -101,7 +101,7 @@ export class Cropper {
       );
 
       const blob = new Blob([data.buffer], { type: 'video/webm' });
-      this._editor.modifyRecording(blob);
+      this._editor.modifyRecording(blob, blob);
     } catch (error) {
       runInAction(() => (this.status = 'error'));
       wait(1500).then(() => runInAction(() => (this.status = 'idle')));

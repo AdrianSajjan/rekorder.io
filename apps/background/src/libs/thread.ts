@@ -1,7 +1,6 @@
-import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { checkBrowserName } from '@rekorder.io/utils';
-import type { Session } from '@supabase/supabase-js';
+import { EventConfig, StorageConfig } from '@rekorder.io/constants';
 
 const OFFSCREEN_PATH = 'build/offscreen.html';
 const AUTHENTICATION_URL = 'http://localhost:4200/extension/login';
@@ -147,15 +146,6 @@ class Thread {
     this.__injectContentScript();
   }
 
-  /**
-   * TODO: Finish up the authentication system
-   */
-  private async __handleAuthenticateUser(tab: chrome.tabs.Tab) {
-    this.currentTab = tab;
-    this.authenticationMode = 'script';
-    this.authenticationTab = await chrome.tabs.create({ url: AUTHENTICATION_URL, active: true });
-  }
-
   private __handleAuthenticationSuccess(message: RuntimeMessage) {
     switch (this.authenticationMode) {
       case 'script':
@@ -177,12 +167,7 @@ class Thread {
   }
 
   private async __handleActionClickListener(tab: chrome.tabs.Tab) {
-    const result = await chrome.storage.local.get(StorageConfig.Authentication);
-    const authentication = result[StorageConfig.Authentication] as Session | null;
-
-    if (!authentication) {
-      this.__handleAuthenticateUser(tab);
-    } else if (this.enabled) {
+    if (this.enabled) {
       this.__handleCloseExtension();
     } else if (this.__preventContentInjection(tab)) {
       console.log('Tab is in the extension, maybe handle this case');
@@ -254,15 +239,15 @@ class Thread {
        * Sender Tab ID is the tab that the content script is injected into
        */
       case EventConfig.StartTabStreamCapture: {
-        this.__handleSetupRecorderTab().then(
-          (recorder) => {
+        this.__handleSetupOffscreenDocument().then(
+          () => {
             console.log('Recorder tab created, getting media stream id');
             chrome.tabCapture.getMediaStreamId({ targetTabId: sender.tab?.id }, (streamId) => {
               if (chrome.runtime.lastError) {
                 if (sender.tab?.id) chrome.tabs.sendMessage(sender.tab.id, { type: EventConfig.StartStreamCaptureError, payload: { error: chrome.runtime.lastError } });
                 console.warn('Error in background while getting media stream id', chrome.runtime.lastError);
               } else {
-                chrome.tabs.sendMessage(recorder.id!, { type: EventConfig.StartTabStreamCapture, payload: Object.assign({ streamId }, message.payload) });
+                chrome.runtime.sendMessage({ type: EventConfig.StartTabStreamCapture, payload: Object.assign({ streamId }, message.payload) });
               }
             });
           },
