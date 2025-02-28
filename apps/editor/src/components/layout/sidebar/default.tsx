@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import { forwardRef } from 'react';
 import { toast } from 'sonner';
-
 import { CaretRight, CloudArrowUp, Crop, Download, MagnifyingGlassPlus, MusicNotes, Panorama, Scissors, ShareFat, Subtitles, Translate, UserFocus, UserSound } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 
@@ -10,8 +9,9 @@ import { StorageResponse } from '@rekorder.io/types';
 import { CrownIcon, Spinner, theme } from '@rekorder.io/ui';
 import { cn, createFilePath, extractVideoFileThumbnail, unwrapError } from '@rekorder.io/utils';
 
-import { fileDownloadBlob } from '../../../lib/utils';
+import { authenticateSession, fileDownloadBlob } from '../../../lib/utils';
 import { editor } from '../../../store/editor';
+import { useSession } from '../../../context/session';
 
 import { PremiumFeatureDialog } from '../../modal/premium-feature';
 import { CircularProgress } from '../../ui/circular-progress';
@@ -24,21 +24,24 @@ interface CloudUploadProps {
 }
 
 const DefaultSidebar = observer(() => {
+  const session = useSession();
+
   const handleUploadVideo = async (blob: Blob) => {
-    const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(null as any, blob), blob);
+    const { data, error } = await supabase.storage.from('recordings').upload(createFilePath(session!, blob), blob);
     if (error) throw error;
     return data;
   };
 
   const handleUploadThumbnail = async (blob: Blob) => {
     const thumbnail = await extractVideoFileThumbnail(blob);
-    const { data, error } = await supabase.storage.from('thumbnails').upload(createFilePath(null as any, thumbnail), thumbnail);
+    const { data, error } = await supabase.storage.from('thumbnails').upload(createFilePath(session!, thumbnail), thumbnail);
     if (error) throw error;
     return data;
   };
 
   const handleCloudUpload = useMutation({
     mutationFn: async () => {
+      if (!session) return;
       const response = {} as CloudUploadProps;
 
       if (editor.originalMp4) {
@@ -58,11 +61,12 @@ const DefaultSidebar = observer(() => {
       await supabase
         .from('recordings')
         .insert({
-          name: editor.name,
-          original_file: response.original_file.id,
-          original_thumbnail: response.original_thumbnail.id,
-          modified_file: response.modified_file ? response.modified_file.id : null,
-          modified_thumbnail: response.modified_thumbnail ? response.modified_thumbnail.id : null,
+          user_id: session.id,
+          project_name: editor.name,
+          original_file: response.original_file.fullPath,
+          original_thumbnail: response.original_thumbnail.fullPath,
+          modified_file: response.modified_file ? response.modified_file.fullPath : null,
+          modified_thumbnail: response.modified_thumbnail ? response.modified_thumbnail.fullPath : null,
         })
         .select()
         .throwOnError();
@@ -102,7 +106,7 @@ const DefaultSidebar = observer(() => {
           title="Upload to cloud"
           description="Get access to premium features"
           status={handleCloudUpload.isPending ? 'loading' : null}
-          onClick={() => handleCloudUpload.mutate()}
+          onClick={() => (session ? handleCloudUpload.mutate() : authenticateSession())}
         />
         <SidebarAction
           icon={<Download weight="bold" />}

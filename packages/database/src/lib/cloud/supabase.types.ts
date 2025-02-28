@@ -39,8 +39,10 @@ export type Database = {
           created_at: string
           id: string
           modified_file: string | null
-          name: string
+          modified_thumbnail: string | null
           original_file: string
+          original_thumbnail: string | null
+          project_name: string
           updated_at: string
           user_id: string
         }
@@ -48,17 +50,21 @@ export type Database = {
           created_at?: string
           id?: string
           modified_file?: string | null
-          name: string
+          modified_thumbnail?: string | null
           original_file: string
+          original_thumbnail?: string | null
+          project_name: string
           updated_at?: string
-          user_id?: string
+          user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           modified_file?: string | null
-          name?: string
+          modified_thumbnail?: string | null
           original_file?: string
+          original_thumbnail?: string | null
+          project_name?: string
           updated_at?: string
           user_id?: string
         }

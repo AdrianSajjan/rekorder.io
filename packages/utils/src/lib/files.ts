@@ -11,3 +11,8 @@ export function createFilePath(user: User, blob: Blob) {
   const name = createFileName(blob);
   return user.id + '/' + name;
 }
+
+export function parseUploadedFilePath(path: string) {
+  const [, ...file] = path.split('/');
+  return file.join('/');
+}
