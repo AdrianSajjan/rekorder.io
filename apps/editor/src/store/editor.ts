@@ -1,12 +1,13 @@
 import { debounce } from 'lodash';
 import { nanoid } from 'nanoid';
 import { makeAutoObservable, runInAction } from 'mobx';
-import { FFmpeg, LogEvent, ProgressEvent } from '@ffmpeg/ffmpeg';
 
 import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
+
 import { Cropper } from './cropper';
+import { MOCK_VIDEO_NAME, MOCK_VIDEO_URL } from '../constants/mock';
 
 export type EditorStatus = 'idle' | 'pending' | 'initialized' | 'error';
 export type SidebarMode = 'default' | 'crop' | 'audio';
@@ -19,8 +20,6 @@ class Editor {
 
   video: BlobStorage | null;
   element: HTMLVideoElement | null;
-
-  ffmpeg: FFmpeg;
   cropper: Cropper;
 
   originalMp4: Blob | null;
@@ -30,10 +29,7 @@ class Editor {
 
   private _offlineDatabase: ExtensionOfflineDatabase;
   private _saveNameOfflineDatabaseDebounced = debounce(this.__saveNameOfflineDatabase, 500);
-
-  private _ffmpegLogsHandler = this.__ffmpegLogsHandler.bind(this);
   private _runtimeEventHandler = this.__runtimeEventHandler.bind(this);
-  private _ffmpegProgressHandler = this.__ffmpegProgressHandler.bind(this);
 
   constructor() {
     this.name = '';
@@ -48,7 +44,6 @@ class Editor {
     this.originalWebm = null;
     this.modifiedWebm = null;
 
-    this.ffmpeg = new FFmpeg();
     this.cropper = new Cropper(this);
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
@@ -94,15 +89,15 @@ class Editor {
 
   private async __initializeState() {
     if (!import.meta.env.DEV) return;
-    fetch('http://localhost:54321/storage/v1/object/public/assets/videos/sample.webm')
+    fetch(MOCK_VIDEO_URL)
       .then((response) => response.blob())
       .then((blob) => {
         runInAction(() => {
           const uuid = nanoid();
-          this.name = 'Big Buck Bunny';
-          this.video = { id: 1, uuid, name: this.name, original_mp4: blob, modified_mp4: null, original_webm: blob, modified_webm: null, created_at: Date.now(), updated_at: null } as BlobStorage;
+          this.name = MOCK_VIDEO_NAME;
           this.originalMp4 = blob;
           this.originalWebm = blob;
+          this.video = { id: 1, uuid, name: this.name, original_mp4: blob, modified_mp4: null, original_webm: blob, modified_webm: null, created_at: Date.now(), updated_at: null } as BlobStorage;
         });
       });
   }
@@ -132,35 +127,20 @@ class Editor {
     }
   }
 
-  private __ffmpegProgressHandler(event: ProgressEvent) {
-    console.log('Time:', event.time, 'Progress:', event.progress);
-  }
-
-  private __ffmpegLogsHandler(event: LogEvent) {
-    console.log('Log:', event.message, event.type);
-  }
-
   private __setupEvents() {
-    this.ffmpeg.on('log', this._ffmpegLogsHandler);
-    this.ffmpeg.on('progress', this._ffmpegProgressHandler);
-    if (!import.meta.env.DEV) chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
+    if (!import.meta.env.DEV) {
+      chrome.runtime.onMessage.addListener(this._runtimeEventHandler);
+    }
   }
 
   private __removeEvents() {
-    this.ffmpeg.off('log', this._ffmpegLogsHandler);
-    this.ffmpeg.off('progress', this._ffmpegProgressHandler);
-    if (!import.meta.env.DEV) chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
+    if (!import.meta.env.DEV) {
+      chrome.runtime.onMessage.removeListener(this._runtimeEventHandler);
+    }
   }
 
   static createInstance() {
     return new Editor();
-  }
-
-  async initializeFFmpeg() {
-    await this.ffmpeg.load({
-      coreURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.js' : chrome.runtime.getURL('build/vendor/ffmpeg/core.js'),
-      wasmURL: import.meta.env.DEV ? 'http://localhost:4300/build/vendor/ffmpeg/core.wasm' : chrome.runtime.getURL('build/vendor/ffmpeg/core.wasm'),
-    });
   }
 
   modifyRecording(mp4: Blob, webm: Blob) {

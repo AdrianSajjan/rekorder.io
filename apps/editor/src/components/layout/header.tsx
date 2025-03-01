@@ -16,20 +16,20 @@ const Header = observer(() => {
             placeholder="Project Name"
             onChange={(event) => editor.changeName(event.target.value)}
             onBlur={() => setEditing(false)}
-            className="text-left text-sm font-medium w-48 py-1 px-2 rounded-md bg-transparent"
+            className="text-left text-sm font-medium w-48 py-1 px-2 rounded-md bg-transparent border-2 border-borders-input ring-0"
           />
         ) : (
-          <p className="text-sm text-left font-medium w-48 line-clamp-1" onDoubleClick={() => setEditing(true)}>
+          <p className="text-sm text-left font-medium w-48 line-clamp-1 py-1 px-2 border-2 border-transparent" onDoubleClick={() => setEditing(true)}>
             {editor.name || 'Project Name'}
           </p>
         )}
       </div>
       <div className="flex items-center gap-3">
-        <Button variant="light" color="accent" className="shrink-0">
+        <Button variant="light" color="accent" className="shrink-0" size="small">
           <ArrowCounterClockwise size={16} weight="bold" />
-          <span>Revert to original</span>
+          <span>Revert Original</span>
         </Button>
-        <Button size="icon" variant="light" color="accent">
+        <Button size="icon" variant="light" color="accent" className="!h-9 !w-9">
           <QuestionMark size={16} weight="bold" />
         </Button>
       </div>
