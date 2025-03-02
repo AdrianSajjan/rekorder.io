@@ -36,8 +36,9 @@
     "../../packages/utils/src/**/*",
     "../../packages/hooks/src/**/*",
     "../../packages/types/src/**/*",
+    "../../packages/player/src/**/*",
     "../../packages/canvas/src/**/*",
     "../../packages/database/src/**/*",
-    "../../packages/constants/src/**/*"
+    "../../packages/constants/src/**/*",
   ]
 }

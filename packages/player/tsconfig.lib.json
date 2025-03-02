@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "declaration": true,
+    "composite": true,
+    "types": ["node", "vite/client"]
+  },
+  "include": ["src/**/*.ts", "mp4box.d.ts","../utils/src/**/*.ts", "../types/src/**/*.ts"]
+}

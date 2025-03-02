@@ -19,6 +19,7 @@
       "@rekorder.io/constants": ["packages/constants/src/index.ts"],
       "@rekorder.io/database": ["packages/database/src/index.ts"],
       "@rekorder.io/hooks": ["packages/hooks/src/index.ts"],
+      "@rekorder.io/player": ["packages/player/src/index.ts"],
       "@rekorder.io/types": ["packages/types/src/index.ts"],
       "@rekorder.io/ui": ["packages/ui/src/index.ts"],
       "@rekorder.io/utils": ["packages/utils/src/index.ts"]

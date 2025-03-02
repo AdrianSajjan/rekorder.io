@@ -1,13 +1,14 @@
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
-import { Spinner, theme, VideoPlayer } from '@rekorder.io/ui';
+import { Spinner, theme } from '@rekorder.io/ui';
 
-import { Cropper } from './cropper';
 import { Footer } from './layout/footer';
 import { Header } from './layout/header';
 import { Sidebar } from './layout/sidebar';
 
+import { Cropper } from './cropper';
+import { MP4VideoPlayer } from './player';
 import { editor } from '../store/editor';
 import { FOOTER_HEIGHT, HEADER_HEIGHT, MAIN_PADDING, SIDEBAR_WIDTH } from '../constants/layout';
 
@@ -21,9 +22,18 @@ const OfflineEditor = observer(() => {
         <Header />
         <main
           className="flex items-center justify-center transition-all duration-300 ease-in-out"
-          style={{ padding: MAIN_PADDING, height: `calc(100vh - ${HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`, width: `calc(100vw - ${SIDEBAR_WIDTH}px)` }}
+          style={{
+            padding: MAIN_PADDING,
+            height: `calc(100vh - ${HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`,
+            width: `calc(100vw - ${SIDEBAR_WIDTH}px)`,
+          }}
         >
-          <Player style={{ maxWidth: `calc(100vw - ${MAIN_PADDING * 2 + SIDEBAR_WIDTH}px)`, maxHeight: `calc(100vh - ${MAIN_PADDING * 2 + HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)` }} />
+          <Player
+            style={{
+              maxWidth: `calc(100vw - ${MAIN_PADDING * 2 + SIDEBAR_WIDTH}px)`,
+              maxHeight: `calc(100vh - ${MAIN_PADDING * 2 + HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`,
+            }}
+          />
         </main>
         <Footer />
       </section>
@@ -63,7 +73,7 @@ const Player = observer(({ style }: { style: React.CSSProperties }) => {
 
   return (
     <div className="relative h-fit w-fit max-w-full max-h-full">
-      <VideoPlayer controls={editor.sidebar === 'default'} ref={editor.initializeElement} src={source} className="transition-all duration-300 ease-in-out" style={style} />
+      <MP4VideoPlayer src={source} className="transition-all duration-300 ease-in-out" style={style} />
       {editor.sidebar === 'crop' ? <Cropper /> : null}
     </div>
   );
