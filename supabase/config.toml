@@ -216,7 +216,7 @@ max_frequency = "5s"
 enabled = true
 client_id = "APPLE_CLIENT_ID"
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
-secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
+secret = "env(APPLE_SECRET_KEY)"
 # Overrides the default auth redirectUrl.
 redirect_uri = ""
 # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
@@ -230,7 +230,7 @@ skip_nonce_check = false
 enabled = true
 client_id = "68419418001-8qi4aihfd8ra0jkvt8mroeu4cm6pdei4.apps.googleusercontent.com"
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
-secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+secret = "env(GOOGLE_SECRET_KEY)"
 # Overrides the default auth redirectUrl.
 redirect_uri = ""
 # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,

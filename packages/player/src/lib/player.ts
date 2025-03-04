@@ -23,9 +23,9 @@ export class MP4Player extends EventTarget {
   videoMetadata: MP4VideoMetadata | null;
   videoConfig: VideoDecoderConfig | null;
 
+  audioBuffer: AudioBuffer | null;
   audioMetadata: MP4AudioMetadata | null;
   audioConfig: AudioDecoderConfig | null;
-  audioBuffer: AudioBuffer | null;
   audioChannelData: Float32Array[] | null;
 
   worker: Worker;

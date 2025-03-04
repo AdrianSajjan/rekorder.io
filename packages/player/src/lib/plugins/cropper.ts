@@ -203,7 +203,16 @@ export class VideoCropper {
 
       if (next.audio) {
         const numberOfFrames = next.audio[0].length;
-        const audio = new AudioData({ format: 'f32-planar', sampleRate, numberOfFrames, numberOfChannels, timestamp, data: Float32Array.from(next.audio.flat()) });
+        const data = new Float32Array(numberOfFrames * numberOfChannels);
+        if (!numberOfFrames || !numberOfChannels) continue;
+
+        for (let i = 0; i < numberOfFrames; i++) {
+          for (let channel = 0; channel < numberOfChannels; channel++) {
+            data[i * numberOfChannels + channel] = next.audio[channel][i];
+          }
+        }
+
+        const audio = new AudioData({ format: 'f32', sampleRate, numberOfFrames, numberOfChannels, timestamp, data: data });
         const clone = audio.clone();
 
         while (true) {
@@ -222,10 +231,15 @@ export class VideoCropper {
 
     await mp4VideoEncoder.flush();
     await webmVideoEncoder.flush();
-    this.signal?.throwIfAborted();
+    await mp4AudioEncoder.flush();
+    await webmAudioEncoder.flush();
 
     mp4VideoEncoder.close();
     webmVideoEncoder.close();
+    mp4AudioEncoder.close();
+    webmAudioEncoder.close();
+
+    this.signal?.throwIfAborted();
     mp4Muxer.finalize();
     webmMuxer.finalize();
 

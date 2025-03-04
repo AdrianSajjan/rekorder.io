@@ -1,17 +1,16 @@
 import clsx from 'clsx';
 import css from 'styled-jsx/css';
 
+import { throttle } from 'lodash';
+import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CornersOut, Pause, PictureInPicture, Play, PushPin, PushPinSlash, SpeakerHigh, SpeakerX } from '@phosphor-icons/react';
 import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '@radix-ui/react-hover-card';
 import { Slider, SliderRange, SliderThumb, SliderTrack, type SliderProps } from '@radix-ui/react-slider';
-
 import { formatSecondsToMMSS } from '@rekorder.io/utils';
-import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
 import { ResolvedStyle } from '../style/resolved-style';
-import { throttle } from 'lodash';
 
 interface VideoPlayerProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   container?: string;
@@ -37,6 +36,7 @@ const VideoPlayerCSS = css.resolve`
 
   .rekorder-video-player {
     display: block;
+    transition: 0.2s ease-out;
   }
 
   .rekorder-video-player-start {
@@ -63,10 +63,11 @@ const VideoPlayerCSS = css.resolve`
     position: absolute;
     align-items: center;
 
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     backdrop-filter: blur(6px);
 
-    gap: ${theme.space(1)};
+    gap: ${theme.space(1.5)};
     transform: translateY(calc(100% + ${theme.space(3)}));
     transition: transform 0.2s ease-in-out;
 
@@ -78,6 +79,10 @@ const VideoPlayerCSS = css.resolve`
     padding: 0px ${theme.space(2)} 0px ${theme.space(1)};
     border-radius: ${theme.space(2)};
     background-color: ${theme.alpha(theme.colors.card.text, 0.5)};
+  }
+
+  .rekorder-video-player-controls::-webkit-scrollbar {
+    display: none;
   }
 
   .rekorder-video-player-controls[data-pinned='true'] {
@@ -97,6 +102,7 @@ const VideoPlayerCSS = css.resolve`
     place-items: center;
     cursor: pointer;
 
+    flex-shrink: 0;
     border-radius: ${theme.space(8)};
     transition: transform 100ms linear;
   }
@@ -116,9 +122,10 @@ const VideoPlayerCSS = css.resolve`
 
     user-select: none;
     touch-action: none;
-
     width: 100%;
+
     height: ${theme.space(4)};
+    min-width: ${theme.space(56)};
     max-width: ${theme.screens.xxs}px;
   }
 
@@ -185,6 +192,7 @@ const VideoPlayerCSS = css.resolve`
     font-variant-numeric: tabular-nums;
 
     margin-left: ${theme.space(1.5)};
+    margin-right: ${theme.space(4)};
     color: ${theme.colors.card.background};
     opacity: 0.8;
   }
@@ -296,18 +304,43 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
     };
   }, []);
 
-  const handleResize = useCallback(() => {
-    const video = video$.current.getBoundingClientRect();
-    const container = container$.current.parentElement!.getBoundingClientRect();
-    const ratio = video$.current.videoWidth / video$.current.videoHeight;
+  const handleResize = useMemo(() => {
+    return throttle(
+      () => {
+        const video = video$.current.getBoundingClientRect();
+        const container = container$.current.parentElement!.getBoundingClientRect();
+        const ratio = video$.current.videoWidth / video$.current.videoHeight;
 
-    video$.current.style.width = container.width + 'px';
-    video$.current.style.height = container.width / ratio + 'px';
+        let width: string | undefined;
+        let height: string | undefined;
 
-    if (video.height > container.height) {
-      video$.current.style.height = container.height + 'px';
-      video$.current.style.width = container.height * ratio + 'px';
-    }
+        if (video.width > container.width || video.height > container.height) {
+          if (video.width > container.width) {
+            width = container.width + 'px';
+            height = container.width / ratio + 'px';
+          }
+          if (video.height > container.height) {
+            height = container.height + 'px';
+            width = container.height * ratio + 'px';
+          }
+        } else {
+          if (video$.current.videoWidth > video$.current.videoHeight) {
+            width = container.width + 'px';
+            height = container.width / ratio + 'px';
+          } else {
+            height = container.height + 'px';
+            width = container.height * ratio + 'px';
+          }
+        }
+
+        if (width) video$.current.style.width = width;
+        if (height) video$.current.style.height = height;
+      },
+      200,
+      {
+        leading: true,
+      }
+    );
   }, []);
 
   useEffect(() => {
