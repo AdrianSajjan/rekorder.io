@@ -1,47 +1,50 @@
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useState } from 'react';
-import { Spinner, theme } from '@rekorder.io/ui';
+import { Fragment, useEffect, useState } from 'react';
+import { Spinner, theme, VideoPlayer } from '@rekorder.io/ui';
 
 import { Footer } from './layout/footer';
 import { Header } from './layout/header';
 import { Sidebar } from './layout/sidebar';
 
 import { Cropper } from './cropper';
-import { MP4VideoPlayer } from './player';
 import { editor } from '../store/editor';
 import { FOOTER_HEIGHT, HEADER_HEIGHT, MAIN_PADDING, SIDEBAR_WIDTH } from '../constants/layout';
 
 const OfflineEditor = observer(() => {
   const VISIBLE_FOOTER_HEIGHT = editor.footer === 'none' ? 0 : FOOTER_HEIGHT;
 
+  const main = {
+    width: `calc(100vw - ${SIDEBAR_WIDTH}px)`,
+    height: `calc(100vh - ${HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`,
+    padding: MAIN_PADDING,
+  };
+
+  const container = {
+    width: `calc(100vw - ${SIDEBAR_WIDTH}px)`,
+    marginLeft: SIDEBAR_WIDTH,
+  };
+
+  const player = {
+    maxWidth: `calc(100vw - ${MAIN_PADDING * 2 + SIDEBAR_WIDTH}px)`,
+    maxHeight: `calc(100vh - ${MAIN_PADDING * 2 + HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`,
+  };
+
   return (
-    <div className="h-screen w-screen bg-background-light flex">
+    <Fragment>
       <Sidebar />
-      <section className="flex-1 flex flex-col h-screen overflow-hidden">
+      <section className="h-screen overflow-hidden bg-background-light" style={container}>
         <Header />
-        <main
-          className="flex items-center justify-center transition-all duration-300 ease-in-out"
-          style={{
-            padding: MAIN_PADDING,
-            height: `calc(100vh - ${HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`,
-            width: `calc(100vw - ${SIDEBAR_WIDTH}px)`,
-          }}
-        >
-          <Player
-            style={{
-              maxWidth: `calc(100vw - ${MAIN_PADDING * 2 + SIDEBAR_WIDTH}px)`,
-              maxHeight: `calc(100vh - ${MAIN_PADDING * 2 + HEADER_HEIGHT + VISIBLE_FOOTER_HEIGHT}px)`,
-            }}
-          />
+        <main className="transition-all duration-300 ease-in-out" style={main}>
+          <Player style={player} />
         </main>
         <Footer />
       </section>
-    </div>
+    </Fragment>
   );
 });
 
-const Player = observer(({ style }: { style: React.CSSProperties }) => {
+const Player = observer(({ style }: { style?: React.CSSProperties }) => {
   const [source, setSource] = useState('');
 
   useEffect(() => {
@@ -72,9 +75,10 @@ const Player = observer(({ style }: { style: React.CSSProperties }) => {
   }
 
   return (
-    <div className="relative h-fit w-fit max-w-full max-h-full">
-      <MP4VideoPlayer src={source} className="transition-all duration-300 ease-in-out" style={style} />
-      {editor.sidebar === 'crop' ? <Cropper /> : null}
+    <div className="h-full w-full max-w-screen-md grid place-items-center transition-all duration-300 ease-in-out" style={style}>
+      <VideoPlayer ref={editor.initializeElement} src={source} controls={editor.sidebar !== 'crop'}>
+        {editor.sidebar === 'crop' ? <Cropper /> : null}
+      </VideoPlayer>
     </div>
   );
 });

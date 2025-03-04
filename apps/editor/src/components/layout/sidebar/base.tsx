@@ -22,7 +22,7 @@ const SidebarBase = observer(({ back, children }: SidebarBaseProps) => {
   };
 
   return (
-    <aside className="h-screen overflow-auto shrink-0 bg-card-background border-r border-borders-input flex flex-col" style={{ width: SIDEBAR_WIDTH }}>
+    <aside className="h-screen overflow-auto bg-card-background border-r border-borders-input flex flex-col fixed top-0 left-0" style={{ width: SIDEBAR_WIDTH }}>
       <div className="flex w-full items-center justify-start shrink-0 gap-1 px-5" style={{ height: HEADER_HEIGHT }}>
         <MotionConfig transition={transition}>
           <LayoutGroup>

@@ -62,6 +62,7 @@ export class MP4Player extends EventTarget {
     this.originalWidth = 0;
     this.originalHeight = 0;
     this.canvas = document.createElement('canvas');
+    this.canvas.style.background = '#000000';
 
     if (container) {
       this.container = container;
@@ -97,7 +98,7 @@ export class MP4Player extends EventTarget {
       const videoAspectRatio = originalWidth / originalHeight;
 
       if (this.options?.fluid) {
-        const containerRect = this.container.getBoundingClientRect();
+        const containerRect = this.container.parentElement!.getBoundingClientRect();
         const containerWidth = containerRect.width;
         const containerHeight = containerRect.height;
         const containerAspectRatio = containerWidth / containerHeight;
@@ -113,8 +114,20 @@ export class MP4Player extends EventTarget {
           height = containerWidth / videoAspectRatio;
         }
 
-        width = Math.floor(width / 2) * 2;
-        height = Math.floor(height / 2) * 2;
+        if (width > containerWidth) {
+          const difference = width - containerWidth;
+          width = containerWidth - difference;
+          height = containerWidth / videoAspectRatio;
+        }
+
+        if (height > containerHeight) {
+          const difference = height - containerHeight;
+          height = containerHeight - difference;
+          width = containerHeight / videoAspectRatio;
+        }
+
+        width = Math.round(width);
+        height = Math.round(height);
 
         this.canvas.style.width = width + 'px';
         this.canvas.style.height = height + 'px';
@@ -131,13 +144,14 @@ export class MP4Player extends EventTarget {
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        if (entry.target === this.container && this.originalWidth && this.originalHeight) {
+        if (entry.target === this.container!.parentElement! && this.originalWidth && this.originalHeight) {
           this.handleCanvasResize(this.originalWidth, this.originalHeight);
           break;
         }
       }
     });
-    resizeObserver.observe(this.container);
+
+    resizeObserver.observe(this.container.parentElement!);
     return resizeObserver;
   }
 

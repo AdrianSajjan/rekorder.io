@@ -6,11 +6,12 @@ import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '
 import { Slider, SliderRange, SliderThumb, SliderTrack, type SliderProps } from '@radix-ui/react-slider';
 
 import { formatSecondsToMMSS } from '@rekorder.io/utils';
-import { forwardRef, Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { theme } from '../../theme';
 import { animations } from '../../animations';
 import { ResolvedStyle } from '../style/resolved-style';
+import { throttle } from 'lodash';
 
 interface VideoPlayerProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   container?: string;
@@ -225,7 +226,7 @@ interface VideoPlayerControls {
   volume: number;
 }
 
-const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container, className, controls: isControlsVisible = true, ...props }, ref) => {
+const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container, children, className, controls: isControlsVisible = true, ...props }, ref) => {
   const video$ = useRef<HTMLVideoElement>(null!);
   const container$ = useRef<HTMLDivElement>(null!);
 
@@ -294,6 +295,46 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
       controller.abort();
     };
   }, []);
+
+  const handleResize = useMemo(() => {
+    return throttle(() => {
+      const video = video$.current.getBoundingClientRect();
+      const container = container$.current.parentElement!.getBoundingClientRect();
+      const ratio = video$.current.videoWidth / video$.current.videoHeight;
+
+      if (video.height > container.height || video.width > container.width) {
+        if (video.height > container.height) {
+          video$.current.style.height = container.height + 'px';
+          video$.current.style.width = container.height * ratio + 'px';
+        }
+        if (video.width > container.width) {
+          video$.current.style.width = container.width + 'px';
+          video$.current.style.height = container.width / ratio + 'px';
+        }
+      } else {
+        if (video$.current.style.width !== 'auto') video$.current.style.width = 'auto';
+        if (video$.current.style.height !== 'auto') video$.current.style.height = 'auto';
+      }
+    }, 250);
+  }, []);
+
+  useEffect(() => {
+    if (!container$.current || !container$.current.parentElement) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === container$.current.parentElement) {
+          handleResize();
+          break;
+        }
+      }
+    });
+    resizeObserver.observe(container$.current.parentElement);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [handleResize]);
 
   const handleInitializeRefs = useCallback(
     (node: HTMLVideoElement) => {
@@ -394,6 +435,7 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
             <Play weight="fill" size={24} color={theme.colors.card.background} />
           </button>
         )}
+        {children}
       </div>
     </Fragment>
   );

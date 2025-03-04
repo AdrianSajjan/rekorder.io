@@ -4,18 +4,21 @@ import { AnimatePresence, motion } from 'motion/react';
 import { observer } from 'mobx-react';
 
 import { editor, FooterMode } from '../../store/editor';
-import { FOOTER_HEIGHT, HEADER_HEIGHT } from '../../constants/layout';
+import { FOOTER_HEIGHT, HEADER_HEIGHT, SIDEBAR_WIDTH } from '../../constants/layout';
 import { Slider } from '../ui/slider';
 
 const variants = {
   exit: {
     y: FOOTER_HEIGHT,
   },
+  initial: {
+    y: FOOTER_HEIGHT,
+  },
+  animate: {
+    y: 0,
+  },
   transition: {
     duration: 0.3,
-  },
-  style: {
-    height: FOOTER_HEIGHT,
   },
 };
 
@@ -39,9 +42,23 @@ const FooterVariant = observer(({ footer }: { footer: FooterMode }) => {
 });
 
 function FooterBase({ children }: { children?: React.ReactNode }) {
+  const footer = {
+    height: FOOTER_HEIGHT,
+    width: `calc(100vw - ${SIDEBAR_WIDTH}px)`,
+    left: SIDEBAR_WIDTH,
+  };
+
   return (
-    <motion.footer exit={variants.exit} style={variants.style} transition={variants.transition} className="bg-card-background shrink-0 border-t border-borders-input flex flex-col">
-      <div className="flex items-center shrink-0 justify-between  px-4 border-b border-borders-input" style={{ height: HEADER_HEIGHT }}>
+    <motion.footer
+      exit="exit"
+      style={footer}
+      initial="initial"
+      animate="animate"
+      variants={variants}
+      transition={variants.transition}
+      className="bg-card-background border-t border-borders-input flex flex-col fixed bottom-0"
+    >
+      <div className="flex items-center shrink-0 justify-between px-4 border-b border-borders-input" style={{ height: HEADER_HEIGHT }}>
         <div className="flex items-center gap-4 min-w-48">
           <Button size="small" variant="light" color="accent">
             <Scissors weight="fill" size={16} />
