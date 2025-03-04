@@ -76,9 +76,13 @@ export class VideoCropper {
 
     const top = this.position.top;
     const left = this.position.left;
+
     const width = this.dimension.width % 2 === 0 ? this.dimension.width : this.dimension.width - 1;
     const height = this.dimension.height % 2 === 0 ? this.dimension.height : this.dimension.height - 1;
+
     const fps = this.player.videoMetadata?.fps || 30;
+    const sampleRate = this.player.audioMetadata?.sampleRate || 48000;
+    const numberOfChannels = this.player.audioMetadata?.numberOfChannels || 2;
 
     const mp4Muxer = new MP4Muxer.Muxer({
       target: new MP4Muxer.ArrayBufferTarget(),
@@ -89,6 +93,11 @@ export class VideoCropper {
         width,
         height,
         frameRate: fps,
+      },
+      audio: {
+        codec: 'aac',
+        numberOfChannels: numberOfChannels,
+        sampleRate: sampleRate,
       },
     });
 
@@ -102,11 +111,25 @@ export class VideoCropper {
         height,
         frameRate: fps,
       },
+      audio: {
+        codec: 'A_OPUS',
+        numberOfChannels: numberOfChannels,
+        sampleRate: sampleRate,
+      },
     });
 
     const mp4VideoEncoder = new VideoEncoder({
       output: (chunk, meta) => {
         mp4Muxer.addVideoChunk(chunk, meta);
+      },
+      error: (error) => {
+        console.warn('Failed to write chunk:', error);
+      },
+    });
+
+    const mp4AudioEncoder = new AudioEncoder({
+      output: (chunk, meta) => {
+        mp4Muxer.addAudioChunk(chunk, meta);
       },
       error: (error) => {
         console.warn('Failed to write chunk:', error);
@@ -122,15 +145,34 @@ export class VideoCropper {
       },
     });
 
-    const mp4Config: VideoEncoderConfig = { width, height, framerate: fps, codec: 'avc1.64002A' };
-    const mp4Support = await VideoEncoder.isConfigSupported(mp4Config);
-    console.assert(mp4Support.supported, 'MP4 video config not supported:', mp4Config);
-    mp4VideoEncoder.configure(mp4Config);
+    const webmAudioEncoder = new AudioEncoder({
+      output: (chunk, meta) => {
+        webmMuxer.addAudioChunk(chunk, meta);
+      },
+      error: (error) => {
+        console.warn('Failed to write chunk:', error);
+      },
+    });
 
-    const webmConfig: VideoEncoderConfig = { width, height, framerate: fps, codec: 'vp09.00.10.08' };
-    const webmSupport = await VideoEncoder.isConfigSupported(webmConfig);
-    console.assert(webmSupport.supported, 'WEBM video config not supported:', webmConfig);
-    webmVideoEncoder.configure(webmConfig);
+    const mp4VideoConfig: VideoEncoderConfig = { width, height, framerate: fps, codec: 'avc1.64002A' };
+    const mp4VideoSupport = await VideoEncoder.isConfigSupported(mp4VideoConfig);
+    console.assert(mp4VideoSupport.supported, 'MP4 video config not supported:', mp4VideoConfig);
+    mp4VideoEncoder.configure(mp4VideoConfig);
+
+    const mp4AudioConfig: AudioEncoderConfig = { codec: 'mp4a.40.2', sampleRate: sampleRate, numberOfChannels: numberOfChannels };
+    const mp4AudioSupport = await AudioEncoder.isConfigSupported(mp4AudioConfig);
+    console.assert(mp4AudioSupport.supported, 'MP4 audio config not supported:', mp4AudioConfig);
+    mp4AudioEncoder.configure(mp4AudioConfig);
+
+    const webmVideoConfig: VideoEncoderConfig = { width, height, framerate: fps, codec: 'vp09.00.10.08' };
+    const webmVideoSupport = await VideoEncoder.isConfigSupported(webmVideoConfig);
+    console.assert(webmVideoSupport.supported, 'WEBM video config not supported:', webmVideoConfig);
+    webmVideoEncoder.configure(webmVideoConfig);
+
+    const webmAudioConfig: AudioEncoderConfig = { codec: 'opus', sampleRate: sampleRate, numberOfChannels: numberOfChannels };
+    const webmAudioSupport = await AudioEncoder.isConfigSupported(webmAudioConfig);
+    console.assert(webmAudioSupport.supported, 'WEBM audio config not supported:', webmAudioConfig);
+    webmAudioEncoder.configure(webmAudioConfig);
 
     while (true) {
       if (this.player.currentFrame >= this.player.videoMetadata!.frames) break;
@@ -138,9 +180,9 @@ export class VideoCropper {
       this.signal?.throwIfAborted();
       this.onProgress?.((this.player.currentFrame / this.player.videoMetadata!.frames) * 100);
 
-      const bitmap = await this.player.next();
-      this.context.drawImage(bitmap, left, top, width, height, 0, 0, width, height);
-      bitmap.close();
+      const next = await this.player.next();
+      this.context.drawImage(next.bitmap, left, top, width, height, 0, 0, width, height);
+      next.bitmap.close();
 
       const keyframe = this.player.currentFrame % (fps * 2) === 0;
       const timestamp = (this.player.currentFrame * 1e6) / fps;
@@ -156,9 +198,26 @@ export class VideoCropper {
 
       mp4VideoEncoder.encode(frame, { keyFrame: keyframe });
       webmVideoEncoder.encode(clone, { keyFrame: keyframe });
-
       frame.close();
       clone.close();
+
+      if (next.audio) {
+        const numberOfFrames = next.audio[0].length;
+        const audio = new AudioData({ format: 'f32-planar', sampleRate, numberOfFrames, numberOfChannels, timestamp, data: Float32Array.from(next.audio.flat()) });
+        const clone = audio.clone();
+
+        while (true) {
+          if (mp4AudioEncoder.encodeQueueSize <= 10 && webmAudioEncoder.encodeQueueSize <= 10) break;
+          this.signal?.throwIfAborted();
+          console.log('Audio encoder queue is full, waiting...');
+          await wait(100);
+        }
+
+        mp4AudioEncoder.encode(audio);
+        webmAudioEncoder.encode(clone);
+        audio.close();
+        clone.close();
+      }
     }
 
     await mp4VideoEncoder.flush();

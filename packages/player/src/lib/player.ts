@@ -281,14 +281,27 @@ export class MP4Player extends EventTarget {
 
   async next() {
     await this.initialize();
-    return new Promise<ImageBitmap>((resolve, reject) => {
+    return new Promise<{ bitmap: ImageBitmap; audio?: Float32Array[] }>((resolve, reject) => {
       this.worker.postMessage({ type: VideoPlayerEvents.NextFrame });
       waitUnitWorkerEvent(this.worker, {
         success: VideoPlayerEvents.NextFrameSuccess,
         error: VideoPlayerEvents.NextFrameError,
+
         onSuccess: (payload) => {
           this.currentFrame = payload.frame;
-          resolve(payload.bitmap);
+          let buffer: Float32Array[] | undefined;
+
+          if (this.audioChannelData && this.audioMetadata && this.videoMetadata) {
+            const samples = this.audioMetadata.sampleRate / this.videoMetadata.fps;
+            const start = Math.floor(this.currentFrame * samples);
+            const end = Math.floor((this.currentFrame + 1) * samples);
+            buffer = this.audioChannelData.map((channel) => channel.slice(start, end));
+          }
+
+          resolve({
+            bitmap: payload.bitmap,
+            audio: buffer,
+          });
         },
         onError: (payload) => {
           reject(payload);
