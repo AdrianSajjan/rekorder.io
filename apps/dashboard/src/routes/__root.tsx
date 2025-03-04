@@ -1,13 +1,14 @@
-import { Fragment, useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
-import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { Fragment, useEffect, useState } from 'react';
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 
 import { supabase } from '@rekorder.io/database';
 import { Spinner, theme } from '@rekorder.io/ui';
 
 import { useAuthenticationStore } from '../store/authentication';
+import { RouterContext } from '../types/common';
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => {
     return (
       <Fragment>

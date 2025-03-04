@@ -1,19 +1,17 @@
-import { Clock, VideoCamera } from '@phosphor-icons/react';
+import { format } from 'date-fns';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { format } from 'date-fns';
+import { Clock, VideoCamera } from '@phosphor-icons/react';
 
 import { Button } from '@rekorder.io/ui';
 import { supabase, Tables } from '@rekorder.io/database';
 import { parseUploadedFilePath } from '@rekorder.io/utils';
 
-import { RouterContext } from '../../types/common';
 import { Heading } from '../../components/layout/heading';
 
 export const Route = createFileRoute('/dashboard/_layout/library')({
-  loader: (props) => {
-    const context = props.context as RouterContext;
-    return context.queryClient.ensureQueryData({
+  loader: ({ context: { queryClient } }) => {
+    return queryClient.ensureQueryData({
       queryKey: ['recordings'],
       queryFn: async () => {
         const recordings = await supabase.from('recordings').select('*').throwOnError();
