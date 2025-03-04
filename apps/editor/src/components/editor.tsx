@@ -67,7 +67,7 @@ const Player = observer(({ style }: { style?: React.CSSProperties }) => {
 
   if (!source) {
     return (
-      <div className="w-fit h-fit">
+      <div className="w-full h-full flex flex-col items-center justify-center">
         <Spinner size={32} color={theme.colors.primary.main} className="mx-auto" />
         <p className="font-medium text-sm text-black mt-3">Processing the screen recording</p>
       </div>

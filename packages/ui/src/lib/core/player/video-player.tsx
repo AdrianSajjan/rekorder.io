@@ -296,26 +296,18 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
     };
   }, []);
 
-  const handleResize = useMemo(() => {
-    return throttle(() => {
-      const video = video$.current.getBoundingClientRect();
-      const container = container$.current.parentElement!.getBoundingClientRect();
-      const ratio = video$.current.videoWidth / video$.current.videoHeight;
+  const handleResize = useCallback(() => {
+    const video = video$.current.getBoundingClientRect();
+    const container = container$.current.parentElement!.getBoundingClientRect();
+    const ratio = video$.current.videoWidth / video$.current.videoHeight;
 
-      if (video.height > container.height || video.width > container.width) {
-        if (video.height > container.height) {
-          video$.current.style.height = container.height + 'px';
-          video$.current.style.width = container.height * ratio + 'px';
-        }
-        if (video.width > container.width) {
-          video$.current.style.width = container.width + 'px';
-          video$.current.style.height = container.width / ratio + 'px';
-        }
-      } else {
-        if (video$.current.style.width !== 'auto') video$.current.style.width = 'auto';
-        if (video$.current.style.height !== 'auto') video$.current.style.height = 'auto';
-      }
-    }, 250);
+    video$.current.style.width = container.width + 'px';
+    video$.current.style.height = container.width / ratio + 'px';
+
+    if (video.height > container.height) {
+      video$.current.style.height = container.height + 'px';
+      video$.current.style.width = container.height * ratio + 'px';
+    }
   }, []);
 
   useEffect(() => {
@@ -329,6 +321,8 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
         }
       }
     });
+
+    handleResize();
     resizeObserver.observe(container$.current.parentElement);
 
     return () => {
