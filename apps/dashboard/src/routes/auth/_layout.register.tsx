@@ -19,6 +19,7 @@ export const Route = createFileRoute('/auth/_layout/register')({
 });
 
 const RegisterSchema = z.object({
+  name: z.string().nonempty('Please enter your name'),
   email: z.string().nonempty('Please enter your email address').email('Please enter a valid email address'),
   password: z.string().nonempty('Please enter your password').regex(PasswordRegex, "Password doesn't meet the requirements"),
 });
@@ -31,15 +32,16 @@ function RegisterPage() {
   const { handleSubmit, control } = useForm<IRegisterSchema>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
     },
   });
 
-  const handleRegister: SubmitHandler<IRegisterSchema> = async ({ email, password }) => {
+  const handleRegister: SubmitHandler<IRegisterSchema> = async ({ email, password, name }) => {
     setSubmitting(true);
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
       if (error) throw error;
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
@@ -49,12 +51,8 @@ function RegisterPage() {
 
   const handleRegisterWithGoogle = async () => {
     try {
-      await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: authRedirectBaseURL,
-        },
-      });
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: authRedirectBaseURL } });
+      if (error) throw error;
     } catch (error) {
       toast.error(unwrapError(error, ErrorMessages.GenericError));
     }
@@ -72,11 +70,26 @@ function RegisterPage() {
         <Divider className="w-full mt-7 mb-5">or continue with email</Divider>
         <form className="w-full flex flex-col" onSubmit={handleSubmit(handleRegister)}>
           <Controller
-            name="email"
+            name="name"
             control={control}
             render={({ field, fieldState: { error, invalid } }) => {
               return (
                 <div className="flex flex-col gap-1">
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" autoComplete="name" placeholder="John Doe" {...field} />
+                  <Hint invalid={invalid} error={error?.message}>
+                    Enter your name
+                  </Hint>
+                </div>
+              );
+            }}
+          />
+          <Controller
+            name="email"
+            control={control}
+            render={({ field, fieldState: { error, invalid } }) => {
+              return (
+                <div className="flex flex-col gap-1 mt-4">
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" autoComplete="email" placeholder="john@doe.com" {...field} />
                   <Hint invalid={invalid} error={error?.message}>

@@ -8,31 +8,18 @@ import { supabase, Tables } from '@rekorder.io/database';
 import { parseUploadedFilePath } from '@rekorder.io/utils';
 
 import { Heading } from '../../components/layout/heading';
+import { RecordingApiFactory } from '../../apis/recordings';
 
 export const Route = createFileRoute('/dashboard/_layout/library')({
-  loader: ({ context: { queryClient } }) => {
-    return queryClient.ensureQueryData({
-      queryKey: ['recordings'],
-      queryFn: async () => {
-        const recordings = await supabase.from('recordings').select('*').throwOnError();
-        return recordings.data || [];
-      },
-    });
-  },
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(RecordingApiFactory.Queries.FetchAll()),
   component: LibraryPage,
 });
 
 function LibraryPage() {
-  const { data } = useSuspenseQuery({
-    queryKey: ['recordings'],
-    queryFn: async () => {
-      const recordings = await supabase.from('recordings').select('*').throwOnError();
-      return recordings.data || [];
-    },
-  });
+  const { data } = useSuspenseQuery(RecordingApiFactory.Queries.FetchAll());
 
   return (
-    <div className="container @container w-full max-w-screen-xl mx-auto h-full pt-10">
+    <div className="@container container w-full max-w-screen-xl mx-auto h-full pt-10">
       <Heading title="My Library" description="Manage and edit your recordings and videos" className="items-end">
         <Button variant="solid" className="shrink-0 !ml-auto">
           <VideoCamera size={18} weight="fill" />
@@ -52,7 +39,7 @@ function RecordingCard({ recording }: { recording: Tables<'recordings'> }) {
   const thumbnail = recording.original_thumbnail ? supabase.storage.from('thumbnails').getPublicUrl(parseUploadedFilePath(recording.original_thumbnail)) : null;
 
   return (
-    <div className="group relative bg-card-background rounded-xl overflow-hidden border border-borders-input transition-all duration-200 hover:shadow-xl hover:shadow-gray-100/35">
+    <button className="group relative cursor-pointer bg-card-background rounded-xl overflow-hidden border border-borders-input transition-all duration-200 hover:shadow-xl hover:shadow-gray-100/35">
       <div className="aspect-video bg-primary-light/5 relative border-b border-primary-light/10">
         <div className="absolute inset-0 flex items-center justify-center">
           <VideoCamera size={36} weight="fill" className="text-primary-main" />
@@ -69,6 +56,6 @@ function RecordingCard({ recording }: { recording: Tables<'recordings'> }) {
           {recording.modified_file ? <span className="ml-3 px-2 py-0.5 text-xs rounded-full bg-primary-light text-primary-main">Edited</span> : null}
         </div>
       </div>
-    </div>
+    </button>
   );
 }
