@@ -1,4 +1,5 @@
 import * as MP4Muxer from 'mp4-muxer';
+import * as WebMMuxer from 'webm-muxer';
 import { wait } from '@rekorder.io/utils';
 import { MP4Player } from '../player';
 
@@ -36,10 +37,10 @@ export class VideoCropper {
 
     this.canvas = document.createElement('canvas');
     this.context = this.canvas.getContext('2d')!;
+    this.player = MP4Player.createInstance(video);
 
     this.signal = options?.signal;
     this.onProgress = options?.onProgress;
-    this.player = MP4Player.createInstance(video);
   }
 
   static createInstance(video: string, options?: VideoCropperOptions) {
@@ -47,8 +48,12 @@ export class VideoCropper {
   }
 
   private async handleInitializePlayer() {
-    if (this.player.status === 'error') throw new Error('Player is in error state');
-    if (this.player.status !== 'ready') await this.player.initialize();
+    switch (this.player.status) {
+      case 'error':
+        throw new Error('Player is in error state');
+      default:
+        await this.player.initialize();
+    }
   }
 
   async initialize(position: Position) {
@@ -71,33 +76,61 @@ export class VideoCropper {
 
     const top = this.position.top;
     const left = this.position.left;
-
-    const fps = this.player.videoMetadata?.fps || 30;
-    const codec = this.player.videoConfig?.codec || 'avc1.64002A';
-
     const width = this.dimension.width % 2 === 0 ? this.dimension.width : this.dimension.width - 1;
     const height = this.dimension.height % 2 === 0 ? this.dimension.height : this.dimension.height - 1;
+    const fps = this.player.videoMetadata?.fps || 30;
 
-    const muxer = new MP4Muxer.Muxer({
+    const mp4Muxer = new MP4Muxer.Muxer({
       target: new MP4Muxer.ArrayBufferTarget(),
       fastStart: 'in-memory',
       firstTimestampBehavior: 'offset',
-      video: { codec: 'avc', width, height, frameRate: fps },
+      video: {
+        codec: 'avc',
+        width,
+        height,
+        frameRate: fps,
+      },
     });
 
-    const videoEncoder = new VideoEncoder({
+    const webmMuxer = new WebMMuxer.Muxer({
+      target: new WebMMuxer.ArrayBufferTarget(),
+      firstTimestampBehavior: 'offset',
+      type: 'webm',
+      video: {
+        codec: 'V_VP9',
+        width,
+        height,
+        frameRate: fps,
+      },
+    });
+
+    const mp4VideoEncoder = new VideoEncoder({
       output: (chunk, meta) => {
-        muxer.addVideoChunk(chunk, meta);
+        mp4Muxer.addVideoChunk(chunk, meta);
       },
       error: (error) => {
         console.warn('Failed to write chunk:', error);
       },
     });
 
-    const config: VideoEncoderConfig = { width, height, framerate: fps, codec };
-    const support = await VideoEncoder.isConfigSupported(config);
-    console.assert(support.supported, 'Video config not supported:', config);
-    videoEncoder.configure(config);
+    const webmVideoEncoder = new VideoEncoder({
+      output: (chunk, meta) => {
+        webmMuxer.addVideoChunk(chunk, meta);
+      },
+      error: (error) => {
+        console.warn('Failed to write chunk:', error);
+      },
+    });
+
+    const mp4Config: VideoEncoderConfig = { width, height, framerate: fps, codec: 'avc1.64002A' };
+    const mp4Support = await VideoEncoder.isConfigSupported(mp4Config);
+    console.assert(mp4Support.supported, 'MP4 video config not supported:', mp4Config);
+    mp4VideoEncoder.configure(mp4Config);
+
+    const webmConfig: VideoEncoderConfig = { width, height, framerate: fps, codec: 'vp09.00.10.08' };
+    const webmSupport = await VideoEncoder.isConfigSupported(webmConfig);
+    console.assert(webmSupport.supported, 'WEBM video config not supported:', webmConfig);
+    webmVideoEncoder.configure(webmConfig);
 
     while (true) {
       if (this.player.currentFrame >= this.player.videoMetadata!.frames) break;
@@ -105,37 +138,42 @@ export class VideoCropper {
       this.signal?.throwIfAborted();
       this.onProgress?.((this.player.currentFrame / this.player.videoMetadata!.frames) * 100);
 
+      const bitmap = await this.player.next();
+      this.context.drawImage(bitmap, left, top, width, height, 0, 0, width, height);
+      bitmap.close();
+
       const keyframe = this.player.currentFrame % (fps * 2) === 0;
       const timestamp = (this.player.currentFrame * 1e6) / fps;
       const frame = new VideoFrame(this.canvas, { timestamp, duration: 1e6 / fps, alpha: 'discard' });
+      const clone = frame.clone();
 
-      try {
-        const bitmap = await this.player.next();
-        this.context.drawImage(bitmap, left, top, width, height, 0, 0, width, height);
-        bitmap.close();
-
-        while (true) {
-          if (videoEncoder.encodeQueueSize <= 10) break;
-          this.signal?.throwIfAborted();
-          console.log('Encoder queue is full, waiting...');
-          await wait(100);
-        }
-
-        videoEncoder.encode(frame, { keyFrame: keyframe });
-      } catch (error) {
-        console.warn(error);
-        break;
+      while (true) {
+        if (mp4VideoEncoder.encodeQueueSize <= 10 && webmVideoEncoder.encodeQueueSize <= 10) break;
+        this.signal?.throwIfAborted();
+        console.log('Encoder queue is full, waiting...');
+        await wait(100);
       }
 
+      mp4VideoEncoder.encode(frame, { keyFrame: keyframe });
+      webmVideoEncoder.encode(clone, { keyFrame: keyframe });
+
       frame.close();
+      clone.close();
     }
 
-    await videoEncoder.flush();
-    videoEncoder.close();
-    muxer.finalize();
-
+    await mp4VideoEncoder.flush();
+    await webmVideoEncoder.flush();
     this.signal?.throwIfAborted();
-    return new Blob([muxer.target.buffer], { type: 'video/mp4' });
+
+    mp4VideoEncoder.close();
+    webmVideoEncoder.close();
+    mp4Muxer.finalize();
+    webmMuxer.finalize();
+
+    return {
+      mp4: new Blob([mp4Muxer.target.buffer], { type: 'video/mp4' }),
+      webm: new Blob([webmMuxer.target.buffer], { type: 'video/webm' }),
+    };
   }
 
   destroy() {

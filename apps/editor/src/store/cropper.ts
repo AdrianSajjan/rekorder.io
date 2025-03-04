@@ -93,7 +93,7 @@ export class Cropper {
         { once: true }
       );
 
-      this._editor.modifyRecording(blob, blob);
+      this._editor.modifyRecording(blob.mp4, blob.webm);
     } catch (error) {
       runInAction(() => (this.status = 'error'));
       wait(1500).then(() => runInAction(() => (this.status = 'idle')));
