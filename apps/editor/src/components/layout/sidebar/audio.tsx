@@ -3,10 +3,11 @@ import { observer } from 'mobx-react';
 import { useDropzone } from 'react-dropzone';
 
 import { theme } from '@rekorder.io/ui';
-import { CloudArrowUp, FileAudio, Trash } from '@phosphor-icons/react';
+import { CloudArrowUp, FileAudio, MusicNotes, Trash, X } from '@phosphor-icons/react';
 
 import { editor } from '../../../store/editor';
 import { ActionButton, ActionButtonContent } from '../../ui/modify-button';
+import { round } from 'lodash';
 
 const AudioSidebar = observer(() => {
   const handleSelectFile = useCallback(async (files: File[]) => {
@@ -42,17 +43,18 @@ const AudioSidebar = observer(() => {
           </div>
         </div>
         {editor.audio.files.length ? (
-          <div className="mt-8 flex flex-col">
+          <div className="mt-8 flex flex-col gap-3">
             {editor.audio.files.map((file) => (
               <div key={file.id}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileAudio weight="bold" size={24} color={theme.colors.accent.dark} />
-                    <div className="text-sm font-medium">{file.file.name}</div>
+                <div className="flex items-center border border-borders-input py-2.5 px-3 rounded-lg gap-3">
+                  <MusicNotes weight="fill" size={24} color={theme.colors.accent.dark} className="shrink-0" />
+                  <div className="gap-y-px flex-1 flex flex-col">
+                    <div className="text-sm font-medium line-clamp-1 break-all">{file.file.name}</div>
+                    <div className="text-xs text-text-muted">{round(file.duration, 2)} seconds</div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Trash weight="bold" size={24} color={theme.colors.accent.dark} />
-                  </div>
+                  <button className="flex items-center gap-2 ml-auto p-1.5 rounded-full hover:bg-background-light transition-colors shrink-0">
+                    <X weight="bold" size={16} color={theme.colors.accent.dark} />
+                  </button>
                 </div>
               </div>
             ))}

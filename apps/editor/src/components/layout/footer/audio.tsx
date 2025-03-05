@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { FastForward, MagnifyingGlassMinus, MagnifyingGlassPlus, Pause, Play, Scissors, Trash } from '@phosphor-icons/react';
+import { FastForward, MagnifyingGlassMinus, MagnifyingGlassPlus, MusicNotes, MusicNoteSimple, Pause, Play, Scissors, Trash } from '@phosphor-icons/react';
 
 import { Button, Tooltip } from '@rekorder.io/ui';
 import { useMeasure, useVideoControls } from '@rekorder.io/hooks';
@@ -77,13 +77,55 @@ const AudioFooter = observer(() => {
               <span
                 className={cn(
                   'text-xs w-fit mt-auto shrink-0 tabular-nums text-accent-dark',
-                  key > 0 ? (key === Math.round(controls.duration) ? '-translate-x-full' : '-translate-x-1/2') : 'translate-x-0'
+                  key > 0 ? (key === Math.round(controls.duration) ? '-translate-x-[85%]' : '-translate-x-1/2') : '-translate-x-1'
                 )}
               >
                 {formatSecondsToMMSS(key)}
               </span>
             </div>
           ))}
+        </div>
+        <div className="w-full px-4 pt-3.5 pb-4 flex flex-col gap-2.5">
+          <div className="h-10 rounded-lg min-w-full bg-accent-light/50 flex gap-px">
+            <div className="h-full flex-1 shrink-0 rounded-l-lg rounded-r-none bg-gradient-to-b from-violet-500/60 to-violet-500/80 border-2 border-violet-600 flex items-end px-6 py-1.5 relative">
+              <div className="absolute top-0 left-0 w-3.5 h-full bg-violet-600 rounded-l-md grid place-items-center">
+                <span className="h-3 w-0.5 rounded-md bg-white" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <MusicNotes size={14} weight="fill" className="text-white" />
+                <span className="text-xs font-medium text-white leading-none">Main Audio</span>
+              </div>
+              <div className="absolute top-0 right-0 w-3.5 h-full bg-violet-600 rounded-r-none grid place-items-center">
+                <span className="h-3 w-0.5 rounded-md bg-white" />
+              </div>
+            </div>
+            <div className="h-full flex-1 shrink-0 rounded-l-none rounded-r-lg bg-gradient-to-b from-violet-500/60 to-violet-500/80 border-2 border-violet-600 flex items-end px-6 py-1.5 relative">
+              <div className="absolute top-0 left-0 w-3.5 h-full bg-violet-600 rounded-l-none grid place-items-center">
+                <span className="h-3 w-0.5 rounded-md bg-white" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <MusicNotes size={14} weight="fill" className="text-white" />
+                <span className="text-xs font-medium text-white leading-none">Main Audio</span>
+              </div>
+              <div className="absolute top-0 right-0 w-3.5 h-full bg-violet-600 rounded-r-md grid place-items-center">
+                <span className="h-3 w-0.5 rounded-md bg-white" />
+              </div>
+            </div>
+          </div>
+          <div className="h-10 rounded-lg min-w-full bg-accent-light/50 flex gap-px">
+            <div className="h-full w-11/12 rounded-lg bg-gradient-to-b from-violet-500/60 to-violet-500/80 border-2 border-violet-600 flex items-end px-6 py-1.5 relative">
+              <div className="absolute top-0 left-0 w-3.5 h-full bg-violet-600 rounded-l-md grid place-items-center">
+                <span className="h-3 w-0.5 rounded-md bg-white" />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <MusicNotes size={14} weight="fill" className="text-white" />
+                <span className="text-xs font-medium text-white leading-none">Main Audio</span>
+              </div>
+              <div className="absolute top-0 right-0 w-3.5 h-full bg-violet-600 rounded-r-md grid place-items-center">
+                <span className="h-3 w-0.5 rounded-md bg-white" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Tooltip.Provider>
