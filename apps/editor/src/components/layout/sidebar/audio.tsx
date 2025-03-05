@@ -1,16 +1,16 @@
-import { observer } from 'mobx-react';
 import { useCallback } from 'react';
+import { observer } from 'mobx-react';
 import { useDropzone } from 'react-dropzone';
 
-import { CloudArrowUp, FileAudio } from '@phosphor-icons/react';
-import { Input, Switch, theme } from '@rekorder.io/ui';
+import { theme } from '@rekorder.io/ui';
+import { CloudArrowUp, FileAudio, Trash } from '@phosphor-icons/react';
 
-import { Slider } from '../../ui/slider';
+import { editor } from '../../../store/editor';
 import { ActionButton, ActionButtonContent } from '../../ui/modify-button';
 
 const AudioSidebar = observer(() => {
-  const handleSelectFile = useCallback((files: File[]) => {
-    console.log(files);
+  const handleSelectFile = useCallback(async (files: File[]) => {
+    await Promise.allSettled(files.map((file) => editor.audio.createAudioFile(file)));
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -41,34 +41,23 @@ const AudioSidebar = observer(() => {
             <div className="text-sm px-5 py-2 rounded-lg border border-borders-input bg-card-background">Browse Audio</div>
           </div>
         </div>
-        <div className="mt-8">
-          <div className="space-y-px">
-            <label className="text-sm font-semibold">Audio Timeline</label>
-            <p className="text-text-muted text-xs leading-normal">Set the start and end time of the audio in minutes</p>
+        {editor.audio.files.length ? (
+          <div className="mt-8 flex flex-col">
+            {editor.audio.files.map((file) => (
+              <div key={file.id}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileAudio weight="bold" size={24} color={theme.colors.accent.dark} />
+                    <div className="text-sm font-medium">{file.file.name}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Trash weight="bold" size={24} color={theme.colors.accent.dark} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center gap-4 mt-4">
-            <Input min={0} step={0.01} placeholder="00.00" type="number" className="w-full" />
-            <span className="text-sm text-accent-dark">to</span>
-            <Input min={0} step={0.01} placeholder="00.00" type="number" className="w-full" />
-          </div>
-        </div>
-        <div className="mt-8">
-          <div className="space-y-px">
-            <label className="text-sm font-semibold">Audio Volume</label>
-            <p className="text-text-muted text-xs leading-normal">Adjust the voume of the uploaded audio to your liking</p>
-          </div>
-          <div className="flex items-center gap-4 mt-4">
-            <Input type="number" className="w-24" placeholder="100%" />
-            <Slider />
-          </div>
-        </div>
-        <div className="flex items-center justify-between gap-8 mt-8">
-          <div className="space-y-px">
-            <label className="text-sm font-semibold">Replace Current Audio</label>
-            <p className="text-text-muted text-xs leading-normal">This will remove the existing audio completely</p>
-          </div>
-          <Switch size="medium" />
-        </div>
+        ) : null}
         <ActionButton container="mt-8" status="idle" progress={0}>
           <ActionButtonContent label="Modify Audio" status="idle" progress={0} />
         </ActionButton>

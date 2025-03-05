@@ -43,6 +43,10 @@ export class Cropper {
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
+  static createInstance(editor: Editor) {
+    return new Cropper(editor);
+  }
+
   get coordinates() {
     const widthRatio = this.originalDimensions.width / this.scaledDimensions.width;
     const heightRatio = this.originalDimensions.height / this.scaledDimensions.height;
@@ -77,8 +81,9 @@ export class Cropper {
       await cropper.initialize({ top: y, left: x, right: x + width, bottom: y + height });
       const blob = await cropper.process();
 
-      wait(1500).then(() => runInAction(() => (this.status = 'idle')));
       runInAction(() => (this.status = 'completed'));
+      wait(1000).then(() => runInAction(() => (this.status = 'idle')));
+      wait(2000).then(() => runInAction(() => this._editor.changeSidebar('default')));
 
       this._editor.elementOrThrow.addEventListener(
         'loadeddata',
@@ -101,6 +106,7 @@ export class Cropper {
     } finally {
       runInAction(() => (this.progress = 0));
       cropper.destroy();
+      URL.revokeObjectURL(url);
     }
   }
 

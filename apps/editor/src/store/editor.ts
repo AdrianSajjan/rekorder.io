@@ -6,6 +6,7 @@ import { EventConfig } from '@rekorder.io/constants';
 import { RuntimeMessage } from '@rekorder.io/types';
 import { BlobStorage, ExtensionOfflineDatabase } from '@rekorder.io/database';
 
+import { Audio } from './audio';
 import { Cropper } from './cropper';
 import { MOCK_VIDEO_NAME, MOCK_VIDEO_URL } from '../constants/mock';
 
@@ -21,6 +22,7 @@ class Editor {
   video: BlobStorage | null;
   element: HTMLVideoElement | null;
   cropper: Cropper;
+  audio: Audio;
 
   originalMp4: Blob | null;
   modifiedMp4: Blob | null;
@@ -44,7 +46,8 @@ class Editor {
     this.originalWebm = null;
     this.modifiedWebm = null;
 
-    this.cropper = new Cropper(this);
+    this.cropper = Cropper.createInstance(this);
+    this.audio = Audio.createInstance(this);
     this._offlineDatabase = ExtensionOfflineDatabase.createInstance();
 
     this.__setupEvents();
@@ -103,9 +106,10 @@ class Editor {
   }
 
   private __saveNameOfflineDatabase(name: string) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore Circular dependency error
-    if (this.video) this._offlineDatabase.blobs.update(this.video.id, { name });
+    if (this.video) {
+      // @ts-ignore - Circular dependency error
+      this._offlineDatabase.blobs.update(this.video.id, { name });
+    }
   }
 
   private async __runtimeEventHandler(message: RuntimeMessage) {

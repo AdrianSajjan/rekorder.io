@@ -66,7 +66,7 @@ const AudioFooter = observer(() => {
                     <div
                       key={index}
                       className={cn(
-                        'w-px border-l-2 border-text-muted',
+                        'w-px border-l border-text-muted',
                         index === 0 || index === 9 ? 'h-3' : index === 5 ? 'h-2.5' : 'h-2',
                         key > 0 ? (index === 0 ? 'opacity-0' : 'opacity-100') : 'opacity-100'
                       )}
