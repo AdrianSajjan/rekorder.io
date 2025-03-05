@@ -314,12 +314,12 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
         let width: string | undefined;
         let height: string | undefined;
 
-        if (video.width > container.width || video.height > container.height) {
-          if (video.width > container.width) {
+        if (video.width >= container.width || video.height >= container.height) {
+          if (video.width >= container.width) {
             width = container.width + 'px';
             height = container.width / ratio + 'px';
           }
-          if (video.height > container.height) {
+          if (video.height >= container.height) {
             height = container.height + 'px';
             width = container.height * ratio + 'px';
           }
@@ -336,7 +336,7 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(({ container,
         if (width) video$.current.style.width = width;
         if (height) video$.current.style.height = height;
       },
-      200,
+      50,
       {
         leading: true,
       }

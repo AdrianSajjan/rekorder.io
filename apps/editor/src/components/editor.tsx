@@ -76,7 +76,7 @@ const Player = observer(({ style }: { style?: React.CSSProperties }) => {
 
   return (
     <div className="h-full w-full max-w-screen-md grid place-items-center transition-all duration-300 ease-in-out" style={style}>
-      <VideoPlayer ref={editor.initializeElement} src={source} controls={editor.sidebar !== 'crop'}>
+      <VideoPlayer ref={editor.initializeElement} src={source} controls={editor.sidebar === 'default'}>
         {editor.sidebar === 'crop' ? <Cropper /> : null}
       </VideoPlayer>
     </div>

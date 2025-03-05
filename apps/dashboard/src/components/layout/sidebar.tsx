@@ -3,6 +3,7 @@ import { CaretDown, CaretLeft, CaretUp, Icon, ListChecks } from '@phosphor-icons
 import { Link, useLocation } from '@tanstack/react-router';
 import { Brand, Button, GoogleChromeIcon, Tooltip } from '@rekorder.io/ui';
 import { cn } from '@rekorder.io/utils';
+import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 
 import { navigations } from '../../constants/layout';
 import { SidebarMode, useAppStore } from '../../store/app';
@@ -57,7 +58,12 @@ function SidebarProfile({ mode }: { mode: SidebarMode }) {
   return (
     <button className={cn('flex items-center gap-3 hover:bg-background-main/70 rounded-b-lg transition-colors w-full', mode === 'expanded' ? 'pl-4 py-3 pr-5' : 'p-3')}>
       <div className={cn('border-2 border-accent-light p-0.5 rounded-full shrink-0', mode === 'expanded' ? 'h-11 w-11' : 'h-10 w-10 mx-auto')}>
-        <img src={user.user_metadata.avatar_url} alt={user.user_metadata.full_name} className="h-full w-full rounded-full shrink-0" />
+        <Avatar className="h-full w-full rounded-full shrink-0">
+          <AvatarImage src={user.user_metadata.avatar_url} alt={user.user_metadata.full_name} className="h-full w-full rounded-full shrink-0" />
+          <AvatarFallback className="text-sm rounded-full leading-1 flex items-center justify-center h-full w-full bg-background-main text-background-text uppercase">
+            {user.user_metadata.full_name ? user.user_metadata.full_name.slice(0, 2) : 'U'}
+          </AvatarFallback>
+        </Avatar>
       </div>
       {mode === 'expanded' ? (
         <Fragment>
