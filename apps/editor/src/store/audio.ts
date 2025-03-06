@@ -1,15 +1,9 @@
 import { nanoid } from 'nanoid';
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
 import { MP4Player } from '@rekorder.io/player';
-import { Editor } from './editor';
 
-interface AudioFile {
-  id: string;
-  file: File;
-  end: number;
-  start: number;
-  duration: number;
-}
+import { Editor } from './editor';
+import { AudioFile, AudioTimeline } from '../types/audio';
 
 export class Audio {
   private _editor: Editor;
@@ -17,6 +11,7 @@ export class Audio {
   private _player: MP4Player | null;
 
   files: AudioFile[];
+  selected: string | null;
 
   constructor(editor: Editor) {
     this._url = null;
@@ -24,7 +19,8 @@ export class Audio {
     this._editor = editor;
 
     this.files = [];
-    makeAutoObservable(this);
+    this.selected = null;
+    makeAutoObservable(this, {}, { autoBind: true });
   }
 
   static createInstance(editor: Editor) {
@@ -40,14 +36,23 @@ export class Audio {
   async createAudioFile(file: File) {
     return new Promise<void>((resolve, reject) => {
       const url = URL.createObjectURL(file);
-      const audio = new window.Audio();
+      const audio = document.createElement('audio');
 
       audio.addEventListener(
         'loadedmetadata',
         () => {
-          const id = nanoid();
-          const duration = audio.duration;
-          this.files.push({ id, file, duration: duration, start: 0, end: duration });
+          runInAction(() => {
+            this.files.push({
+              id: nanoid(),
+              file,
+              duration: audio.duration,
+              layer: Math.max(this.files.length + 1, 1),
+              timeline: {
+                start: 0,
+                end: audio.duration,
+              },
+            });
+          });
           URL.revokeObjectURL(url);
           resolve();
         },
@@ -58,7 +63,7 @@ export class Audio {
         'error',
         () => {
           URL.revokeObjectURL(url);
-          reject('Failed to load audio file');
+          reject();
         },
         { once: true }
       );
@@ -67,7 +72,21 @@ export class Audio {
     });
   }
 
-  async removeAudioFile(id: string) {
+  removeAudioFile(id: string) {
     this.files = this.files.filter((file) => file.id !== id);
+  }
+
+  updateAudioFileLayer(id: string, layer: number) {
+    const file = this.files.find((file) => file.id === id);
+    if (file) file.layer = layer;
+  }
+
+  updateAudioFileTimeline(id: string, timeline: Partial<AudioTimeline>) {
+    const file = this.files.find((file) => file.id === id);
+    if (file) file.timeline = Object.assign(file.timeline, timeline);
+  }
+
+  selectAudioFileToggle(id: string) {
+    this.selected = this.selected === id ? null : id;
   }
 }

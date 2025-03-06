@@ -1,13 +1,13 @@
+import { round } from 'lodash';
 import { useCallback } from 'react';
 import { observer } from 'mobx-react';
 import { useDropzone } from 'react-dropzone';
 
 import { theme } from '@rekorder.io/ui';
-import { CloudArrowUp, FileAudio, MusicNotes, Trash, X } from '@phosphor-icons/react';
+import { CloudArrowUp, FileAudio, MusicNotes, X } from '@phosphor-icons/react';
 
 import { editor } from '../../../store/editor';
 import { ActionButton, ActionButtonContent } from '../../ui/modify-button';
-import { round } from 'lodash';
 
 const AudioSidebar = observer(() => {
   const handleSelectFile = useCallback(async (files: File[]) => {
@@ -33,7 +33,7 @@ const AudioSidebar = observer(() => {
             className="w-full rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-borders-input p-6 hover:bg-background-light transition-colors cursor-pointer"
             {...getRootProps()}
           >
-            <input {...getInputProps()} />
+            <input id="sidebar-audio-explorer" {...getInputProps()} />
             {isDragActive ? <FileAudio weight="bold" size={24} color={theme.colors.accent.dark} /> : <CloudArrowUp weight="bold" size={24} color={theme.colors.accent.dark} />}
             <div className="space-y-1.5 text-center mt-4 mb-5">
               <h4 className="text-sm font-medium">{isDragActive ? 'Drop your audio here' : 'Browse a file or drag & drop it here'}</h4>

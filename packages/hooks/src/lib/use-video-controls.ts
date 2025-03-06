@@ -2,6 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 const isVideoPlaying = (video: HTMLVideoElement) => !!(video.currentTime > 0 && !video.paused && !video.ended && video.readyState > 2);
 
+export interface VideoControls {
+  playing: boolean;
+  muted: boolean;
+  duration: number;
+  seek: number;
+  volume: number;
+}
+
 export function useVideoControls(element: HTMLVideoElement) {
   const [controls, setControls] = useState(() => ({ playing: isVideoPlaying(element), muted: element.muted, duration: element.duration, seek: element.currentTime, volume: element.volume }));
 
