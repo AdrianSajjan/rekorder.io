@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { FastForward, MagnifyingGlassMinus, MagnifyingGlassPlus, MusicNotes, MusicNoteSimple, Pause, Play, Scissors, Trash } from '@phosphor-icons/react';
+import { FastForward, MagnifyingGlassMinus, MagnifyingGlassPlus, MusicNotes, Pause, Play, Scissors, Trash } from '@phosphor-icons/react';
 
 import { Button, Tooltip } from '@rekorder.io/ui';
 import { useMeasure, useVideoControls } from '@rekorder.io/hooks';
