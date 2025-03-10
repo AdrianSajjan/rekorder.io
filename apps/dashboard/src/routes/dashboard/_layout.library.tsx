@@ -26,7 +26,7 @@ function LibraryPage() {
           <span>Record a new video</span>
         </Button>
       </Heading>
-      <div className="grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4 gap-6 mt-8">
+      <div className="grid grid-cols-1 @md:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4 gap-6 mt-8">
         {data.map((recording) => (
           <RecordingCard key={recording.id} recording={recording} />
         ))}

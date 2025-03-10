@@ -4,6 +4,7 @@ export * from './style/resolved-style';
 export * from './button/button';
 export * from './spinner/spinner';
 export * from './button/loading-button';
+export * from './dropdown-menu/dropdown-menu';
 
 export * from './select/select';
 export * from './switch/switch';
