@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Clock, VideoCamera } from '@phosphor-icons/react';
 
 import { Button } from '@rekorder.io/ui';
@@ -36,10 +36,23 @@ function LibraryPage() {
 }
 
 function RecordingCard({ recording }: { recording: Tables<'recordings'> }) {
+  const navigate = Route.useNavigate();
   const thumbnail = recording.original_thumbnail ? supabase.storage.from('thumbnails').getPublicUrl(parseUploadedFilePath(recording.original_thumbnail)) : null;
 
+  const handleClick = () => {
+    navigate({
+      to: '/dashboard/recording/$id',
+      params: {
+        id: recording.id,
+      },
+    });
+  };
+
   return (
-    <button className="group relative cursor-pointer bg-card-background rounded-xl overflow-hidden border border-borders-input transition-all duration-200 hover:shadow-xl hover:shadow-gray-100/35">
+    <button
+      onClick={handleClick}
+      className="group relative cursor-pointer bg-card-background rounded-xl overflow-hidden border border-borders-input transition-all duration-200 hover:shadow-xl hover:shadow-gray-100/35"
+    >
       <div className="aspect-video bg-primary-light/5 relative border-b border-primary-light/10">
         <div className="absolute inset-0 flex items-center justify-center">
           <VideoCamera size={36} weight="fill" className="text-primary-main" />
