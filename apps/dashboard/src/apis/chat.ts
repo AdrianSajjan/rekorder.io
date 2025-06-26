@@ -1,3 +1,5 @@
+import { api } from '../libs/api-client';
+
 export const ChatApiFactory = {
   Endpoint: 'http://localhost:8000',
   Keys: {
@@ -5,7 +7,7 @@ export const ChatApiFactory = {
   },
   Api: {
     Chat: async (prompt: string, session: string) => {
-      const response = await fetch(ChatApiFactory.Endpoint + '/api/chat/stream', {
+      const response = await api(ChatApiFactory.Endpoint + '/api/chat/stream', {
         method: 'POST',
         body: JSON.stringify({ prompt, session }),
       });

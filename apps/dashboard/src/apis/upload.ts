@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { createFormData } from '../libs/form-helper';
+import { api } from '../libs/api-client';
 
 export const UploadApiFactory = {
   Endpoint: 'https://qa.zocket.com/engine/ads/api/v1/upload_template_S3',
@@ -14,9 +15,10 @@ export const UploadApiFactory = {
     UploadFile: async (file: File | Blob) => {
       const form = createFormData({ template_file: file }, {});
 
-      const response = await fetch(UploadApiFactory.Endpoint, {
+      const response = await api(UploadApiFactory.Endpoint, {
         method: 'POST',
         body: form,
+        multipart: true,
       });
 
       if (!response.ok) {
