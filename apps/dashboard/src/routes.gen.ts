@@ -20,14 +20,13 @@ import { Route as AuthLayoutImport } from './routes/auth/_layout'
 import { Route as ExtensionLayoutRegisterImport } from './routes/extension/_layout.register'
 import { Route as ExtensionLayoutLoginImport } from './routes/extension/_layout.login'
 import { Route as ExtensionLayoutCallbackImport } from './routes/extension/_layout.callback'
+import { Route as DashboardSharedLayoutImport } from './routes/dashboard/shared/_layout'
 import { Route as DashboardRecordingLayoutImport } from './routes/dashboard/recording/_layout'
-import { Route as DashboardLayoutSharedImport } from './routes/dashboard/_layout.shared'
-import { Route as DashboardLayoutSettingsImport } from './routes/dashboard/_layout.settings'
 import { Route as DashboardLayoutLibraryImport } from './routes/dashboard/_layout.library'
-import { Route as DashboardLayoutAnalyticsImport } from './routes/dashboard/_layout.analytics'
 import { Route as AuthLayoutRegisterImport } from './routes/auth/_layout.register'
 import { Route as AuthLayoutLoginImport } from './routes/auth/_layout.login'
 import { Route as AuthLayoutCallbackImport } from './routes/auth/_layout.callback'
+import { Route as DashboardSharedLayoutIdImport } from './routes/dashboard/shared/_layout.$id'
 import { Route as DashboardRecordingLayoutIdImport } from './routes/dashboard/recording/_layout.$id'
 import { Route as AuthLayoutPasswordForgotImport } from './routes/auth/_layout.password.forgot'
 
@@ -36,6 +35,7 @@ import { Route as AuthLayoutPasswordForgotImport } from './routes/auth/_layout.p
 const ExtensionImport = createFileRoute('/extension')()
 const DashboardImport = createFileRoute('/dashboard')()
 const AuthImport = createFileRoute('/auth')()
+const DashboardSharedImport = createFileRoute('/dashboard/shared')()
 const DashboardRecordingImport = createFileRoute('/dashboard/recording')()
 
 // Create/Update Routes
@@ -62,6 +62,12 @@ const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardSharedRoute = DashboardSharedImport.update({
+  id: '/shared',
+  path: '/shared',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 const DashboardRecordingRoute = DashboardRecordingImport.update({
@@ -103,32 +109,19 @@ const ExtensionLayoutCallbackRoute = ExtensionLayoutCallbackImport.update({
   getParentRoute: () => ExtensionLayoutRoute,
 } as any)
 
+const DashboardSharedLayoutRoute = DashboardSharedLayoutImport.update({
+  id: '/_layout',
+  getParentRoute: () => DashboardSharedRoute,
+} as any)
+
 const DashboardRecordingLayoutRoute = DashboardRecordingLayoutImport.update({
   id: '/_layout',
   getParentRoute: () => DashboardRecordingRoute,
 } as any)
 
-const DashboardLayoutSharedRoute = DashboardLayoutSharedImport.update({
-  id: '/shared',
-  path: '/shared',
-  getParentRoute: () => DashboardLayoutRoute,
-} as any)
-
-const DashboardLayoutSettingsRoute = DashboardLayoutSettingsImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => DashboardLayoutRoute,
-} as any)
-
 const DashboardLayoutLibraryRoute = DashboardLayoutLibraryImport.update({
   id: '/library',
   path: '/library',
-  getParentRoute: () => DashboardLayoutRoute,
-} as any)
-
-const DashboardLayoutAnalyticsRoute = DashboardLayoutAnalyticsImport.update({
-  id: '/analytics',
-  path: '/analytics',
   getParentRoute: () => DashboardLayoutRoute,
 } as any)
 
@@ -148,6 +141,12 @@ const AuthLayoutCallbackRoute = AuthLayoutCallbackImport.update({
   id: '/callback',
   path: '/callback',
   getParentRoute: () => AuthLayoutRoute,
+} as any)
+
+const DashboardSharedLayoutIdRoute = DashboardSharedLayoutIdImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardSharedLayoutRoute,
 } as any)
 
 const DashboardRecordingLayoutIdRoute = DashboardRecordingLayoutIdImport.update(
@@ -238,32 +237,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLayoutRegisterImport
       parentRoute: typeof AuthLayoutImport
     }
-    '/dashboard/_layout/analytics': {
-      id: '/dashboard/_layout/analytics'
-      path: '/analytics'
-      fullPath: '/dashboard/analytics'
-      preLoaderRoute: typeof DashboardLayoutAnalyticsImport
-      parentRoute: typeof DashboardLayoutImport
-    }
     '/dashboard/_layout/library': {
       id: '/dashboard/_layout/library'
       path: '/library'
       fullPath: '/dashboard/library'
       preLoaderRoute: typeof DashboardLayoutLibraryImport
-      parentRoute: typeof DashboardLayoutImport
-    }
-    '/dashboard/_layout/settings': {
-      id: '/dashboard/_layout/settings'
-      path: '/settings'
-      fullPath: '/dashboard/settings'
-      preLoaderRoute: typeof DashboardLayoutSettingsImport
-      parentRoute: typeof DashboardLayoutImport
-    }
-    '/dashboard/_layout/shared': {
-      id: '/dashboard/_layout/shared'
-      path: '/shared'
-      fullPath: '/dashboard/shared'
-      preLoaderRoute: typeof DashboardLayoutSharedImport
       parentRoute: typeof DashboardLayoutImport
     }
     '/dashboard/recording': {
@@ -279,6 +257,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/recording'
       preLoaderRoute: typeof DashboardRecordingLayoutImport
       parentRoute: typeof DashboardRecordingRoute
+    }
+    '/dashboard/shared': {
+      id: '/dashboard/shared'
+      path: '/shared'
+      fullPath: '/dashboard/shared'
+      preLoaderRoute: typeof DashboardSharedImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/shared/_layout': {
+      id: '/dashboard/shared/_layout'
+      path: '/shared'
+      fullPath: '/dashboard/shared'
+      preLoaderRoute: typeof DashboardSharedLayoutImport
+      parentRoute: typeof DashboardSharedRoute
     }
     '/extension/_layout/callback': {
       id: '/extension/_layout/callback'
@@ -315,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRecordingLayoutIdImport
       parentRoute: typeof DashboardRecordingLayoutImport
     }
+    '/dashboard/shared/_layout/$id': {
+      id: '/dashboard/shared/_layout/$id'
+      path: '/$id'
+      fullPath: '/dashboard/shared/$id'
+      preLoaderRoute: typeof DashboardSharedLayoutIdImport
+      parentRoute: typeof DashboardSharedLayoutImport
+    }
   }
 }
 
@@ -349,17 +348,11 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface DashboardLayoutRouteChildren {
-  DashboardLayoutAnalyticsRoute: typeof DashboardLayoutAnalyticsRoute
   DashboardLayoutLibraryRoute: typeof DashboardLayoutLibraryRoute
-  DashboardLayoutSettingsRoute: typeof DashboardLayoutSettingsRoute
-  DashboardLayoutSharedRoute: typeof DashboardLayoutSharedRoute
 }
 
 const DashboardLayoutRouteChildren: DashboardLayoutRouteChildren = {
-  DashboardLayoutAnalyticsRoute: DashboardLayoutAnalyticsRoute,
   DashboardLayoutLibraryRoute: DashboardLayoutLibraryRoute,
-  DashboardLayoutSettingsRoute: DashboardLayoutSettingsRoute,
-  DashboardLayoutSharedRoute: DashboardLayoutSharedRoute,
 }
 
 const DashboardLayoutRouteWithChildren = DashboardLayoutRoute._addFileChildren(
@@ -391,14 +384,41 @@ const DashboardRecordingRouteChildren: DashboardRecordingRouteChildren = {
 const DashboardRecordingRouteWithChildren =
   DashboardRecordingRoute._addFileChildren(DashboardRecordingRouteChildren)
 
+interface DashboardSharedLayoutRouteChildren {
+  DashboardSharedLayoutIdRoute: typeof DashboardSharedLayoutIdRoute
+}
+
+const DashboardSharedLayoutRouteChildren: DashboardSharedLayoutRouteChildren = {
+  DashboardSharedLayoutIdRoute: DashboardSharedLayoutIdRoute,
+}
+
+const DashboardSharedLayoutRouteWithChildren =
+  DashboardSharedLayoutRoute._addFileChildren(
+    DashboardSharedLayoutRouteChildren,
+  )
+
+interface DashboardSharedRouteChildren {
+  DashboardSharedLayoutRoute: typeof DashboardSharedLayoutRouteWithChildren
+}
+
+const DashboardSharedRouteChildren: DashboardSharedRouteChildren = {
+  DashboardSharedLayoutRoute: DashboardSharedLayoutRouteWithChildren,
+}
+
+const DashboardSharedRouteWithChildren = DashboardSharedRoute._addFileChildren(
+  DashboardSharedRouteChildren,
+)
+
 interface DashboardRouteChildren {
   DashboardLayoutRoute: typeof DashboardLayoutRouteWithChildren
   DashboardRecordingRoute: typeof DashboardRecordingRouteWithChildren
+  DashboardSharedRoute: typeof DashboardSharedRouteWithChildren
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLayoutRoute: DashboardLayoutRouteWithChildren,
   DashboardRecordingRoute: DashboardRecordingRouteWithChildren,
+  DashboardSharedRoute: DashboardSharedRouteWithChildren,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -441,16 +461,15 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthLayoutCallbackRoute
   '/auth/login': typeof AuthLayoutLoginRoute
   '/auth/register': typeof AuthLayoutRegisterRoute
-  '/dashboard/analytics': typeof DashboardLayoutAnalyticsRoute
   '/dashboard/library': typeof DashboardLayoutLibraryRoute
-  '/dashboard/settings': typeof DashboardLayoutSettingsRoute
-  '/dashboard/shared': typeof DashboardLayoutSharedRoute
   '/dashboard/recording': typeof DashboardRecordingLayoutRouteWithChildren
+  '/dashboard/shared': typeof DashboardSharedLayoutRouteWithChildren
   '/extension/callback': typeof ExtensionLayoutCallbackRoute
   '/extension/login': typeof ExtensionLayoutLoginRoute
   '/extension/register': typeof ExtensionLayoutRegisterRoute
   '/auth/password/forgot': typeof AuthLayoutPasswordForgotRoute
   '/dashboard/recording/$id': typeof DashboardRecordingLayoutIdRoute
+  '/dashboard/shared/$id': typeof DashboardSharedLayoutIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -461,16 +480,15 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthLayoutCallbackRoute
   '/auth/login': typeof AuthLayoutLoginRoute
   '/auth/register': typeof AuthLayoutRegisterRoute
-  '/dashboard/analytics': typeof DashboardLayoutAnalyticsRoute
   '/dashboard/library': typeof DashboardLayoutLibraryRoute
-  '/dashboard/settings': typeof DashboardLayoutSettingsRoute
-  '/dashboard/shared': typeof DashboardLayoutSharedRoute
   '/dashboard/recording': typeof DashboardRecordingLayoutRouteWithChildren
+  '/dashboard/shared': typeof DashboardSharedLayoutRouteWithChildren
   '/extension/callback': typeof ExtensionLayoutCallbackRoute
   '/extension/login': typeof ExtensionLayoutLoginRoute
   '/extension/register': typeof ExtensionLayoutRegisterRoute
   '/auth/password/forgot': typeof AuthLayoutPasswordForgotRoute
   '/dashboard/recording/$id': typeof DashboardRecordingLayoutIdRoute
+  '/dashboard/shared/$id': typeof DashboardSharedLayoutIdRoute
 }
 
 export interface FileRoutesById {
@@ -485,17 +503,17 @@ export interface FileRoutesById {
   '/auth/_layout/callback': typeof AuthLayoutCallbackRoute
   '/auth/_layout/login': typeof AuthLayoutLoginRoute
   '/auth/_layout/register': typeof AuthLayoutRegisterRoute
-  '/dashboard/_layout/analytics': typeof DashboardLayoutAnalyticsRoute
   '/dashboard/_layout/library': typeof DashboardLayoutLibraryRoute
-  '/dashboard/_layout/settings': typeof DashboardLayoutSettingsRoute
-  '/dashboard/_layout/shared': typeof DashboardLayoutSharedRoute
   '/dashboard/recording': typeof DashboardRecordingRouteWithChildren
   '/dashboard/recording/_layout': typeof DashboardRecordingLayoutRouteWithChildren
+  '/dashboard/shared': typeof DashboardSharedRouteWithChildren
+  '/dashboard/shared/_layout': typeof DashboardSharedLayoutRouteWithChildren
   '/extension/_layout/callback': typeof ExtensionLayoutCallbackRoute
   '/extension/_layout/login': typeof ExtensionLayoutLoginRoute
   '/extension/_layout/register': typeof ExtensionLayoutRegisterRoute
   '/auth/_layout/password/forgot': typeof AuthLayoutPasswordForgotRoute
   '/dashboard/recording/_layout/$id': typeof DashboardRecordingLayoutIdRoute
+  '/dashboard/shared/_layout/$id': typeof DashboardSharedLayoutIdRoute
 }
 
 export interface FileRouteTypes {
@@ -508,16 +526,15 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/login'
     | '/auth/register'
-    | '/dashboard/analytics'
     | '/dashboard/library'
-    | '/dashboard/settings'
-    | '/dashboard/shared'
     | '/dashboard/recording'
+    | '/dashboard/shared'
     | '/extension/callback'
     | '/extension/login'
     | '/extension/register'
     | '/auth/password/forgot'
     | '/dashboard/recording/$id'
+    | '/dashboard/shared/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -527,16 +544,15 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/login'
     | '/auth/register'
-    | '/dashboard/analytics'
     | '/dashboard/library'
-    | '/dashboard/settings'
-    | '/dashboard/shared'
     | '/dashboard/recording'
+    | '/dashboard/shared'
     | '/extension/callback'
     | '/extension/login'
     | '/extension/register'
     | '/auth/password/forgot'
     | '/dashboard/recording/$id'
+    | '/dashboard/shared/$id'
   id:
     | '__root__'
     | '/'
@@ -549,17 +565,17 @@ export interface FileRouteTypes {
     | '/auth/_layout/callback'
     | '/auth/_layout/login'
     | '/auth/_layout/register'
-    | '/dashboard/_layout/analytics'
     | '/dashboard/_layout/library'
-    | '/dashboard/_layout/settings'
-    | '/dashboard/_layout/shared'
     | '/dashboard/recording'
     | '/dashboard/recording/_layout'
+    | '/dashboard/shared'
+    | '/dashboard/shared/_layout'
     | '/extension/_layout/callback'
     | '/extension/_layout/login'
     | '/extension/_layout/register'
     | '/auth/_layout/password/forgot'
     | '/dashboard/recording/_layout/$id'
+    | '/dashboard/shared/_layout/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -616,17 +632,15 @@ export const routeTree = rootRoute
       "filePath": "dashboard",
       "children": [
         "/dashboard/_layout",
-        "/dashboard/recording"
+        "/dashboard/recording",
+        "/dashboard/shared"
       ]
     },
     "/dashboard/_layout": {
       "filePath": "dashboard/_layout.tsx",
       "parent": "/dashboard",
       "children": [
-        "/dashboard/_layout/analytics",
-        "/dashboard/_layout/library",
-        "/dashboard/_layout/settings",
-        "/dashboard/_layout/shared"
+        "/dashboard/_layout/library"
       ]
     },
     "/extension": {
@@ -656,20 +670,8 @@ export const routeTree = rootRoute
       "filePath": "auth/_layout.register.tsx",
       "parent": "/auth/_layout"
     },
-    "/dashboard/_layout/analytics": {
-      "filePath": "dashboard/_layout.analytics.tsx",
-      "parent": "/dashboard/_layout"
-    },
     "/dashboard/_layout/library": {
       "filePath": "dashboard/_layout.library.tsx",
-      "parent": "/dashboard/_layout"
-    },
-    "/dashboard/_layout/settings": {
-      "filePath": "dashboard/_layout.settings.tsx",
-      "parent": "/dashboard/_layout"
-    },
-    "/dashboard/_layout/shared": {
-      "filePath": "dashboard/_layout.shared.tsx",
       "parent": "/dashboard/_layout"
     },
     "/dashboard/recording": {
@@ -684,6 +686,20 @@ export const routeTree = rootRoute
       "parent": "/dashboard/recording",
       "children": [
         "/dashboard/recording/_layout/$id"
+      ]
+    },
+    "/dashboard/shared": {
+      "filePath": "dashboard/shared",
+      "parent": "/dashboard",
+      "children": [
+        "/dashboard/shared/_layout"
+      ]
+    },
+    "/dashboard/shared/_layout": {
+      "filePath": "dashboard/shared/_layout.tsx",
+      "parent": "/dashboard/shared",
+      "children": [
+        "/dashboard/shared/_layout/$id"
       ]
     },
     "/extension/_layout/callback": {
@@ -705,6 +721,10 @@ export const routeTree = rootRoute
     "/dashboard/recording/_layout/$id": {
       "filePath": "dashboard/recording/_layout.$id.tsx",
       "parent": "/dashboard/recording/_layout"
+    },
+    "/dashboard/shared/_layout/$id": {
+      "filePath": "dashboard/shared/_layout.$id.tsx",
+      "parent": "/dashboard/shared/_layout"
     }
   }
 }

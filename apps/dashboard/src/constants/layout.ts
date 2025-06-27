@@ -7,22 +7,22 @@ export const navigations = [
     value: 'library',
     href: '/dashboard/library',
   },
-  {
-    icon: ChartDonut,
-    label: 'Analytics',
-    value: 'analytics',
-    href: '/dashboard/analytics',
-  },
-  {
-    icon: ShareFat,
-    label: 'Shared Videos',
-    value: 'shared',
-    href: '/dashboard/shared',
-  },
-  {
-    icon: GearSix,
-    label: 'Settings',
-    value: 'settings',
-    href: '/dashboard/settings',
-  },
+  // {
+  //   icon: ChartDonut,
+  //   label: 'Analytics',
+  //   value: 'analytics',
+  //   href: '/dashboard/analytics',
+  // },
+  // {
+  //   icon: ShareFat,
+  //   label: 'Shared Videos',
+  //   value: 'shared',
+  //   href: '/dashboard/shared',
+  // },
+  // {
+  //   icon: GearSix,
+  //   label: 'Settings',
+  //   value: 'settings',
+  //   href: '/dashboard/settings',
+  // },
 ];

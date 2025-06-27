@@ -4,7 +4,7 @@ import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router'
 import { useAuthenticationStore } from '../../../store/authentication'
 import { Sidebar } from '../../../components/layout/sidebar'
 
-export const Route = createFileRoute('/dashboard/shared copy/_layout')({
+export const Route = createFileRoute('/dashboard/shared/_layout')({
   component: RecordingLayout,
 })
 

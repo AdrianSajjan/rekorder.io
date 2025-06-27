@@ -1,9 +1,17 @@
+import { z } from 'zod';
 import { api } from '../libs/api-client';
 
 export const ChatApiFactory = {
   Endpoint: 'http://localhost:8000',
   Keys: {
     Chat: (recording: string) => ['chat', recording],
+  },
+  Schemas: {
+    Response: {
+      Chat: z.object({
+        message: z.string(),
+      }),
+    },
   },
   Api: {
     Chat: async (prompt: string, session: string) => {
@@ -17,7 +25,7 @@ export const ChatApiFactory = {
         throw error;
       }
 
-      return response.body;
+      return response.json().then(ChatApiFactory.Schemas.Response.Chat.parse);
     },
   },
 };

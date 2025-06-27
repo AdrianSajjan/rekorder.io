@@ -25,7 +25,7 @@ interface IChatMessage {
   type: 'user' | 'agent'
 }
 
-export const Route = createFileRoute('/dashboard/shared copy/_layout/$id')({
+export const Route = createFileRoute('/dashboard/shared/_layout/$id')({
   component: RouteComponent,
   loader: async ({ params, context: { queryClient } }) => {
     const data = await queryClient.ensureQueryData(
