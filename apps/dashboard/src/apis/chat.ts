@@ -27,5 +27,18 @@ export const ChatApiFactory = {
 
       return response.json().then(ChatApiFactory.Schemas.Response.Chat.parse);
     },
+    SetupSemanticSearch: async (id: string, docs: string) => {
+      const response = await api(ChatApiFactory.Endpoint + '/api/chat/semantics', {
+        method: 'POST',
+        body: JSON.stringify({ id, docs }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Oops! Something went wrong.' }));
+        throw error;
+      }
+
+      return response.json();
+    },
   },
 };

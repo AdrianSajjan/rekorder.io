@@ -112,6 +112,9 @@ importers:
       dexie:
         specifier: ^4.0.10
         version: 4.0.10
+      easy-speech:
+        specifier: ^2.4.0
+        version: 2.4.0
       fabric:
         specifier: 6.5.3
         version: 6.5.3(encoding@0.1.13)
@@ -4518,6 +4521,10 @@ packages:
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
+
+  easy-speech@2.4.0:
+    resolution: {integrity: sha512-wpMv29DEoeP/eyXr4aXpDqd9DvlXl7aQs7BgfKbjGVxqkmQPgNmpbF5YULaTH5bc/5qrteg5MDfCD2Zd0qr4rQ==}
+    engines: {node: '>= 14.x'}
 
   ecc-jsbn@0.1.2:
     resolution: {integrity: sha512-eh9O+hwRHNbG4BLTjEl3nw044CkGm5X6LoaCf7LPp7UU8Qrt47JYNi6nPX8xjW97TKGKm1ouctg0QSpZe9qrnw==}
@@ -13078,6 +13085,8 @@ snapshots:
       gopd: 1.2.0
 
   eastasianwidth@0.2.0: {}
+
+  easy-speech@2.4.0: {}
 
   ecc-jsbn@0.1.2:
     dependencies:

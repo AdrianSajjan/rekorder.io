@@ -9,11 +9,13 @@ export const RecordingApiFactory = Object.freeze({
   Apis: {
     FetchAll: async () => {
       const recording = await supabase.from('recordings').select('*').throwOnError();
-      return recording.data || [];
+      if (!recording.data) throw new Error('Failed to fetch recordings');
+      return recording.data;
     },
     FetchOne: async (id: string) => {
       const recording = await supabase.from('recordings').select('*').eq('id', id).single().throwOnError();
-      return recording.data || null;
+      if (!recording.data) throw new Error('Recording not found');
+      return recording.data;
     },
   },
   Queries: {

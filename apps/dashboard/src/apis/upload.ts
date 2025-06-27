@@ -1,6 +1,7 @@
+import { supabase } from '@rekorder.io/database';
+import { createFilePath } from '@rekorder.io/utils';
+import { User } from '@supabase/supabase-js';
 import { z } from 'zod';
-import { createFormData } from '../libs/form-helper';
-import { api } from '../libs/api-client';
 
 export const UploadApiFactory = {
   Endpoint: 'https://qa.zocket.com/engine/ads/api/v1/upload_template_S3',
@@ -12,21 +13,10 @@ export const UploadApiFactory = {
     },
   },
   Apis: {
-    UploadFile: async (file: File | Blob) => {
-      const form = createFormData({ template_file: file }, {});
-
-      const response = await api(UploadApiFactory.Endpoint, {
-        method: 'POST',
-        body: form,
-        multipart: true,
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Oops! Something went wrong.' }));
-        throw error;
-      }
-
-      return response.json().then(UploadApiFactory.Schemas.Response.UploadFile.parse);
+    UploadFile: async (user: User, file: File | Blob) => {
+      const result = await supabase.storage.from('frames').upload(createFilePath(user, file), file);
+      if (result.error) throw result.error;
+      return result.data;
     },
   },
 };

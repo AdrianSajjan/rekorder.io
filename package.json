@@ -37,6 +37,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dexie": "^4.0.10",
+    "easy-speech": "^2.4.0",
     "fabric": "6.5.3",
     "fix-webm-duration": "^1.0.6",
     "lodash": "^4.17.21",
