@@ -6,7 +6,7 @@ import { useState, useRef } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { Brain, Lightning, MagicWand } from '@phosphor-icons/react';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
 import { supabase } from '@rekorder.io/database';
@@ -22,6 +22,7 @@ export const Route = createFileRoute('/dashboard/recording/_layout/$id')({
 
 function RouteComponent() {
   const params = Route.useParams();
+  const queryClient = useQueryClient();
   const knowledge$ = useRef<HTMLInputElement>(null);
 
   const [isLinkCopied, setLinkCopied] = useState(false);
@@ -31,6 +32,14 @@ function RouteComponent() {
 
   const { mutate: setupSemanticSearch, isPending: isSetupSemanticSearchPending } = useMutation({
     mutationFn: (docs: string) => ChatApiFactory.Api.SetupSemanticSearch(params.id, docs),
+  });
+
+  const { mutate: setupAutoDocs, isPending: isSetupAutoDocsPending } = useMutation({
+    mutationFn: async (url: string) => RecordingApiFactory.Apis.ProcessRecording(url),
+  });
+
+  const { mutate: updateRecording, isPending: isUpdateRecordingPending } = useMutation({
+    mutationFn: (documentMarkdown: string) => RecordingApiFactory.Apis.UpdateRecording(params.id, { document_markdown: documentMarkdown }),
   });
 
   const handleSetupSemanticSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +61,26 @@ function RouteComponent() {
     } else {
       toast.error('No file selected');
     }
+  };
+
+  const handleSetupAutoDocs = () => {
+    const source = supabase.storage.from('recordings').getPublicUrl(parseUploadedFilePath(recording.original_file)).data.publicUrl;
+    setupAutoDocs(source, {
+      onSuccess(data) {
+        updateRecording(data.documentation, {
+          onSuccess() {
+            queryClient.invalidateQueries({ queryKey: RecordingApiFactory.Keys.FetchOne(params.id) });
+            toast.success('Auto docs setup successfully');
+          },
+          onError() {
+            toast.error('Failed to setup auto docs');
+          },
+        });
+      },
+      onError() {
+        toast.error('Failed to setup auto docs');
+      },
+    });
   };
 
   const handleCopyLink = () => {
@@ -104,7 +133,7 @@ function RouteComponent() {
                     <ReactMarkdown remarkPlugins={[RemarkGfm]}>{recording.document_markdown}</ReactMarkdown>
                   </div>
                 ) : (
-                  <Button disabled={isSetupSemanticSearchPending}>
+                  <Button disabled={isSetupAutoDocsPending || isUpdateRecordingPending} onClick={handleSetupAutoDocs}>
                     <MagicWand size={16} weight="fill" />
                     <span>Generate Document Now</span>
                   </Button>

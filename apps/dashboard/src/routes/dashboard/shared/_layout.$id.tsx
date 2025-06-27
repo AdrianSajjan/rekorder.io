@@ -243,7 +243,7 @@ function RouteComponent() {
           </div>
         </header>
         <div className="flex flex-col items-center justify-center flex-1 shrink-0">
-          <VideoPlayer crossOrigin="anonymous" src={source} ref={video$} className="!h-fit" />
+          <VideoPlayer crossOrigin="anonymous" src={source} ref={video$} className="!h-fit !rounded-2xl" />
         </div>
       </main>
       <aside className="h-screen p-2.5 sticky top-0 bg-card-background shrink-0 w-full max-w-xl">
